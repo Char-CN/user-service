@@ -1,0 +1,71 @@
+系统名称：
+<select ds_index="system_list" class="easyui-combobox" style="width: 200px;" editable="false"></select>
+<table ds_index="permissions_table" style="width: 100%;"></table>
+<script>
+	$(function() {
+		var windowId = '$windowId';
+		var this_window = $("#" + windowId);
+		var systemId = 0;
+
+		var init = function() {
+			$.ajax({
+				url : $.ds.url.find_system_all,
+				type : 'post',
+				async : false,
+				success : function(data) {
+					var select = this_window.DSFind("system_list");
+					for ( var i in data) {
+						var sel = "";
+						if (i == 0) {
+							sel = "selected";
+							systemId = data[i].id;
+						}
+						var op = $('<option value="' + data[i].id + '" ' + sel + '>' + data[i].systemName + '</option>');
+						select.append(op);
+					}
+				},
+				fail : function() {
+					$.ds.show("出现莫名失败。");
+				}
+			});
+
+			this_window.DSFind("system_list").combobox({
+				onChange : function(newValue, oldValue) {
+					systemId = newValue;
+					refer();
+				}
+			});
+
+		};
+		
+		var refer = function() {
+			this_window.DSFind("permissions_table").treegrid({
+				url : $.ds.url.find_permissions_by_parent_id + "?parentId=-1&systemId=" + systemId,
+				idField : 'id',
+				rownumbers : true,
+				treeField : 'permissionsName',
+				columns : [ [ {
+					title : 'id',
+					field : 'id',
+					hidden : true
+				}, {
+					title : '名称',
+					field : 'permissionsName',
+					width : "30%"
+				}, {
+					title : '地址',
+					field : 'url',
+					width : "65%"
+				} ] ],
+				onBeforeExpand : function(row) {
+					//动态设置展开查询的url
+					var url = $.ds.url.find_permissions_by_parent_id + "?parentId=" + row.id + "&systemId=" + systemId;
+					this_window.DSFind("permissions_table").treegrid("options").url = url;
+					return true;
+				}
+			});
+		};
+		init();
+		refer();
+	});
+</script>

@@ -2,16 +2,6 @@ $(function() {
 	$.ds = {
 		url : {
 			root : window.location.href,
-			get_params : "dataservice/getparams.do",
-			get_config : "dataservice/getconfig.do",
-			tree : "view/getTree.do",
-			configs_by_group_id : "view/getConfigsByGroupId.do",
-			config_by_id : "view/getConfigById.do",
-			datasource_all : "view/getDataSourceAll.do",
-			run_config : "view/runConfig.do",
-			delete_config : "view/deleteConfig.do",
-			save_config_order : "view/saveConfigOrderAsc.do",
-			save_config : "view/saveConfig.do",
 			find_user_by_page : "user/findUserByPage.do",
 			find_user_by_id : "user/findUserById.do",
 			save_user : "user/saveUser.do",
@@ -25,7 +15,8 @@ $(function() {
 			find_system_by_id : "user/findSystemById.do",
 			save_system : "user/saveSystem.do",
 			del_system : "user/delSystem.do",
-			find_system_all : "user/findSystemAll.do"
+			find_system_all : "user/findSystemAll.do",
+			find_permissions_by_parent_id : "user/findPermissionsByParentID.do"
 		},
 		commons : {
 			chooseTreeId : "",
@@ -163,8 +154,8 @@ $(function() {
 			user : '<i class="fa fa-user fa-1x"></i>',
 			role_cls : 'fa fa-users fa-1x',
 			role : '<i class="fa fa-users fa-1x"></i>',
-			permission_cls : 'fa fa-th-list fa-1x',
-			permission : '<i class="fa fa-th-list fa-1x"></i>',
+			permissions_cls : 'fa fa-th-list fa-1x',
+			permissions : '<i class="fa fa-th-list fa-1x"></i>',
 			system_cls : 'fa fa-desktop fa-1x',
 			system : '<i class="fa fa-desktop fa-1x"></i>'
 		},

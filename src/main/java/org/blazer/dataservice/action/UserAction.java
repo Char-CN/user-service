@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.blazer.dataservice.body.Body;
 import org.blazer.dataservice.body.PageBody;
+import org.blazer.dataservice.body.PermissionsTreeBody;
+import org.blazer.dataservice.entity.USPermissions;
 import org.blazer.dataservice.entity.USRole;
 import org.blazer.dataservice.entity.USSystem;
 import org.blazer.dataservice.entity.USUser;
@@ -188,4 +190,12 @@ public class UserAction extends BaseAction {
 	/**
 	 * TODO : 权限相关
 	 */
+
+	@ResponseBody
+	@RequestMapping("/findPermissionsByParentID")
+	public List<PermissionsTreeBody> findPermissionsByParentID(HttpServletRequest request, HttpServletResponse response) {
+		logger.debug("map : " + getParamMap(request));
+		return userService.findPermissionsByParentID(getParamMap(request));
+	}
+
 }

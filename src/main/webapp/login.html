@@ -19,8 +19,8 @@
  *
  */
 body {
-	margin :0;
-	padding :0;
+	margin: 0;
+	padding: 0;
 	background: #f8f8f8;
 	text-align: center;
 	color: #fff;
@@ -201,44 +201,65 @@ input.Captcha {
 <body>
 	<div class="page-container">
 		<h1>登录（Login）</h1>
-		<input type="text" id="userName" placeholder="请输入您的用户名！" style="width:300px; float:left;">
-		<input type="password" id="password" placeholder="请输入您的用户密码！" style="width:300px; float:left;">
-<!-- 			<input type="text" name="Captcha" placeholder="请输入验证码！" style="width:200px; float:left;"> -->
-		<button type="button" style="font-size: 24px; width:200px; outline:none;" onclick="login()">登&nbsp;&nbsp;&nbsp;&nbsp;录</button>
+		<input type="text" id="userName" placeholder="请输入您的用户名！" style="width: 300px; float: left;"> <input type="password" id="password"
+			placeholder="请输入您的用户密码！" style="width: 300px; float: left;">
+		<!-- 			<input type="text" name="Captcha" placeholder="请输入验证码！" style="width:200px; float:left;"> -->
+		<button type="button" style="font-size: 24px; width: 200px; outline: none;" onclick="login()">登&nbsp;&nbsp;&nbsp;&nbsp;录</button>
 	</div>
-<!-- Javascript -->
-<script type="text/javascript" src="js/jquery.min.js"></script>
-<script type="text/javascript" src="../js/supersized.3.2.7.min.js"></script>
-<script type="text/javascript" src="../js/supersized-init.js"></script>
-<script type="text/javascript" src="../js/scripts.js"></script>
-<script>
-	var getQueryString = function(name) {
-	    var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
-	    var r = window.location.search.substr(1).match(reg);
-	    if (r != null) {
-	        return unescape(r[2]);
-	    }
-	    return null;
-	};
-	$.get("/userservice/checkuser.do", function(data) {
-		if (data != undefined && data.split(",", 2)[0] == "true") {
-			location.href = getQueryString("url");
-		}
-	});
-	var login = function() {
-		var userName = document.getElementById("userName").value;
-		var password = document.getElementById("password").value;
-		$.get("/userservice/login.do", {
-			userName : userName,
-			password : password
-		}, function(data) {
-			alert(data.message);
-			if (data.status == 200) {
+	<!-- Javascript -->
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="../js/supersized.3.2.7.min.js"></script>
+	<script type="text/javascript" src="../js/supersized-init.js"></script>
+	<script type="text/javascript" src="../js/scripts.js"></script>
+	<script>
+		var getQueryString = function(name) {
+			var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+			var r = window.location.search.substr(1).match(reg);
+			if (r != null) {
+				return unescape(r[2]);
+			}
+			return null;
+		};
+		$.get("/userservice/checkuser.do", function(data) {
+			if (data != undefined && data.split(",", 2)[0] == "true") {
 				location.href = getQueryString("url");
 			}
 		});
-	};
-</script>
+		var login = function() {
+			var userName = $("#userName").val();
+			var password = $("#password").val();
+			if (userName == "") {
+				alert("请填写用户名");
+				return;
+			}
+			if (password == "") {
+				alert("请填写密码");
+				return;
+			}
+			$.get("/userservice/login.do", {
+				userName : userName,
+				password : password
+			}, function(data) {
+				alert(data.message);
+				if (data.status == 200) {
+					location.href = getQueryString("url");
+				}
+			});
+		};
+		$("#userName").focus();
+		$("input").keydown(function(event) {
+			var e = event || window.event || arguments.callee.caller.arguments[0];
+			// 按 Esc 
+			if (e && e.keyCode == 27) {
+				$("#userName").val("");
+				$("#password").val("");
+			}
+			// enter 键
+			if (e && e.keyCode == 13) {
+				login();
+			}
+		});
+	</script>
 </body>
 </html>
 

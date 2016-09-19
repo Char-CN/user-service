@@ -7,8 +7,10 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.blazer.dataservice.body.PageBody;
+import org.blazer.dataservice.body.PermissionsTreeBody;
+import org.blazer.dataservice.cache.SystemCache;
 import org.blazer.dataservice.cache.UserCache;
-import org.blazer.dataservice.entity.USPermission;
+import org.blazer.dataservice.entity.USPermissions;
 import org.blazer.dataservice.entity.USRole;
 import org.blazer.dataservice.entity.USSystem;
 import org.blazer.dataservice.entity.USUser;
@@ -30,9 +32,12 @@ public class UserService {
 
 	@Autowired
 	JdbcTemplate jdbcTemplate;
-	
+
 	@Autowired
 	UserCache userCache;
+
+	@Autowired
+	SystemCache systemCache;
 
 	/**
 	 * TODO : 系统相关
@@ -45,7 +50,7 @@ public class UserService {
 			List<USSystem> list = HMap.toList(rst, USSystem.class);
 			logger.debug("rst size : " + rst.size());
 			if (list.size() > 0) {
-				logger.debug("role : " + list.get(0));
+				logger.debug("system : " + list.get(0));
 			}
 			return list;
 		} catch (Exception e) {
@@ -107,9 +112,9 @@ public class UserService {
 		jdbcTemplate.update(sql, id);
 	}
 
-	public USSystem findSystemById(HashMap<String, String> params) {
-		String sql = "select * from us_system where id = ? and enable=1";
-		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql, IntegerUtil.getInt0(params.get("id")));
+	public USSystem findSystemById(Integer id) {
+		String sql = "select * from us_system where id=? and enable=1";
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql, id);
 		USSystem system = new USSystem();
 		if (list.size() == 0) {
 			return system;
@@ -119,6 +124,10 @@ public class UserService {
 		system.setSystemName(StringUtil.getStrEmpty(map.get("system_name")));
 		system.setRemark(StringUtil.getStrEmpty(map.get("remark")));
 		return system;
+	}
+
+	public USSystem findSystemById(HashMap<String, String> params) {
+		return findSystemById(IntegerUtil.getInt0(params.get("id")));
 	}
 
 	/**
@@ -327,13 +336,41 @@ public class UserService {
 	 * TODO : 权限相关
 	 */
 
-	public void savePermissions(USPermission permission) {
-
+	public void savePermissions(USPermissions permission) {
+		
 	}
 
 	public void delPermissions(Integer id) {
 		logger.debug("del permissions id " + id);
 
+	}
+
+	public List<PermissionsTreeBody> findPermissionsByParentID(HashMap<String, String> params) {
+		Integer parentId = IntegerUtil.getInt(params.get("parentId"));
+		Integer systemId = IntegerUtil.getInt(params.get("systemId"));
+		if (parentId == null || systemId == null) {
+			return new ArrayList<PermissionsTreeBody>();
+		}
+		String sql = "select * from us_permissions where enable=1 and parent_id=? and system_id=?";
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql, parentId, systemId);
+		logger.debug(SqlUtil.Show(sql, parentId, systemId));
+		List<PermissionsTreeBody> rst = null;
+		try {
+			rst = HMap.toList(list, PermissionsTreeBody.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		for (PermissionsTreeBody body : rst) {
+			body.setState("closed");
+			// fa-c 兼容easyui的自定义fa-c
+			if (parentId == -1) {
+				body.setIconCls("fa fa-pagelines fa-1x fa-c");
+			} else {
+				body.setIconCls("fa fa-pied-piper fa-1x fa-c");
+			}
+		}
+		logger.debug(rst.toString());
+		return rst;
 	}
 
 }
