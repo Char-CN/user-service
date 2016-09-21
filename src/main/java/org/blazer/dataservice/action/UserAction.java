@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.blazer.dataservice.body.Body;
 import org.blazer.dataservice.body.PageBody;
 import org.blazer.dataservice.body.PermissionsTreeBody;
-import org.blazer.dataservice.entity.USPermissions;
 import org.blazer.dataservice.entity.USRole;
 import org.blazer.dataservice.entity.USSystem;
 import org.blazer.dataservice.entity.USUser;

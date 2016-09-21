@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.blazer.dataservice.body.Body;
 import org.blazer.dataservice.body.LoginBody;
+import org.blazer.dataservice.cache.CookieSecondsCache;
 import org.blazer.dataservice.cache.PermissionsCache;
 import org.blazer.dataservice.cache.UserCache;
 import org.blazer.dataservice.model.LoginType;
@@ -16,6 +17,7 @@ import org.blazer.dataservice.model.PermissionsModel;
 import org.blazer.dataservice.model.SessionModel;
 import org.blazer.dataservice.model.UserModel;
 import org.blazer.dataservice.util.DesUtil;
+import org.blazer.dataservice.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +31,9 @@ public class UserServiceAction extends BaseAction {
 
 	private static Logger logger = LoggerFactory.getLogger(UserServiceAction.class);
 	private static final String COOKIE_KEY = "MYSESSIONID";
+	@SuppressWarnings("unused")
 	private static final String COOKIE_PATH = "/";
-	private static final int COOKIE_SECONDS = 10;
+	private static final int COOKIE_SECONDS = 60 * 30;
 	// LoginType,UserId,UserName,ExpireTime
 	private static final String LOGGIN_FORMAT = "%s,%s,%s,%s";
 
@@ -39,6 +42,9 @@ public class UserServiceAction extends BaseAction {
 
 	@Autowired
 	PermissionsCache permissionsCache;
+
+	@Autowired
+	CookieSecondsCache cookieSecondsCache;
 
 	@RequestMapping("/getlogin")
 	public String getLogin(HttpServletRequest request, HttpServletResponse response) {
@@ -50,12 +56,12 @@ public class UserServiceAction extends BaseAction {
 	public String logout(HttpServletRequest request, HttpServletResponse response) {
 		String sessionId = getSessionId(request);
 		logger.debug("logout session id : " + sessionId);
-		Cookie cookie = new Cookie(COOKIE_KEY, null);
-		cookie.setPath(COOKIE_PATH);
-		cookie.setMaxAge(0);
-		response.addCookie(cookie);
+//		Cookie cookie = new Cookie(COOKIE_KEY, null);
+//		cookie.setPath(COOKIE_PATH);
+//		cookie.setMaxAge(0);
+//		response.addCookie(cookie);
 //		return new Body().setStatus("200").setMessage("注销成功");
-		return true + "," + null;
+		return true + ",";
 	}
 
 	@ResponseBody
@@ -65,7 +71,7 @@ public class UserServiceAction extends BaseAction {
 		sessionStr = DesUtil.decrypt(sessionStr);
 		SessionModel sessionModel = new SessionModel(sessionStr);
 		if (checkUser(sessionModel)) {
-			delay(sessionModel, response);
+			delay(sessionModel, response, request);
 			return new Body().setMessage("您好，" + getUser(request, response).getUserName() + "，您已经登录，无需再次登录");
 		}
 		HashMap<String, String> params = getParamMap(request);
@@ -81,10 +87,13 @@ public class UserServiceAction extends BaseAction {
 		logger.debug("params password : " + params.get("password"));
 		if (um.getPassword().equals(params.get("password").toString())) {
 			String sessionId = DesUtil.encrypt(String.format(LOGGIN_FORMAT, LoginType.userName.index, um.getId(), um.getUserName(), getExpire()));
-			Cookie cookie = new Cookie(COOKIE_KEY, sessionId);
-			cookie.setPath(COOKIE_PATH);
-			cookie.setMaxAge(COOKIE_SECONDS);
-			response.addCookie(cookie);
+//			Cookie cookie = new Cookie(COOKIE_KEY, sessionId);
+//			String domain = StringUtil.findOneStrByReg(request.getRequestURL().toString(), "[http|https]://([a-zA-Z0-9.]*).*");
+//			logger.debug("domain : " + domain);
+//			cookie.setDomain(domain);
+//			cookie.setPath(COOKIE_PATH);
+//			cookie.setMaxAge(COOKIE_SECONDS);
+//			response.addCookie(cookie);
 			return new LoginBody().setSessionId(sessionId).setMessage("登录成功");
 		}
 		return new Body().setStatus("201").setMessage("密码不对，登录失败");
@@ -96,8 +105,9 @@ public class UserServiceAction extends BaseAction {
 		String sessionStr = getSessionId(request);
 		sessionStr = DesUtil.decrypt(sessionStr);
 		SessionModel sessionModel = new SessionModel(sessionStr);
-		delay(sessionModel, response);
+		delay(sessionModel, response, request);
 		UserModel um = getUser(sessionModel);
+		// 该类变量太多，必须设置成null，否则无法使用@ResponseBody转换。
 		um.setPermissionsBitmap(null);
 		return um;
 	}
@@ -109,7 +119,8 @@ public class UserServiceAction extends BaseAction {
 		sessionStr = DesUtil.decrypt(sessionStr);
 		SessionModel sessionModel = new SessionModel(sessionStr);
 //		delay(sessionModel, response);
-		return checkUser(sessionModel) + "," + delay(sessionModel, response);
+		boolean flag = checkUser(sessionModel);
+		return flag + "," + (flag ? delay(sessionModel, response, request) : "");
 	}
 
 	@ResponseBody
@@ -118,7 +129,7 @@ public class UserServiceAction extends BaseAction {
 		String sessionStr = getSessionId(request);
 		sessionStr = DesUtil.decrypt(sessionStr);
 		SessionModel sessionModel = new SessionModel(sessionStr);
-		String newSession = delay(sessionModel, response);
+		String newSession = delay(sessionModel, response, request);
 		return (newSession != null) + "," + newSession;
 	}
 
@@ -128,7 +139,8 @@ public class UserServiceAction extends BaseAction {
 		String sessionStr = getSessionId(request);
 		sessionStr = DesUtil.decrypt(sessionStr);
 		SessionModel sessionModel = new SessionModel(sessionStr);
-		String newSession = delay(sessionModel, response);
+		HashMap<String, String> params = getParamMap(request);
+		String newSession = delay(sessionModel, response, request);
 		if (!checkUser(sessionModel)) {
 			logger.debug("checkurl by 1 false");
 			return false + "," + newSession;
@@ -138,8 +150,8 @@ public class UserServiceAction extends BaseAction {
 			logger.debug("checkurl by 2 false");
 			return false + "," + newSession;
 		}
-		PermissionsModel permissionsModel = permissionsCache.get(permissionsCache.get(getSystemName_Url(request)));
-		logger.debug("url key : " + getSystemName_Url(request));
+		PermissionsModel permissionsModel = permissionsCache.get(permissionsCache.get(getSystemName_Url(params)));
+		logger.debug("url key : " + getSystemName_Url(params));
 		logger.debug("permissionsModel : " + permissionsModel);
 		logger.debug("bitmap : " + um.getPermissionsBitmap());
 		// 系统存了该URL并且该URL的bitmap是没有值的
@@ -180,16 +192,35 @@ public class UserServiceAction extends BaseAction {
 		return true;
 	}
 
-	public String delay(SessionModel sessionModel, HttpServletResponse response) {
+	public String delay(SessionModel sessionModel, HttpServletResponse response, HttpServletRequest request) {
 		UserModel um = getUser(sessionModel);
 		if (um == null) {
 			return null;
 		}
+		String domain = StringUtil.findOneStrByReg(request.getRequestURL().toString(), "[http|https]://([a-zA-Z0-9.]*).*");
+		logger.debug("domain : " + domain);
 		String newSessionId = DesUtil.encrypt(String.format(LOGGIN_FORMAT, LoginType.userName.index, um.getId(), um.getUserName(), getExpire()));
-		Cookie cookie = new Cookie(COOKIE_KEY, newSessionId);
-		cookie.setPath(COOKIE_PATH);
-		cookie.setMaxAge(COOKIE_SECONDS);
-		response.addCookie(cookie);
+//		Cookie cookie = new Cookie(COOKIE_KEY, newSessionId);
+//		cookie.setPath(COOKIE_PATH);
+//		cookie.setDomain(domain);
+//		cookie.setMaxAge(COOKIE_SECONDS);
+//		response.addCookie(cookie);
+		return newSessionId;
+	}
+
+	public String delay(SessionModel sessionModel, HttpServletResponse response, HttpServletRequest request, HashMap<String, String> params) {
+		UserModel um = getUser(sessionModel);
+		if (um == null) {
+			return null;
+		}
+		String domain = StringUtil.findOneStrByReg(request.getRequestURL().toString(), "[http|https]://([a-zA-Z0-9.]*).*");
+		logger.debug("domain : " + domain);
+		String newSessionId = DesUtil.encrypt(String.format(LOGGIN_FORMAT, LoginType.userName.index, um.getId(), um.getUserName(), getExpire()));
+//		Cookie cookie = new Cookie(COOKIE_KEY, newSessionId);
+//		cookie.setPath(COOKIE_PATH);
+//		cookie.setDomain(domain);
+//		cookie.setMaxAge(cookieSecondsCache.get(getUrl(params)));
+//		response.addCookie(cookie);
 		return newSessionId;
 	}
 
@@ -197,12 +228,23 @@ public class UserServiceAction extends BaseAction {
 		return COOKIE_SECONDS * 1000 + System.currentTimeMillis();
 	}
 
-	private String getSystemName_Url(HttpServletRequest request) {
-		HashMap<String, String> params = getParamMap(request);
-		return params.get("systemName") + "_" + params.get("url");
+	private String getSystemName_Url(HashMap<String, String> params) {
+		return getSystemName(params) + "_" + getUrl(params);
+	}
+
+	private String getSystemName(HashMap<String, String> params) {
+		return params.get("systemName");
+	}
+
+	private String getUrl(HashMap<String, String> params) {
+		return params.get("url");
 	}
 
 	private String getSessionId(HttpServletRequest request) {
+		String paramKey = getParamMap(request).get(COOKIE_KEY);
+		if (StringUtils.isNotBlank(paramKey)) {
+			return paramKey;
+		}
 		Cookie[] cookies = request.getCookies();
 		Cookie sessionCookie = null;
 		if (cookies != null) {
@@ -213,10 +255,6 @@ public class UserServiceAction extends BaseAction {
 					break;
 				}
 			}
-		}
-		String paramKey = getParamMap(request).get(COOKIE_KEY);
-		if (StringUtils.isNotBlank(paramKey)) {
-			return paramKey;
 		}
 		return sessionCookie == null ? null : sessionCookie.getValue();
 	}
