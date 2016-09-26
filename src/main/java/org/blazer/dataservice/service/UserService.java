@@ -14,19 +14,23 @@ import org.blazer.dataservice.entity.USPermissions;
 import org.blazer.dataservice.entity.USRole;
 import org.blazer.dataservice.entity.USSystem;
 import org.blazer.dataservice.entity.USUser;
+import org.blazer.dataservice.exception.DuplicateUserName;
 import org.blazer.dataservice.exception.NotAllowDeleteException;
+import org.blazer.dataservice.util.DesUtil;
 import org.blazer.dataservice.util.HMap;
 import org.blazer.dataservice.util.IntegerUtil;
 import org.blazer.dataservice.util.SqlUtil;
 import org.blazer.dataservice.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 @Service(value = "userService")
-public class UserService {
+public class UserService implements InitializingBean {
 
 	private static Logger logger = LoggerFactory.getLogger(UserService.class);
 
@@ -38,6 +42,16 @@ public class UserService {
 
 	@Autowired
 	SystemCache systemCache;
+
+	@Value("#{systemProperties.new_user_defalut_password}")
+	private String _newUserDefaultPassword;
+
+	private String newUserDefaultPassword;
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		newUserDefaultPassword = DesUtil.encrypt(_newUserDefaultPassword);
+	}
 
 	/**
 	 * TODO : 系统相关
@@ -185,19 +199,36 @@ public class UserService {
 		return user;
 	}
 
-	public void saveUser(USUser user, String roleIds) {
+	public void saveUser(USUser user, String roleIds) throws DuplicateUserName {
+		// 验证是否重名
 		Integer userId = null;
 		if (user.getId() == null) {
-			String sql = "insert into us_user(user_name,user_name_cn,email,phone_number,remark) values(?,?,?,?,?)";
-			jdbcTemplate.update(sql, user.getUserName(), user.getUserNameCn(), user.getEmail(), user.getPhoneNumber(), user.getRemark());
+			String checkSql = "select 1 from us_user where enable=1 and user_name=? ";
+			List<Map<String, Object>> rst = jdbcTemplate.queryForList(checkSql, user.getUserName());
+			if (rst != null && rst.size() != 0) {
+				throw new DuplicateUserName("已经存在该用户名！");
+			}
+			String sql = "insert into us_user(user_name,user_name_cn,password,email,phone_number,remark) values(?,?,?,?,?,?)";
+			jdbcTemplate.update(sql, user.getUserName(), user.getUserNameCn(), newUserDefaultPassword, user.getEmail(), user.getPhoneNumber(), user.getRemark());
 			userId = IntegerUtil.getInt0(jdbcTemplate.queryForMap("select max(id) as id from us_user where enable=1").get("id"));
 		} else {
+			String checkSql = "select 1 from us_user where enable=1 and user_name=? and id != ?";
+			List<Map<String, Object>> rst = jdbcTemplate.queryForList(checkSql, user.getUserName(), user.getId());
+			if (rst != null && rst.size() != 0) {
+				throw new DuplicateUserName("已经存在该用户名！");
+			}
 			userId = user.getId();
-			String sql = "update us_user set user_name=?,user_name_cn=?,email=?,phone_number=?,remark=? where id=?";
+			String sql = "update us_user set user_name=?,user_name_cn=?,email=?,phone_number=?,remark=? where id=? and enable=1";
 			jdbcTemplate.update(sql, user.getUserName(), user.getUserNameCn(), user.getEmail(), user.getPhoneNumber(), user.getRemark(), user.getId());
 		}
 		userCache.init(userId);
 		addUserRole(userId, roleIds);
+	}
+
+	public void updatePwd(USUser user) {
+		String sql = "update us_user set password=? where id=? and enable=1";
+		jdbcTemplate.update(sql, user.getPassword(), user.getId());
+		userCache.init(user.getId());
 	}
 
 	public void delUser(Integer id) {

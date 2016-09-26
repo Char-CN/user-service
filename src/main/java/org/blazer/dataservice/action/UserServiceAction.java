@@ -12,10 +12,12 @@ import org.blazer.dataservice.body.LoginBody;
 import org.blazer.dataservice.cache.CookieSecondsCache;
 import org.blazer.dataservice.cache.PermissionsCache;
 import org.blazer.dataservice.cache.UserCache;
+import org.blazer.dataservice.entity.USUser;
 import org.blazer.dataservice.model.LoginType;
 import org.blazer.dataservice.model.PermissionsModel;
 import org.blazer.dataservice.model.SessionModel;
 import org.blazer.dataservice.model.UserModel;
+import org.blazer.dataservice.service.UserService;
 import org.blazer.dataservice.util.DesUtil;
 import org.blazer.dataservice.util.StringUtil;
 import org.slf4j.Logger;
@@ -39,6 +41,9 @@ public class UserServiceAction extends BaseAction {
 
 	@Autowired
 	UserCache userCache;
+
+	@Autowired
+	UserService userService;
 
 	@Autowired
 	PermissionsCache permissionsCache;
@@ -75,17 +80,19 @@ public class UserServiceAction extends BaseAction {
 			return new Body().setMessage("您好，" + getUser(request, response).getUserName() + "，您已经登录，无需再次登录");
 		}
 		HashMap<String, String> params = getParamMap(request);
+		logger.debug("user name : " + params.get("userName"));
 		if (!params.containsKey("userName")) {
 			return new Body().setStatus("201").setMessage("登录失败");
 		}
-		logger.debug("user name : " + params.get("userName"));
 		UserModel um = userCache.get(params.get("userName").toString());
 		if (um == null) {
 			return new Body().setStatus("201").setMessage("找不到账号，登录失败");
 		}
-		logger.debug("user password : " + um.getPassword());
-		logger.debug("params password : " + params.get("password"));
-		if (um.getPassword().equals(params.get("password").toString())) {
+		if (logger.isDebugEnabled()) {
+			logger.debug("user password : " + um.getPassword());
+			logger.debug("params password : " + DesUtil.encrypt(params.get("password")));
+		}
+		if (um.getPassword().equals(DesUtil.encrypt(params.get("password")))) {
 			String sessionId = DesUtil.encrypt(String.format(LOGGIN_FORMAT, LoginType.userName.index, um.getId(), um.getUserName(), getExpire()));
 //			Cookie cookie = new Cookie(COOKIE_KEY, sessionId);
 //			String domain = StringUtil.findOneStrByReg(request.getRequestURL().toString(), "[http|https]://([a-zA-Z0-9.]*).*");
@@ -257,6 +264,33 @@ public class UserServiceAction extends BaseAction {
 			}
 		}
 		return sessionCookie == null ? null : sessionCookie.getValue();
+	}
+
+	@ResponseBody
+	@RequestMapping("/uppwd")
+	public Body uppwd(HttpServletRequest request, HttpServletResponse response) {
+		HashMap<String, String> params = getParamMap(request);
+		logger.debug("user name : " + params.get("userName"));
+		if (!params.containsKey("userName")) {
+			return new Body().setStatus("201").setMessage("修改失败");
+		}
+		UserModel um = userCache.get(params.get("userName").toString());
+		if (um == null) {
+			return new Body().setStatus("201").setMessage("找不到账号，修改失败");
+		}
+		if (logger.isDebugEnabled()) {
+			logger.debug("user password : " + um.getPassword());
+			logger.debug("params password : " + DesUtil.encrypt(params.get("password")));
+		}
+		if (um.getPassword().equals(DesUtil.encrypt(params.get("password")))) {
+			String newPassword1 = DesUtil.encrypt(params.get("newPassword1"));
+			USUser usUser = new USUser();
+			usUser.setId(um.getId());
+			usUser.setPassword(newPassword1);
+			userService.updatePwd(usUser);
+			return new Body().setStatus("200").setMessage("修改成功");
+		}
+		return new Body().setStatus("201").setMessage("密码错误，修改失败");
 	}
 
 }

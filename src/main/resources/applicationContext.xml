@@ -15,6 +15,8 @@
 
 	<util:properties id="dataSourceProperties" location="classpath:datasource.properties"></util:properties>
 
+	<util:properties id="systemProperties" location="classpath:system.properties"></util:properties>
+
 	<bean id="propertyConfigurer4Server" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="ignoreResourceNotFound" value="true" />
 		<property name="ignoreUnresolvablePlaceholders" value="false" />
