@@ -21,13 +21,13 @@
 		});
 
 		// 刷新
-		var a_reload = $('<a href="javascript:void(0)" class="icon-reload"></a>');
+		var a_reload = $('<a href="javascript:void(0)" class="icon-reload easyui-tooltip" title="刷新"></a>');
 		this_window.parent().find(" .panel-tool").prepend(a_reload);
 		a_reload.click(function() {
 			table.datagrid('reload');
 		});
 		// 删除
-		var a_del = $('<a href="javascript:void(0)" class="icon-remove"></a>');
+		var a_del = $('<a href="javascript:void(0)" class="icon-remove easyui-tooltip" title="删除"></a>');
 		this_window.parent().find(" .panel-tool").prepend(a_del);
 		a_del.click(function() {
 			var selected = table.datagrid('getSelected');
@@ -45,8 +45,29 @@
 				});
 			});
 		});
+		// 初始化密码
+		var a_init_pwd = $('<a href="javascript:void(0)" class="icon-redo easyui-tooltip" title="初始化密码"></a>');
+		this_window.parent().find(" .panel-tool").prepend(a_init_pwd);
+		a_init_pwd.click(function() {
+			var selected = table.datagrid('getSelected');
+			var idx = table.datagrid('getRowIndex', selected);
+			if (selected == undefined || selected == null) {
+				$.ds.show('请选择一个用户！');
+				return;
+			}
+			$.ds.confirm("该操作是在用户忘记密码时，由系统管理员重新初始化密码，请知晓。", function() {
+				$.ds.confirm("您确定要初始化该用户的密码吗？该操作不可逆！", function() {
+					$.post($.ds.url.init_pwd_user, {
+						id : selected.id
+					}, function(data) {
+						$.ds.show(data.message);
+						table.datagrid('reload');
+					});
+				});
+			});
+		});
 		// 编辑
-		var a_edit = $('<a href="javascript:void(0)" class="icon-edit"></a>');
+		var a_edit = $('<a href="javascript:void(0)" class="icon-edit easyui-tooltip" title="编辑"></a>');
 		this_window.parent().find(" .panel-tool").prepend(a_edit);
 		a_edit.click(function() {
 			var selected = table.datagrid('getSelected');
@@ -67,7 +88,7 @@
 			});
 		});
 		// 增加
-		var a_add = $('<a href="javascript:void(0)" class="icon-add"></a>');
+		var a_add = $('<a href="javascript:void(0)" class="icon-add easyui-tooltip" title="新增"></a>');
 		this_window.parent().find(" .panel-tool").prepend(a_add);
 		a_add.click(function() {
 			$.ds.commons.openDialog("user_add", $.ds.icon.user, "用户增加", "users/user_add.html", null, {

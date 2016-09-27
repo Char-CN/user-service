@@ -6,6 +6,7 @@ $(function() {
 			find_user_by_id : "user/findUserById.do",
 			save_user : "user/saveUser.do",
 			del_user : "user/delUser.do",
+			init_pwd_user : "user/initPwd.do",
 			find_role_by_page : "user/findRoleByPage.do",
 			find_role_by_id : "user/findRoleById.do",
 			save_role : "user/saveRole.do",

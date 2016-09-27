@@ -231,6 +231,12 @@ public class UserService implements InitializingBean {
 		userCache.init(user.getId());
 	}
 
+	public void initPwd(Integer userId) {
+		String sql = "update us_user set password=? where id=? and enable=1";
+		jdbcTemplate.update(sql, newUserDefaultPassword, userId);
+		userCache.init(userId);
+	}
+
 	public void delUser(Integer id) {
 		logger.debug("userId " + id);
 		String sql = "update us_user set enable=0 where id=?";

@@ -136,6 +136,19 @@ public class UserAction extends BaseAction {
 		return new Body().setMessage("删除成功！");
 	}
 
+	@ResponseBody
+	@RequestMapping("/initPwd")
+	public Body initPwd(@RequestParam Integer id) throws Exception {
+		logger.debug("userid : " + id);
+		try {
+			userService.initPwd(id);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			return new Body().error().setMessage("初始化密码失败：" + e.getMessage());
+		}
+		return new Body().setMessage("初始化密码成功！");
+	}
+
 	/**
 	 * TODO : 角色相关
 	 */
