@@ -26,6 +26,25 @@
 		a_reload.click(function() {
 			table.datagrid('reload');
 		});
+		// 删除
+		var a_del = $('<a href="javascript:void(0)" class="icon-remove"></a>');
+		this_window.parent().find(" .panel-tool").prepend(a_del);
+		a_del.click(function() {
+			var selected = table.datagrid('getSelected');
+			var idx = table.datagrid('getRowIndex', selected);
+			if (selected == undefined || selected == null) {
+				$.ds.show('请选择一个用户！');
+				return;
+			}
+			$.ds.confirm("您确定要删除该用户吗？", function() {
+				$.post($.ds.url.del_user, {
+					id : selected.id
+				}, function(data) {
+					$.ds.show(data.message);
+					table.datagrid('reload');
+				});
+			});
+		});
 		// 编辑
 		var a_edit = $('<a href="javascript:void(0)" class="icon-edit"></a>');
 		this_window.parent().find(" .panel-tool").prepend(a_edit);
