@@ -144,7 +144,7 @@ public class UserCache extends BaseCache implements InitializingBean {
 		this.add(userModel);
 	}
 
-	public void clear() {
+	private void clear() {
 		getCache().clear();
 	}
 
@@ -164,6 +164,7 @@ public class UserCache extends BaseCache implements InitializingBean {
 
 	public UserModel get(String userName) {
 		if (!contains(userName)) {
+			logger.debug("not found " + userName + ", init start ~");
 			this.init(userName);
 		}
 		if (!contains(userName)) {

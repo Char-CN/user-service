@@ -61,12 +61,13 @@ public class UserServiceAction extends BaseAction {
 	public String logout(HttpServletRequest request, HttpServletResponse response) {
 		String sessionId = getSessionId(request);
 		logger.debug("logout session id : " + sessionId);
-//		Cookie cookie = new Cookie(COOKIE_KEY, null);
-//		cookie.setPath(COOKIE_PATH);
-//		cookie.setMaxAge(0);
-//		response.addCookie(cookie);
-//		return new Body().setStatus("200").setMessage("注销成功");
-		return true + ",";
+		// Cookie cookie = new Cookie(COOKIE_KEY, null);
+		// cookie.setPath(COOKIE_PATH);
+		// cookie.setMaxAge(0);
+		// response.addCookie(cookie);
+		// return new Body().setStatus("200").setMessage("注销成功");
+//		return true + ",";
+		return output(true, "");
 	}
 
 	@ResponseBody
@@ -94,13 +95,15 @@ public class UserServiceAction extends BaseAction {
 		}
 		if (um.getPassword().equals(DesUtil.encrypt(params.get("password")))) {
 			String sessionId = DesUtil.encrypt(String.format(LOGGIN_FORMAT, LoginType.userName.index, um.getId(), um.getUserName(), getExpire()));
-//			Cookie cookie = new Cookie(COOKIE_KEY, sessionId);
-//			String domain = StringUtil.findOneStrByReg(request.getRequestURL().toString(), "[http|https]://([a-zA-Z0-9.]*).*");
-//			logger.debug("domain : " + domain);
-//			cookie.setDomain(domain);
-//			cookie.setPath(COOKIE_PATH);
-//			cookie.setMaxAge(COOKIE_SECONDS);
-//			response.addCookie(cookie);
+			// Cookie cookie = new Cookie(COOKIE_KEY, sessionId);
+			// String domain =
+			// StringUtil.findOneStrByReg(request.getRequestURL().toString(),
+			// "[http|https]://([a-zA-Z0-9.]*).*");
+			// logger.debug("domain : " + domain);
+			// cookie.setDomain(domain);
+			// cookie.setPath(COOKIE_PATH);
+			// cookie.setMaxAge(COOKIE_SECONDS);
+			// response.addCookie(cookie);
 			return new LoginBody().setSessionId(sessionId).setMessage("登录成功");
 		}
 		return new Body().setStatus("201").setMessage("密码不对，登录失败");
@@ -114,9 +117,19 @@ public class UserServiceAction extends BaseAction {
 		SessionModel sessionModel = new SessionModel(sessionStr);
 		delay(sessionModel, response, request);
 		UserModel um = getUser(sessionModel);
+		if (um == null) {
+			return null;
+		}
 		// 该类变量太多，必须设置成null，否则无法使用@ResponseBody转换。
-		um.setPermissionsBitmap(null);
-		return um;
+		UserModel rst = new UserModel();
+		rst.setId(um.getId());
+		rst.setEmail(um.getEmail());
+		rst.setPassword(um.getPassword());
+		rst.setPermissionsBitmap(null);
+		rst.setPhoneNumber(um.getPhoneNumber());
+		rst.setUserName(um.getUserName());
+		rst.setUserNameCn(um.getUserNameCn());
+		return rst;
 	}
 
 	@ResponseBody
@@ -125,9 +138,10 @@ public class UserServiceAction extends BaseAction {
 		String sessionStr = getSessionId(request);
 		sessionStr = DesUtil.decrypt(sessionStr);
 		SessionModel sessionModel = new SessionModel(sessionStr);
-//		delay(sessionModel, response);
+		// delay(sessionModel, response);
 		boolean flag = checkUser(sessionModel);
-		return flag + "," + (flag ? delay(sessionModel, response, request) : "");
+//		return flag + "," + (flag ? delay(sessionModel, response, request) : "");
+		return output(flag, (flag ? delay(sessionModel, response, request) : ""));
 	}
 
 	@ResponseBody
@@ -137,7 +151,8 @@ public class UserServiceAction extends BaseAction {
 		sessionStr = DesUtil.decrypt(sessionStr);
 		SessionModel sessionModel = new SessionModel(sessionStr);
 		String newSession = delay(sessionModel, response, request);
-		return (newSession != null) + "," + newSession;
+//		return (newSession != null) + "," + newSession;
+		return output(newSession != null, newSession);
 	}
 
 	@ResponseBody
@@ -150,12 +165,15 @@ public class UserServiceAction extends BaseAction {
 		String newSession = delay(sessionModel, response, request);
 		if (!checkUser(sessionModel)) {
 			logger.debug("checkurl by 1 false");
-			return false + "," + newSession;
+//			return false + "," + newSession;
+			return output(false, false, newSession);
 		}
 		UserModel um = getUser(sessionModel);
+		logger.debug("um : " + um);
 		if (um == null) {
 			logger.debug("checkurl by 2 false");
-			return false + "," + newSession;
+//			return false + "," + newSession;
+			return output(false, false, newSession);
 		}
 		PermissionsModel permissionsModel = permissionsCache.get(permissionsCache.get(getSystemName_Url(params)));
 		logger.debug("url key : " + getSystemName_Url(params));
@@ -164,23 +182,25 @@ public class UserServiceAction extends BaseAction {
 		// 系统存了该URL并且该URL的bitmap是没有值的
 		if (permissionsModel != null && um.getPermissionsBitmap() != null && !um.getPermissionsBitmap().contains(permissionsModel.getId())) {
 			logger.debug("checkurl by 3 false");
-			return false + "," + newSession;
+//			return false + "," + newSession;
+			return output(true, false, newSession);
 		}
 		logger.debug("checkurl true");
-		return true + "," + newSession;
+//		return true + "," + newSession;
+		return output(true, true, newSession);
 	}
 
 	private UserModel getUser(SessionModel sessionModel) {
 		if (!sessionModel.isValid()) {
-			return new UserModel();
+			return null;
 		}
 		if (sessionModel.getExpireTime() < System.currentTimeMillis()) {
-			return new UserModel();
+			return null;
 		}
 		UserModel um = userCache.get(sessionModel.getUserName());
-		if (um == null) {
-			return new UserModel();
-		}
+		// if (um == null) {
+		// return new UserModel();
+		// }
 		return um;
 	}
 
@@ -207,11 +227,11 @@ public class UserServiceAction extends BaseAction {
 		String domain = StringUtil.findOneStrByReg(request.getRequestURL().toString(), "[http|https]://([a-zA-Z0-9.]*).*");
 		logger.debug("domain : " + domain);
 		String newSessionId = DesUtil.encrypt(String.format(LOGGIN_FORMAT, LoginType.userName.index, um.getId(), um.getUserName(), getExpire()));
-//		Cookie cookie = new Cookie(COOKIE_KEY, newSessionId);
-//		cookie.setPath(COOKIE_PATH);
-//		cookie.setDomain(domain);
-//		cookie.setMaxAge(COOKIE_SECONDS);
-//		response.addCookie(cookie);
+		// Cookie cookie = new Cookie(COOKIE_KEY, newSessionId);
+		// cookie.setPath(COOKIE_PATH);
+		// cookie.setDomain(domain);
+		// cookie.setMaxAge(COOKIE_SECONDS);
+		// response.addCookie(cookie);
 		return newSessionId;
 	}
 
@@ -223,11 +243,11 @@ public class UserServiceAction extends BaseAction {
 		String domain = StringUtil.findOneStrByReg(request.getRequestURL().toString(), "[http|https]://([a-zA-Z0-9.]*).*");
 		logger.debug("domain : " + domain);
 		String newSessionId = DesUtil.encrypt(String.format(LOGGIN_FORMAT, LoginType.userName.index, um.getId(), um.getUserName(), getExpire()));
-//		Cookie cookie = new Cookie(COOKIE_KEY, newSessionId);
-//		cookie.setPath(COOKIE_PATH);
-//		cookie.setDomain(domain);
-//		cookie.setMaxAge(cookieSecondsCache.get(getUrl(params)));
-//		response.addCookie(cookie);
+		// Cookie cookie = new Cookie(COOKIE_KEY, newSessionId);
+		// cookie.setPath(COOKIE_PATH);
+		// cookie.setDomain(domain);
+		// cookie.setMaxAge(cookieSecondsCache.get(getUrl(params)));
+		// response.addCookie(cookie);
 		return newSessionId;
 	}
 
@@ -268,15 +288,17 @@ public class UserServiceAction extends BaseAction {
 
 	@ResponseBody
 	@RequestMapping("/uppwd")
-	public Body uppwd(HttpServletRequest request, HttpServletResponse response) {
+	public String uppwd(HttpServletRequest request, HttpServletResponse response) {
 		HashMap<String, String> params = getParamMap(request);
 		logger.debug("user name : " + params.get("userName"));
 		if (!params.containsKey("userName")) {
-			return new Body().setStatus("201").setMessage("修改失败");
+//			return new Body().setStatus("201").setMessage("修改失败");
+			return output(true, "修改失败");
 		}
 		UserModel um = userCache.get(params.get("userName").toString());
 		if (um == null) {
-			return new Body().setStatus("201").setMessage("找不到账号，修改失败");
+//			return new Body().setStatus("201").setMessage("找不到账号，修改失败");
+			return output(true, "找不到账号，修改失败");
 		}
 		if (logger.isDebugEnabled()) {
 			logger.debug("user password : " + um.getPassword());
@@ -288,9 +310,26 @@ public class UserServiceAction extends BaseAction {
 			usUser.setId(um.getId());
 			usUser.setPassword(newPassword1);
 			userService.updatePwd(usUser);
-			return new Body().setStatus("200").setMessage("修改成功");
+//			return new Body().setStatus("200").setMessage("修改成功");
+			return output(true, "修改成功");
 		}
-		return new Body().setStatus("201").setMessage("密码错误，修改失败");
+//		return new Body().setStatus("201").setMessage("密码错误，修改失败");
+		return output(true, "密码错误，修改失败");
+	}
+
+	public static String output(Object... objs) {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < objs.length; i++) {
+			if (i != 0) {
+				sb.append(",");
+			}
+			sb.append(objs[i]);
+		}
+		return sb.toString();
+	}
+
+	public static void main(String[] args) {
+		System.out.println(output(true, ""));
 	}
 
 }

@@ -104,12 +104,22 @@
 				password : password,
 				newPassword1 : new_password_1
 			}, function(data) {
-				alert(data.message);
-				if (data.status == 200) {
-					removeCookie();
-					self.location = document.referrer;
-// 					location.href = getQueryString("url");
+				try {
+					var datas = data.split(",", 2);
+	 				alert(datas[1]);
+					if (data != undefined && datas[0] == "true") {
+						removeCookie();
+						self.location = document.referrer;
+					}
+				} catch (e) {
+					alert("出现未知错误：" + e);
 				}
+// 				alert(data.message);
+// 				if (data.status == 200) {
+// 					removeCookie();
+// 					self.location = document.referrer;
+// // 					location.href = getQueryString("url");
+// 				}
 			});
 		};
 		$("#userName").focus();
