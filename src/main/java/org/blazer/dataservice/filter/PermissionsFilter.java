@@ -67,18 +67,18 @@ public class PermissionsFilter implements Filter {
 			StringBuilder requestUrl = new StringBuilder(serviceUrl);
 			requestUrl.append("/userservice/checkurl.do?");
 			requestUrl.append(COOKIE_KEY).append("=").append(sessionid);
-			requestUrl.append("&").append("url").append("=").append(url);
 			requestUrl.append("&").append("systemName").append("=").append(systemName);
+			requestUrl.append("&").append("url").append("=").append(url);
 			String content = executeGet(requestUrl.toString());
-			System.out.println(content);
+			System.out.println("check url ~ content : " + content);
 			String[] contents = content.split(",", 3);
 			if (contents.length != 3) {
 				System.err.println("checkurl.do result length is not valid... please check it...");
-//				delay(response, request, contents[1]);
 			}
+			delay(response, request, contents[2]);
 			// no login
 			if ("false".equals(contents[0])) {
-				System.out.println("no login");
+				System.out.println("check url ~ no login ~");
 				System.out.println(serviceUrl + "/login.html");
 //				RequestDispatcher rd = request.getRequestDispatcher(serviceUrl + "/login.html");
 //				rd.forward(req, resp);
@@ -87,7 +87,12 @@ public class PermissionsFilter implements Filter {
 			}
 			// no permissions
 			if ("false".equals(contents[1])) {
-				System.out.println("no permissions");
+				System.out.println("check url ~ no permissions ~");
+				if (noPermissionsPage == null) {
+					RequestDispatcher rd = request.getRequestDispatcher(serviceUrl + "/nopermissions.html");
+					rd.forward(req, resp);
+					return;
+				}
 				RequestDispatcher rd = request.getRequestDispatcher(noPermissionsPage);
 				rd.forward(req, resp);
 				return;
@@ -133,11 +138,11 @@ public class PermissionsFilter implements Filter {
 		if ("".equals(newSession)) {
 			newSession = null;
 		}
-		String domain = StringUtil.findOneStrByReg(request.getRequestURL().toString(), "[http|https]://([a-zA-Z0-9.]*).*");
+		String domain = StringUtil.findOneStrByReg(request.getRequestURL().toString(), "[http|https]://.*([.][a-zA-Z0-9]*[.][a-zA-Z0-9]*)/*.*");
 		System.out.println("delay ~ new session : " + newSession);
 		Cookie cookie = new Cookie(COOKIE_KEY, newSession);
 		cookie.setPath(COOKIE_PATH);
-		domain = ".blazer2.org";
+//		domain = ".bigdata.blazer.org";
 		System.out.println("domain ~ " + domain);
 		cookie.setDomain(domain);
 		cookie.setMaxAge(cookieSeconds);

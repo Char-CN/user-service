@@ -28,8 +28,10 @@
 	<!-- Javascript -->
 	<script type="text/javascript" src="js/jquery.min.js"></script>
 	<script type="text/javascript" src="js/jquery.cookie.js"></script>
+	<script type="text/javascript" src="js/domainhelp.js"></script>
 	<script type="text/javascript" src="js/supersized.3.2.7.min.js"></script>
 	<script>
+		var domain = $domain.getDomain();
 		jQuery(document).ready(function() {
 			$.supersized({
 				//Functionality
@@ -115,15 +117,18 @@
 				userName : userName,
 				password : password
 			}, function(data) {
-				alert(data.message);
 				if (data.status == 200) {
 					var expires = new Date();
 					expires.setTime(expires.getTime() + (30 * 60 * 1000));
 					$.cookie(cookie_id, data.sessionId, {
 						path : "/",
-						expires : expires
+						expires : expires,
+						domain : domain
 					});
+					alert(data.message);
 					location.href = getQueryString("url");
+				} else {
+					alert(data.message);
 				}
 			});
 		};
@@ -146,7 +151,8 @@
 			expires.setTime(expires.getTime() - (30 * 60 * 1000));
 			$.cookie(cookie_id, "", {
 				path : "/",
-				expires : expires
+				expires : expires,
+				domain : domain
 			});
 		};
 	</script>

@@ -28,8 +28,10 @@
 	<!-- Javascript -->
 	<script type="text/javascript" src="js/jquery.min.js"></script>
 	<script type="text/javascript" src="js/jquery.cookie.js"></script>
+	<script type="text/javascript" src="js/domainhelp.js"></script>
 	<script type="text/javascript" src="js/supersized.3.2.7.min.js"></script>
 	<script>
+		var domain = $domain.getDomain();
 		jQuery(document).ready(function() {
 			$.supersized({
 				//Functionality
@@ -141,7 +143,7 @@
 		var removeCookie = function() {
 			var expires = new Date();
 			expires.setTime(expires.getTime() - (30 * 60 * 1000));
-			$.cookie(cookie_id, "", { path: "/", expires : expires});
+			$.cookie(cookie_id, "", { path: "/", expires: expires, domain: domain});
 		};
 	</script>
 </body>

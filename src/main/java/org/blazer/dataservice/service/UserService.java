@@ -221,8 +221,8 @@ public class UserService implements InitializingBean {
 			String sql = "update us_user set user_name=?,user_name_cn=?,email=?,phone_number=?,remark=? where id=? and enable=1";
 			jdbcTemplate.update(sql, user.getUserName(), user.getUserNameCn(), user.getEmail(), user.getPhoneNumber(), user.getRemark(), user.getId());
 		}
-		userCache.init(userId);
 		addUserRole(userId, roleIds);
+		userCache.init(userId);
 	}
 
 	public void updatePwd(USUser user) {
