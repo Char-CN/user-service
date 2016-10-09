@@ -66,6 +66,7 @@ var $userservice = function() {
 	};
 
 	var checkurl = function(url) {
+		var flag = false;
 		$.ajax({
 			url : _checkurl,
 			type : "GET",
@@ -76,15 +77,29 @@ var $userservice = function() {
 				url : url
 			},
 			success : function(data) {
-				alert(data);
+				try {
+					var datas = data.split(",", 3);
+					if (data != undefined && datas[0] == "false") {
+						alert("对不起，您没有登录，请您登录。");
+						location.href = _getlogin + "?url=" + encodeURIComponent(location.href);
+						return;
+					} else if (data != undefined && datas[1] == "false") {
+						// 没有权限
+						return;
+					}
+					flag = true;
+					var expires = new Date();
+					expires.setTime(expires.getTime() + (30 * 60 * 1000));
+					$.cookie(cookie_id, datas[2], { path: "/", expires: expires, domain : domain});
+				} catch (e) {
+					alert("出现未知错误：" + e);
+				}
 			},
 			error : function(XMLHttpRequest, textStatus, errorThrown) {
-//				alert(XMLHttpRequest.status);
-//				alert(XMLHttpRequest.readyState);
-//				alert(textStatus);
 				alert('status：' + XMLHttpRequest.status + ',state：' + XMLHttpRequest.readyState + ',text：' + (textStatus || errorThrown));
 			}
 		});
+		return flag;
 	};
 
 	init();

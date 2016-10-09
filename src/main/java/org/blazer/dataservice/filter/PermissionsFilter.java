@@ -3,11 +3,15 @@ package org.blazer.dataservice.filter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -19,7 +23,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.blazer.dataservice.util.StringUtil;
 
 public class PermissionsFilter implements Filter {
 
@@ -28,23 +31,19 @@ public class PermissionsFilter implements Filter {
 
 	private String systemName = null;
 	private String serviceUrl = null;
+	private String innerServiceUrl = null;
 	private String noPermissionsPage = null;
 	private Integer cookieSeconds = null;
 	private boolean onOff = false;
 
 	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {
-		HttpServletRequest request = (HttpServletRequest) req;
-		HttpServletResponse response = (HttpServletResponse) resp;
-		String sessionid = getSessionId(request);
-		System.out.println(request.getRequestURL());
-		System.out.println(request.getRequestURI());
-		System.out.println(request.getRemoteHost());
-		System.out.println(request.getRemoteAddr());
-		System.out.println(request.getContextPath());
 		if (!onOff) {
 			chain.doFilter(req, resp);
 			return;
 		}
+		HttpServletRequest request = (HttpServletRequest) req;
+		HttpServletResponse response = (HttpServletResponse) resp;
+		String sessionid = getSessionId(request);
 		String url = request.getRequestURI();
 		if (!"".equals(request.getContextPath())) {
 			url = url.replaceFirst(request.getContextPath(), "");
@@ -60,45 +59,41 @@ public class PermissionsFilter implements Filter {
 			return;
 		}
 		try {
-//			String content = executeGet(serviceUrl + "/getuser.do?" + SESSION_KEY + "=" + sessionid);
-//			ObjectMapper mapper = new ObjectMapper();
-//			UserModel um = mapper.readValue(content, UserModel.class);
-//			System.out.println(um);
-			StringBuilder requestUrl = new StringBuilder(serviceUrl);
+			StringBuilder requestUrl = new StringBuilder(innerServiceUrl);
 			requestUrl.append("/userservice/checkurl.do?");
 			requestUrl.append(COOKIE_KEY).append("=").append(sessionid);
 			requestUrl.append("&").append("systemName").append("=").append(systemName);
 			requestUrl.append("&").append("url").append("=").append(url);
 			String content = executeGet(requestUrl.toString());
-			System.out.println("check url ~ content : " + content);
+			System.out.println("请求checkurl.do返回结果：" + content);
 			String[] contents = content.split(",", 3);
 			if (contents.length != 3) {
-				System.err.println("checkurl.do result length is not valid... please check it...");
+				System.err.println("请求checkurl.do返回：长度不对。");
 			}
 			delay(response, request, contents[2]);
 			// no login
 			if ("false".equals(contents[0])) {
-				System.out.println("check url ~ no login ~");
-				System.out.println(serviceUrl + "/login.html");
-//				RequestDispatcher rd = request.getRequestDispatcher(serviceUrl + "/login.html");
-//				rd.forward(req, resp);
-				response.sendRedirect(serviceUrl + "/login.html");
+				System.err.println("请求checkurl.do返回：没有登录。");
+				System.err.println(serviceUrl + "/login.html?url=" + URLEncoder.encode(request.getRequestURL().toString(), "UTF-8"));
+				response.sendRedirect(serviceUrl + "/login.html?url=" + URLEncoder.encode(request.getRequestURL().toString(), "UTF-8"));
 				return;
 			}
 			// no permissions
 			if ("false".equals(contents[1])) {
-				System.out.println("check url ~ no permissions ~");
+				System.err.println("请求checkurl.do返回：没有权限。");
 				if (noPermissionsPage == null) {
-					RequestDispatcher rd = request.getRequestDispatcher(serviceUrl + "/nopermissions.html");
-					rd.forward(req, resp);
+					System.err.println("noPermissionsPage没有配置。");
+					response.sendRedirect(serviceUrl + "/nopermissions.html");
 					return;
 				}
-				RequestDispatcher rd = request.getRequestDispatcher(noPermissionsPage);
-				rd.forward(req, resp);
+				response.sendRedirect(noPermissionsPage);
 				return;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			System.err.println("验证userservice出现错误。。。");
+			response.sendRedirect(noPermissionsPage);
+			return;
 		}
 		chain.doFilter(req, resp);
 	}
@@ -138,12 +133,10 @@ public class PermissionsFilter implements Filter {
 		if ("".equals(newSession)) {
 			newSession = null;
 		}
-		String domain = StringUtil.findOneStrByReg(request.getRequestURL().toString(), "[http|https]://.*([.][a-zA-Z0-9]*[.][a-zA-Z0-9]*)/*.*");
-		System.out.println("delay ~ new session : " + newSession);
+		String domain = findOneStrByReg(request.getRequestURL().toString(), "[http|https]://.*([.][a-zA-Z0-9]*[.][a-zA-Z0-9]*)/*.*");
+		System.out.println("delay ~ [" + domain + "] ~ new session : " + newSession);
 		Cookie cookie = new Cookie(COOKIE_KEY, newSession);
 		cookie.setPath(COOKIE_PATH);
-//		domain = ".bigdata.blazer.org";
-		System.out.println("domain ~ " + domain);
 		cookie.setDomain(domain);
 		cookie.setMaxAge(cookieSeconds);
 		response.addCookie(cookie);
@@ -168,6 +161,10 @@ public class PermissionsFilter implements Filter {
 	public void init(FilterConfig filterConfig) throws ServletException {
 		systemName = filterConfig.getInitParameter("systemName");
 		serviceUrl = filterConfig.getInitParameter("serviceUrl");
+		innerServiceUrl = filterConfig.getInitParameter("innerServiceUrl");
+		if (innerServiceUrl == null) {
+			innerServiceUrl = serviceUrl;
+		}
 		noPermissionsPage = filterConfig.getInitParameter("noPermissionsPage");
 		onOff = "1".equals(filterConfig.getInitParameter("on-off"));
 		try {
@@ -177,6 +174,7 @@ public class PermissionsFilter implements Filter {
 		}
 		System.out.println("init filter systemName : " + systemName);
 		System.out.println("init filter serviceUrl : " + serviceUrl);
+		System.out.println("init filter innerServiceUrl : " + innerServiceUrl);
 		System.out.println("init filter noPermissionsPage : " + noPermissionsPage);
 		System.out.println("init filter cookieSeconds : " + cookieSeconds);
 		System.out.println("init filter on-off : " + onOff);
@@ -185,26 +183,27 @@ public class PermissionsFilter implements Filter {
 	public void destroy() {
 	}
 
-//	private String systemName = null;
-//
-//	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {
-//		System.out.println(systemName);
-//		if (systemName != null) {
-//			HttpServletRequest request = (HttpServletRequest) req;
-//			System.out.println(request.getRequestURL());
-//			System.out.println(request.getRequestURI());
-//			System.out.println(request.getRemoteHost());
-//			System.out.println(request.getRemoteAddr());
-//		}
-//		chain.doFilter(req, resp);
-//	}
-//
-//	public void init(FilterConfig filterConfig) throws ServletException {
-//		systemName = filterConfig.getInitParameter("systemName");
-//		System.out.println("init filter : " + systemName);
-//	}
-//
-//	public void destroy() {
-//	}
+	public static String findOneStrByReg(final String str, final String reg) {
+		try {
+			return findStrByReg(str, reg).get(0);
+		} catch (IndexOutOfBoundsException e) {
+		}
+		return null;
+	}
+
+	public static List<String> findStrByReg(final String str, final String reg) {
+		List<String> list = new ArrayList<String>();
+		if (str == null || reg == null) {
+			return list;
+		}
+		Pattern p = Pattern.compile(reg);
+		Matcher m = p.matcher(str);
+		while (m.find()) {
+			for (int i = 1; i <= m.groupCount(); i++) {
+				list.add(m.group(i));
+			}
+		}
+		return list;
+	}
 
 }

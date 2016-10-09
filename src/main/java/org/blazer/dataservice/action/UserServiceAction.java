@@ -78,16 +78,19 @@ public class UserServiceAction extends BaseAction {
 		SessionModel sessionModel = new SessionModel(sessionStr);
 		if (checkUser(sessionModel)) {
 			delay(sessionModel, response, request);
-			return new Body().setMessage("您好，" + getUser(request, response).getUserName() + "，您已经登录，无需再次登录");
+			String un = getUser(request, response).getUserName();
+			return new Body().setMessage("您好，" + (un == null ? "" : un) + "，您已经登录，无需再次登录");
 		}
 		HashMap<String, String> params = getParamMap(request);
 		logger.debug("user name : " + params.get("userName"));
 		if (!params.containsKey("userName")) {
-			return new Body().setStatus("201").setMessage("登录失败");
+			// 参数中找不到用户名，登录失败
+			return new Body().setStatus("201").setMessage("登录失败。");
 		}
 		UserModel um = userCache.get(params.get("userName").toString());
 		if (um == null) {
-			return new Body().setStatus("201").setMessage("找不到账号，登录失败");
+			// 找不到账号，登录失败
+			return new Body().setStatus("201").setMessage("登录失败。");
 		}
 		if (logger.isDebugEnabled()) {
 			logger.debug("user password : " + um.getPassword());
@@ -95,18 +98,10 @@ public class UserServiceAction extends BaseAction {
 		}
 		if (um.getPassword().equals(DesUtil.encrypt(params.get("password")))) {
 			String sessionId = DesUtil.encrypt(String.format(LOGGIN_FORMAT, LoginType.userName.index, um.getId(), um.getUserName(), getExpire()));
-			// Cookie cookie = new Cookie(COOKIE_KEY, sessionId);
-			// String domain =
-			// StringUtil.findOneStrByReg(request.getRequestURL().toString(),
-			// "[http|https]://([a-zA-Z0-9.]*).*");
-			// logger.debug("domain : " + domain);
-			// cookie.setDomain(domain);
-			// cookie.setPath(COOKIE_PATH);
-			// cookie.setMaxAge(COOKIE_SECONDS);
-			// response.addCookie(cookie);
-			return new LoginBody().setSessionId(sessionId).setMessage("登录成功");
+			return new LoginBody().setSessionId(sessionId).setMessage("登录成功。");
 		}
-		return new Body().setStatus("201").setMessage("密码不对，登录失败");
+		// 密码不正确，登录失败
+		return new Body().setStatus("201").setMessage("登录失败。");
 	}
 
 	@ResponseBody
