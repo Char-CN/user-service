@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,6 +34,7 @@ public class PermissionsFilter implements Filter {
 	private String serviceUrl = null;
 	private String innerServiceUrl = null;
 	private String noPermissionsPage = null;
+	private HashSet<String> ignoreUrlsMap = null;
 	private Integer cookieSeconds = null;
 	private boolean onOff = false;
 
@@ -43,18 +45,24 @@ public class PermissionsFilter implements Filter {
 		}
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) resp;
-		String sessionid = getSessionId(request);
 		String url = request.getRequestURI();
 		if (!"".equals(request.getContextPath())) {
 			url = url.replaceFirst(request.getContextPath(), "");
 		}
 		System.out.println("action url : " + url);
+		String sessionid = getSessionId(request);
 		// 由于是本系统，因此过滤掉
 		if ("/login.html".equals(url)) {
 			chain.doFilter(req, resp);
 			return;
 		}
+		// 过滤
 		if (url.startsWith("/userservice")) {
+			chain.doFilter(req, resp);
+			return;
+		}
+		// web.xml配置的过滤页面
+		if (ignoreUrlsMap.contains(url)) {
 			chain.doFilter(req, resp);
 			return;
 		}
@@ -134,6 +142,10 @@ public class PermissionsFilter implements Filter {
 			newSession = null;
 		}
 		String domain = findOneStrByReg(request.getRequestURL().toString(), "[http|https]://.*([.][a-zA-Z0-9]*[.][a-zA-Z0-9]*)/*.*");
+		if (domain == null) {
+			System.out.println("delay error ~ domain is null ~ new session : " + newSession);
+			return;
+		}
 		System.out.println("delay ~ [" + domain + "] ~ new session : " + newSession);
 		Cookie cookie = new Cookie(COOKIE_KEY, newSession);
 		cookie.setPath(COOKIE_PATH);
@@ -143,19 +155,24 @@ public class PermissionsFilter implements Filter {
 	}
 
 	private String getSessionId(HttpServletRequest request) {
+		String sessionValue = request.getParameter(COOKIE_KEY);
+		if (sessionValue != null) {
+			System.out.println("cookie : request params[" + COOKIE_KEY + "] | " + sessionValue);
+			return sessionValue;
+		}
 		Cookie[] cookies = request.getCookies();
 		if (cookies == null) {
+			System.out.println("cookie : " + COOKIE_KEY + " | " + null);
 			return null;
 		}
-		Cookie sessionCookie = null;
 		for (Cookie cookie : cookies) {
 			if (COOKIE_KEY.equals(cookie.getName())) {
-				System.out.println("cookie : " + cookie.getName() + " | " + cookie.getValue());
-				sessionCookie = cookie;
-				break;
+				System.out.println("cookie : " + COOKIE_KEY + " | " + cookie.getValue());
+				return cookie.getValue();
 			}
 		}
-		return sessionCookie == null ? null : sessionCookie.getValue();
+		System.out.println("cookie : " + COOKIE_KEY + " | " + null);
+		return null;
 	}
 
 	public void init(FilterConfig filterConfig) throws ServletException {
@@ -172,12 +189,22 @@ public class PermissionsFilter implements Filter {
 		} catch (Exception e) {
 			System.err.println("初始化cookie时间出错。");
 		}
+		ignoreUrlsMap = new HashSet<String>();
+		String ignoreUrls = filterConfig.getInitParameter("ignoreUrls");
+		if (ignoreUrls != null && !"".equals(ignoreUrls)) {
+			String[] urls = ignoreUrls.split(",");
+			for (String url : urls) {
+				ignoreUrlsMap.add(url);
+			}
+		}
 		System.out.println("init filter systemName : " + systemName);
 		System.out.println("init filter serviceUrl : " + serviceUrl);
 		System.out.println("init filter innerServiceUrl : " + innerServiceUrl);
 		System.out.println("init filter noPermissionsPage : " + noPermissionsPage);
 		System.out.println("init filter cookieSeconds : " + cookieSeconds);
 		System.out.println("init filter on-off : " + onOff);
+		System.out.println("init filter ignoreUrls : " + ignoreUrls);
+		System.out.println("init filter ignoreUrlsMap : " + ignoreUrlsMap);
 	}
 
 	public void destroy() {

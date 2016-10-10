@@ -48,8 +48,8 @@ var $userservice = function() {
 			},
 			success : function(data) {
 				var datas = data.split(",", 6);
-				userName = datas[2].userName;
-				userNameCn = datas[3].userNameCn;
+				userName = datas[2];
+				userNameCn = datas[3];
 			},
 			error : function(XMLHttpRequest, textStatus, errorThrown) {
 //				alert(XMLHttpRequest.status);

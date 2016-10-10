@@ -126,6 +126,7 @@ public class UserServiceAction extends BaseAction {
 //		rst.setUserName(um.getUserName());
 //		rst.setUserNameCn(um.getUserNameCn());
 //		return rst;
+		response.setContentType("text/html;charset=utf-8");
 		String sessionStr = getSessionId(request);
 		sessionStr = DesUtil.decrypt(sessionStr);
 		SessionModel sessionModel = new SessionModel(sessionStr);

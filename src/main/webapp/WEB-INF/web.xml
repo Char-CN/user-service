@@ -33,19 +33,11 @@
 
 	<!-- init encoding filter -->
 	<filter>
-		<filter-name>CharacterEncodingFilter</filter-name>
-		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
-		<init-param>
-			<param-name>encoding</param-name>
-			<param-value>UTF-8</param-value>
-		</init-param>
-		<init-param>
-			<param-name>forceEncoding</param-name>
-			<param-value>true</param-value>
-		</init-param>
+		<filter-name>UTF8CharsetEncodingFilter</filter-name>
+		<filter-class>org.blazer.dataservice.filter.UTF8CharsetEncodingFilter</filter-class>
 	</filter>
 	<filter-mapping>
-		<filter-name>CharacterEncodingFilter</filter-name>
+		<filter-name>UTF8CharsetEncodingFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
@@ -63,6 +55,10 @@
 		</init-param>
 		<init-param>
 			<param-name>serviceUrl</param-name>
+			<param-value>http://bigdata.blazer.org:8030/user</param-value>
+		</init-param>
+		<init-param>
+			<param-name>innerServiceUrl</param-name>
 			<param-value>http://bigdata.blazer.org:8030/user</param-value>
 		</init-param>
 		<init-param>
