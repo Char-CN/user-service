@@ -7,6 +7,7 @@ var $userservice = function() {
 	var _getuser = _url + "/userservice/getuser.do";
 	var _getlogin = _url + "/login.html";
 	var userName = null;
+	var userNameCn = null;
 	var cookie_id = "MYSESSIONID";
 	// 如：.blazer.org
 	var domain = location.href.match(new RegExp("[http|https]://.*([.][a-zA-Z0-9]*[.][a-zA-Z0-9]*)/*.*"))[1];
@@ -46,7 +47,9 @@ var $userservice = function() {
 				MYSESSIONID : $.cookie(cookie_id)
 			},
 			success : function(data) {
-				userName = data.userName;
+				var datas = data.split(",", 6);
+				userName = datas[2].userName;
+				userNameCn = datas[3].userNameCn;
 			},
 			error : function(XMLHttpRequest, textStatus, errorThrown) {
 //				alert(XMLHttpRequest.status);
@@ -102,9 +105,11 @@ var $userservice = function() {
 		return flag;
 	};
 
-	init();
+	init(); // 初始化
+
 	var obj = new Object();
 	obj.userName = userName;
+	obj.userNameCn = userNameCn;
 	obj.logout = logout;
 	obj.checkurl = checkurl;
 	return obj;

@@ -78,7 +78,7 @@ public class UserServiceAction extends BaseAction {
 		SessionModel sessionModel = new SessionModel(sessionStr);
 		if (checkUser(sessionModel)) {
 			delay(sessionModel, response, request);
-			String un = getUser(request, response).getUserName();
+			String un = getUser(sessionModel).getUserName();
 			return new Body().setMessage("您好，" + (un == null ? "" : un) + "，您已经登录，无需再次登录");
 		}
 		HashMap<String, String> params = getParamMap(request);
@@ -106,25 +106,45 @@ public class UserServiceAction extends BaseAction {
 
 	@ResponseBody
 	@RequestMapping("/getuser")
-	public UserModel getUser(HttpServletRequest request, HttpServletResponse response) {
+	public String getUser(HttpServletRequest request, HttpServletResponse response) {
+//	public UserModel getUser(HttpServletRequest request, HttpServletResponse response) {
+//		String sessionStr = getSessionId(request);
+//		sessionStr = DesUtil.decrypt(sessionStr);
+//		SessionModel sessionModel = new SessionModel(sessionStr);
+//		delay(sessionModel, response, request);
+//		UserModel um = getUser(sessionModel);
+//		if (um == null) {
+//			return null;
+//		}
+//		// 该类变量太多，必须设置成null，否则无法使用@ResponseBody转换。
+//		UserModel rst = new UserModel();
+//		rst.setId(um.getId());
+//		rst.setEmail(um.getEmail());
+//		rst.setPassword(um.getPassword());
+//		rst.setPermissionsBitmap(null);
+//		rst.setPhoneNumber(um.getPhoneNumber());
+//		rst.setUserName(um.getUserName());
+//		rst.setUserNameCn(um.getUserNameCn());
+//		return rst;
 		String sessionStr = getSessionId(request);
 		sessionStr = DesUtil.decrypt(sessionStr);
 		SessionModel sessionModel = new SessionModel(sessionStr);
-		delay(sessionModel, response, request);
+		// 检查用户
+		boolean flag = checkUser(sessionModel);
+		if (!flag) {
+			return output(flag, "", "", "", "", "");
+		}
 		UserModel um = getUser(sessionModel);
 		if (um == null) {
-			return null;
+			return output(flag, "", "", "", "", "");
 		}
-		// 该类变量太多，必须设置成null，否则无法使用@ResponseBody转换。
-		UserModel rst = new UserModel();
-		rst.setId(um.getId());
-		rst.setEmail(um.getEmail());
-		rst.setPassword(um.getPassword());
-		rst.setPermissionsBitmap(null);
-		rst.setPhoneNumber(um.getPhoneNumber());
-		rst.setUserName(um.getUserName());
-		rst.setUserNameCn(um.getUserNameCn());
-		return rst;
+		// 延期session
+		String newSession = delay(sessionModel, response, request);
+		if (newSession == null) {
+			return output(false, null, um.getUserName(), um.getUserNameCn(), um.getPhoneNumber(), um.getEmail());
+		}
+		// 返回
+		return output(true, newSession, um.getUserName(), um.getUserNameCn(), um.getPhoneNumber(), um.getEmail());
 	}
 
 	@ResponseBody
