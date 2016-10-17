@@ -27,8 +27,8 @@ import org.apache.http.impl.client.HttpClients;
 
 public class PermissionsFilter implements Filter {
 
-	private static final String COOKIE_KEY = "MYSESSIONID";
-	private static final String COOKIE_PATH = "/";
+	public static final String COOKIE_KEY = "MYSESSIONID";
+	public static final String COOKIE_PATH = "/";
 
 	private String systemName = null;
 	private String serviceUrl = null;
@@ -51,17 +51,12 @@ public class PermissionsFilter implements Filter {
 		}
 		System.out.println("action url : " + url);
 		String sessionid = getSessionId(request);
-		// 由于是本系统，因此过滤掉
-		if ("/login.html".equals(url)) {
-			chain.doFilter(req, resp);
-			return;
-		}
 		// 过滤
 		if (url.startsWith("/userservice")) {
 			chain.doFilter(req, resp);
 			return;
 		}
-		// web.xml配置的过滤页面
+		// web.xml配置的过滤页面以及强制过滤/login.html和pwd.html
 		if (ignoreUrlsMap.contains(url)) {
 			chain.doFilter(req, resp);
 			return;
@@ -154,7 +149,7 @@ public class PermissionsFilter implements Filter {
 		response.addCookie(cookie);
 	}
 
-	private String getSessionId(HttpServletRequest request) {
+	public static String getSessionId(HttpServletRequest request) {
 		String sessionValue = request.getParameter(COOKIE_KEY);
 		if (sessionValue != null) {
 			System.out.println("cookie : request params[" + COOKIE_KEY + "] | " + sessionValue);
@@ -189,7 +184,11 @@ public class PermissionsFilter implements Filter {
 		} catch (Exception e) {
 			System.err.println("初始化cookie时间出错。");
 		}
+		// 过滤的URL
 		ignoreUrlsMap = new HashSet<String>();
+		// 强制过滤/login.html和/pwd.html
+		ignoreUrlsMap.add("/login.html");
+		ignoreUrlsMap.add("/pwd.html");
 		String ignoreUrls = filterConfig.getInitParameter("ignoreUrls");
 		if (ignoreUrls != null && !"".equals(ignoreUrls)) {
 			String[] urls = ignoreUrls.split(",");
