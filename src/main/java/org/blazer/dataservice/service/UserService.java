@@ -105,11 +105,11 @@ public class UserService implements InitializingBean {
 	public void saveSystem(USSystem system) {
 		logger.debug("system " + system);
 		if (system.getId() == null) {
-			String sql = "insert into us_system(system_name,remark) values(?,?)";
-			jdbcTemplate.update(sql, system.getSystemName(), system.getRemark());
+			String sql = "insert into us_system(system_name,index_url,remark) values(?,?,?)";
+			jdbcTemplate.update(sql, system.getSystemName(), system.getIndexUrl(), system.getRemark());
 		} else {
-			String sql = "update us_system set system_name=?,remark=? where id=?";
-			jdbcTemplate.update(sql, system.getSystemName(), system.getRemark(), system.getId());
+			String sql = "update us_system set system_name=?,index_url=?,remark=? where id=?";
+			jdbcTemplate.update(sql, system.getSystemName(), system.getIndexUrl(), system.getRemark(), system.getId());
 		}
 	}
 
