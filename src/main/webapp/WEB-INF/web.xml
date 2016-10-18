@@ -4,7 +4,7 @@
 	<display-name>user-service</display-name>
 
 	<welcome-file-list>
-		<welcome-file>index.html</welcome-file>
+		<welcome-file>login.html</welcome-file>
 	</welcome-file-list>
 
 	<!-- init applicationContext.xml -->

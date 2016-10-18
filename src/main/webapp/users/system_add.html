@@ -6,6 +6,10 @@
 		<input ds_index="id" type="hidden" name="id">
 	</div>
 	<div style="margin-bottom: 20px">
+		<span style="width: 130px; padding-left: 20px; display: inline-block">首页:</span>
+		<input ds_index="index_url" class="easyui-textbox" style="width: 200px;" data-options="multiline:false">
+	</div>
+	<div style="margin-bottom: 20px">
 		<span style="width: 130px; padding-left: 20px; display: inline-block">备注:</span>
 		<input ds_index="remark" class="easyui-textbox" style="width: 200px; height: 60px" data-options="multiline:true">
 	</div>
@@ -28,6 +32,7 @@
 			this_window.DSFind("submit").click(function() {
 				var json = {
 					id : this_window.DSFind("id").val(),
+					indexUrl : this_window.DSFind("index_url").textbox('getValue'),
 					systemName : this_window.DSFind("system_name").textbox('getValue'),
 					remark : this_window.DSFind("remark").textbox('getValue')
 				};
@@ -53,6 +58,7 @@
 					id : id
 				}, function(system) {
 					this_window.DSFind("system_name").textbox('setValue', system.systemName);
+					this_window.DSFind("index_url").textbox('setValue', system.indexUrl);
 					this_window.DSFind("remark").textbox('setValue', system.remark);
 					this_window.DSFind("id").val(system.id);
 				});

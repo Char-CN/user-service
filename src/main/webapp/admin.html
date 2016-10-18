@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>user-service</title>
+<link rel="shortcut icon" type="image/ico" href="images/favicon.png">
+<!-- css引入顺序，不可置换。 -->
+<!-- easyui -->
+<link rel="stylesheet" type="text/css" href="themes/custom/easyui.css">
+<link rel="stylesheet" type="text/css" href="themes/icon.css">
+<link rel="stylesheet" type="text/css" href="css/icon_extends.css">
+<!-- font-awesome -->
+<link rel="stylesheet" type="text/css" href="css/font-awesome.css">
+<link rel="stylesheet" type="text/css" href="css/font-awesome-easyui.css">
+<!-- commons -->
+<link rel="stylesheet" type="text/css" href="css/commons.css">
+<!-- js引入顺序，不可置换 -->
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/jquery.cookie.js"></script>
+<script type="text/javascript" src="js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="js/jquery.easyui.commons.js"></script>
+<script type="text/javascript" src="js/jquery.easyui.extends.js"></script>
+<script type="text/javascript" src="js/Sortable.js"></script>
+<script type="text/javascript" src="js/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="js/userservice.js"></script>
+<script>
+	window.onload = function() {
+		// 初始化west
+		$("#north").panel('refresh', 'north.html');
+		$("#titlebar .home").click(function(){
+			$("#center").panel('refresh', 'manager.html');
+			$("#center").panel('setTitle', '管理首页');
+		}).click();
+		// 增加用户管理
+		var logout = $('<a href="javascript:void(0);">登出</a>');
+		logout.click(function() {
+			$userservice.logout();
+		});
+		var login = $('<span style="float: right; padding: 7px;">' + $userservice.userName + '&nbsp;&nbsp;</span>');
+		login.append(logout);
+		$("#foot").append(login);
+	};
+</script>
+</head>
+<body>
+	<div id="main" class="easyui-layout" data-options="fit:true">
+		<div id="north" data-options="region:'north'" style="height: 100px; overflow: hidden;"></div>
+		<div id="center" class="easyui-panel" data-options="region:'center',title:' '"></div>
+		<div id="foot" data-options="region:'south'" style="height: 31px;"></div>
+	</div>
+	<div id="titlebar" style="padding: 2px">
+		<a href="javascript:void(0)" class="easyui-linkbutton" style="width: 55px" data-options="iconCls:'layout-button-right'"
+			onclick="$('#main').layout('expand','west')"></a> 
+		<a href="javascript:void(0)" class="easyui-linkbutton home" style="width: 55px"> <i class="fa fa-home fa-4x"></i></a>
+		<a href="javascript:void(0)" class="easyui-linkbutton cog" style="width: 55px"> <i class="fa fa-cog fa-4x"></i></a>
+	</div>
+</body>
+</html>

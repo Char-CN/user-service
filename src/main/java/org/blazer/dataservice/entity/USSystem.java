@@ -4,6 +4,7 @@ public class USSystem {
 
 	private Integer id;
 	private String systemName;
+	private String indexUrl;
 	private String remark;
 
 	public Integer getId() {
@@ -22,6 +23,14 @@ public class USSystem {
 		this.systemName = systemName;
 	}
 
+	public String getIndexUrl() {
+		return indexUrl;
+	}
+
+	public void setIndexUrl(String indexUrl) {
+		this.indexUrl = indexUrl;
+	}
+
 	public String getRemark() {
 		return remark;
 	}
@@ -32,7 +41,7 @@ public class USSystem {
 
 	@Override
 	public String toString() {
-		return "USSystem [id=" + id + ", systemName=" + systemName + ", remark=" + remark + "]";
+		return "USSystem [id=" + id + ", systemName=" + systemName + ", indexUrl=" + indexUrl + ", remark=" + remark + "]";
 	}
 
 }

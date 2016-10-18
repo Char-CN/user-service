@@ -61,7 +61,7 @@
 					}, 200);
 				}
 			}).dialog('resize', {
-				height : 220
+				height : 280
 			});
 		});
 		// 增加
@@ -73,7 +73,7 @@
 					table.datagrid('getPager').pagination('select', 99999999);
 				}
 			}).dialog('resize', {
-				height : 220
+				height : 280
 			});
 		});
 
@@ -90,11 +90,15 @@
 				hidden : true
 			}, {
 				field : 'systemName',
-				width : "45%",
+				width : "25%",
 				title : '系统名'
 			}, {
+				field : 'indexUrl',
+				width : "30%",
+				title : '首页'
+			}, {
 				field : 'remark',
-				width : "50%",
+				width : "40%",
 				title : '备注'
 			} ] ],
 			rownumbers : true,

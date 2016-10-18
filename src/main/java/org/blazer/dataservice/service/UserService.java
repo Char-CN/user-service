@@ -91,6 +91,7 @@ public class UserService implements InitializingBean {
 		for (Map<String, Object> map : list) {
 			USSystem system = new USSystem();
 			system.setId(IntegerUtil.getInt0(map.get("id")));
+			system.setIndexUrl(StringUtil.getStrEmpty(map.get("index_url")));
 			system.setSystemName(StringUtil.getStrEmpty(map.get("system_name")));
 			system.setRemark(StringUtil.getStrEmpty(map.get("remark")));
 			systemList.add(system);
@@ -136,6 +137,7 @@ public class UserService implements InitializingBean {
 		Map<String, Object> map = list.get(0);
 		system.setId(IntegerUtil.getInt0(map.get("id")));
 		system.setSystemName(StringUtil.getStrEmpty(map.get("system_name")));
+		system.setIndexUrl(StringUtil.getStrEmpty(map.get("index_url")));
 		system.setRemark(StringUtil.getStrEmpty(map.get("remark")));
 		return system;
 	}
