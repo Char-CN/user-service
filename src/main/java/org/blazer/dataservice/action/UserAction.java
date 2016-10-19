@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.blazer.dataservice.body.Body;
 import org.blazer.dataservice.body.PageBody;
 import org.blazer.dataservice.body.PermissionsTreeBody;
+import org.blazer.dataservice.entity.USPermissions;
 import org.blazer.dataservice.entity.USRole;
 import org.blazer.dataservice.entity.USSystem;
 import org.blazer.dataservice.entity.USUser;
@@ -208,6 +209,37 @@ public class UserAction extends BaseAction {
 	public List<PermissionsTreeBody> findPermissionsByParentID(HttpServletRequest request, HttpServletResponse response) {
 		logger.debug("map : " + getParamMap(request));
 		return userService.findPermissionsByParentID(getParamMap(request));
+	}
+
+	@ResponseBody
+	@RequestMapping("/findPermissionsByID")
+	public USPermissions findPermissionsByID(HttpServletRequest request, HttpServletResponse response) {
+		logger.debug("map : " + getParamMap(request));
+		return userService.findPermissionsById(getParamMap(request));
+	}
+
+	@ResponseBody
+	@RequestMapping("/savePermissions")
+	public Body savePermissions(@RequestBody USPermissions permissions) throws Exception {
+		logger.debug("permissions : " + permissions);
+		try {
+			userService.savePermissions(permissions);
+		} catch (Exception e) {
+			return new Body().error().setMessage("保存失败：" + e.getMessage());
+		}
+		return new Body().setMessage("保存成功！");
+	}
+
+	@ResponseBody
+	@RequestMapping("/del_permissions")
+	public Body delPermissions(@RequestParam Integer id) throws Exception {
+		logger.debug("permissions id : " + id);
+		try {
+			userService.delPermissions(id);
+		} catch (Exception e) {
+			return new Body().error().setMessage("删除失败：" + e.getMessage());
+		}
+		return new Body().setMessage("删除成功！");
 	}
 
 }

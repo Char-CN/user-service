@@ -17,7 +17,9 @@ $(function() {
 			save_system : "user/saveSystem.do",
 			del_system : "user/delSystem.do",
 			find_system_all : "user/findSystemAll.do",
-			find_permissions_by_parent_id : "user/findPermissionsByParentID.do"
+			find_permissions_by_id : "user/findPermissionsByID.do",
+			find_permissions_by_parent_id : "user/findPermissionsByParentID.do",
+			del_permissions : "user/delPermissions.do"
 		},
 		commons : {
 			chooseTreeId : "",

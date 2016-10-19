@@ -7,6 +7,66 @@
 		var this_window = $("#" + windowId);
 		var systemId = 0;
 
+		var table = this_window.DSFind("permissions_table");
+		// 刷新
+		var a_reload = $('<a href="javascript:void(0)" class="icon-reload"></a>');
+		this_window.parent().find(" .panel-tool").prepend(a_reload);
+		a_reload.click(function() {
+			table.treegrid('reload');
+		});
+		// 删除
+		var a_del = $('<a href="javascript:void(0)" class="icon-remove"></a>');
+		this_window.parent().find(" .panel-tool").prepend(a_del);
+		a_del.click(function() {
+			var selected = table.treegrid('getSelected');
+			var idx = table.treegrid('getRowIndex', selected);
+			if (selected == undefined || selected == null) {
+				$.ds.show('请选择一个权限！');
+				return;
+			}
+			$.ds.confirm("您确定要删除该权限吗？", function() {
+				$.post($.ds.url.del_permissions, {
+					id : selected.id
+				}, function(data) {
+					$.ds.show(data.message);
+					table.treegrid('reload');
+				});
+			});
+		});
+		// 编辑
+		var a_edit = $('<a href="javascript:void(0)" class="icon-edit"></a>');
+		this_window.parent().find(" .panel-tool").prepend(a_edit);
+		a_edit.click(function() {
+			var selected = table.treegrid('getSelected');
+			var idx = table.treegrid('getRowIndex', selected);
+			if (selected == undefined || selected == null) {
+				$.ds.show('请选择一个权限！');
+				return;
+			}
+			$.ds.commons.openDialog("permissions_add", $.ds.icon.role, "权限编辑", "users/permissions_add.html", "id=" + selected.id, {
+				onClose : function() {
+					table.treegrid('reload');
+					setTimeout(function() {
+						table.treegrid('selectRow', idx);
+					}, 200);
+				}
+			}).dialog('resize', {
+				height : 220
+			});
+		});
+		// 增加
+		var a_add = $('<a href="javascript:void(0)" class="icon-add"></a>');
+		this_window.parent().find(" .panel-tool").prepend(a_add);
+		a_add.click(function() {
+			$.ds.commons.openDialog("permissions_add", $.ds.icon.role, "权限增加", "users/permissions_add.html", null, {
+				onClose : function() {
+					table.treegrid('getPager').pagination('select', 99999999);
+				}
+			}).dialog('resize', {
+				height : 220
+			});
+		});
+
 		var init = function() {
 			$.ajax({
 				url : $.ds.url.find_system_all,

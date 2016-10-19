@@ -105,6 +105,7 @@ public class UserService implements InitializingBean {
 	public void saveSystem(USSystem system) {
 		logger.debug("system " + system);
 		if (system.getId() == null) {
+			// enable 数据库默认值1
 			String sql = "insert into us_system(system_name,index_url,remark) values(?,?,?)";
 			jdbcTemplate.update(sql, system.getSystemName(), system.getIndexUrl(), system.getRemark());
 		} else {
@@ -210,6 +211,7 @@ public class UserService implements InitializingBean {
 			if (rst != null && rst.size() != 0) {
 				throw new DuplicateUserName("已经存在该用户名！");
 			}
+			// enable 数据库默认值1
 			String sql = "insert into us_user(user_name,user_name_cn,password,email,phone_number,remark) values(?,?,?,?,?,?)";
 			jdbcTemplate.update(sql, user.getUserName(), user.getUserNameCn(), newUserDefaultPassword, user.getEmail(), user.getPhoneNumber(), user.getRemark());
 			userId = IntegerUtil.getInt0(jdbcTemplate.queryForMap("select max(id) as id from us_user where enable=1").get("id"));
@@ -327,6 +329,7 @@ public class UserService implements InitializingBean {
 
 	public void saveRole(USRole role) {
 		if (role.getId() == null) {
+			// enable 数据库默认值1
 			String sql = "insert into us_role(role_name,remark) values(?,?)";
 			jdbcTemplate.update(sql, role.getRoleName(), role.getRemark());
 		} else {
@@ -375,13 +378,29 @@ public class UserService implements InitializingBean {
 	 * TODO : 权限相关
 	 */
 
-	public void savePermissions(USPermissions permission) {
-		
+	public void savePermissions(USPermissions permissions) {
+		if (permissions.getId() == null) {
+			// enable 数据库默认值1
+			String sql = "insert into us_permissions(system_id,parent_id,permissions_name,url,remark) values(?,?,?,?,?)";
+			jdbcTemplate.update(sql, permissions.getSystemId(), permissions.getParentId(), permissions.getPermissionsName(), permissions.getUrl(), permissions.getRemark());
+		} else {
+			String sql = "update us_permissions set permissions_name=?,url=?,remark=? where id=?";
+			jdbcTemplate.update(sql, permissions.getPermissionsName(), permissions.getUrl(), permissions.getRemark(), permissions.getId());
+		}
 	}
 
-	public void delPermissions(Integer id) {
+	public void delPermissions(Integer id) throws NotAllowDeleteException {
 		logger.debug("del permissions id " + id);
-
+		String sql = "select count(0) as ct from us_permissions up inner join us_role_permissions urp on urp.permissions_id=up.id where up.id=?";
+		logger.debug(SqlUtil.Show(sql, id));
+		Integer count = IntegerUtil.getInt0(jdbcTemplate.queryForList(sql, id).get(0).get("ct"));
+		logger.debug("role count : " + count);
+		if (count != 0) {
+			throw new NotAllowDeleteException("该权限被分配[" + count + "]个角色，不能删除。");
+		}
+		sql = "update us_permissions set enable=0 where id=?";
+		logger.debug(SqlUtil.Show(sql, id));
+		jdbcTemplate.update(sql, id);
 	}
 
 	public List<PermissionsTreeBody> findPermissionsByParentID(HashMap<String, String> params) {
@@ -410,6 +429,23 @@ public class UserService implements InitializingBean {
 		}
 		logger.debug(rst.toString());
 		return rst;
+	}
+
+	public USPermissions findPermissionsById(HashMap<String, String> params) {
+		String sql = "select * from us_role where id=? and enable=1";
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql, IntegerUtil.getInt0(params.get("id")));
+		USPermissions permissions = new USPermissions();
+		if (list.size() == 0) {
+			return permissions;
+		}
+		Map<String, Object> map = list.get(0);
+		permissions.setId(IntegerUtil.getInt0(map.get("id")));
+		permissions.setSystemId(IntegerUtil.getInt0(map.get("system_id")));
+		permissions.setParentId(IntegerUtil.getInt0(map.get("parent_id")));
+		permissions.setPermissionsName(StringUtil.getStrEmpty(map.get("permissions_name")));
+		permissions.setUrl(StringUtil.getStrEmpty(map.get("url")));
+		permissions.setRemark(StringUtil.getStrEmpty(map.get("remark")));
+		return permissions;
 	}
 
 }
