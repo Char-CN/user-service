@@ -12,6 +12,8 @@
 		var a_reload = $('<a href="javascript:void(0)" class="icon-reload"></a>');
 		this_window.parent().find(" .panel-tool").prepend(a_reload);
 		a_reload.click(function() {
+			var url = $.ds.url.find_permissions_by_parent_id + "?parentId=-1&systemId=" + systemId;
+			this_window.DSFind("permissions_table").treegrid("options").url = url;
 			table.treegrid('reload');
 		});
 		// 删除
@@ -29,7 +31,9 @@
 					id : selected.id
 				}, function(data) {
 					$.ds.show(data.message);
-					table.treegrid('reload');
+					if (data.status == 200) {
+						table.treegrid('remove', selected.id);
+					}
 				});
 			});
 		});
@@ -51,20 +55,38 @@
 					}, 200);
 				}
 			}).dialog('resize', {
-				height : 220
+				height : 320
 			});
 		});
 		// 增加
 		var a_add = $('<a href="javascript:void(0)" class="icon-add"></a>');
 		this_window.parent().find(" .panel-tool").prepend(a_add);
 		a_add.click(function() {
-			$.ds.commons.openDialog("permissions_add", $.ds.icon.role, "权限增加", "users/permissions_add.html", null, {
-				onClose : function() {
-					table.treegrid('getPager').pagination('select', 99999999);
-				}
-			}).dialog('resize', {
-				height : 220
-			});
+			var selected = table.treegrid('getSelected');
+			var idx = table.treegrid('getRowIndex', selected);
+			if (selected == undefined || selected == null) {
+				$.ds.confirm('您没有选择权限，默认是添加到根目录。', function() {
+					var params = "system_id=" + systemId + "&parent_id=-1";
+					$.ds.commons.openDialog("permissions_add", $.ds.icon.role, "权限增加", "users/permissions_add.html", params, {
+						onClose : function() {
+							table.treegrid('reload');
+// 							table.treegrid('getPager').pagination('select', 99999999);
+						}
+					}).dialog('resize', {
+						height : 320
+					});
+				});
+			} else {
+				var params = "system_id=" + systemId + "&parent_id=" + selected.id;
+				$.ds.commons.openDialog("permissions_add", $.ds.icon.role, "权限增加", "users/permissions_add.html", params, {
+					onClose : function() {
+						table.treegrid('reload', selected.id);
+// 						table.treegrid('getPager').pagination('select', 99999999);
+					}
+				}).dialog('resize', {
+					height : 320
+				});
+			}
 		});
 
 		var init = function() {
@@ -97,13 +119,29 @@
 			});
 
 		};
-		
+
+		var selectId = 0;
 		var refer = function() {
 			this_window.DSFind("permissions_table").treegrid({
 				url : $.ds.url.find_permissions_by_parent_id + "?parentId=-1&systemId=" + systemId,
 				idField : 'id',
 				rownumbers : true,
 				treeField : 'permissionsName',
+				onSelect : function(row) {
+					// 选中其他行
+					if (selectId != 0 && selectId != row.id) {
+						selectId = row.id;
+					}
+					// 选中当前行
+					else if (selectId != 0) {
+						this_window.DSFind("permissions_table").treegrid("unselect", row.id);
+						selectId = 0;
+					}
+					// 第一次选择行
+					else {
+						selectId = row.id;
+					}
+				},
 				columns : [ [ {
 					title : 'id',
 					field : 'id',
@@ -111,11 +149,15 @@
 				}, {
 					title : '名称',
 					field : 'permissionsName',
-					width : "30%"
+					width : "25%"
 				}, {
 					title : '地址',
 					field : 'url',
-					width : "65%"
+					width : "40%"
+				}, {
+					title : '备注',
+					field : 'remark',
+					width : "30%"
 				} ] ],
 				onBeforeExpand : function(row) {
 					//动态设置展开查询的url

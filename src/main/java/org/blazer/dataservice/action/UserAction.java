@@ -231,7 +231,7 @@ public class UserAction extends BaseAction {
 	}
 
 	@ResponseBody
-	@RequestMapping("/del_permissions")
+	@RequestMapping("/delPermissions")
 	public Body delPermissions(@RequestParam Integer id) throws Exception {
 		logger.debug("permissions id : " + id);
 		try {

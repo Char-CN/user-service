@@ -1,13 +1,15 @@
 <div style="margin-top: 10px"></div>
-<form method="post" url="">
+<form ds_index="form" method="post" url="">
 	<div style="margin-bottom: 20px">
 		<span style="width: 130px; padding-left: 20px; display: inline-block">权限名称:</span>
 		<input ds_index="permissions_name" class="easyui-textbox" style="width: 200px" data-options="validType:'nospace'">
-		<input ds_index="id" type="hidden" name="id">
+		<input ds_index="id" type="hidden">
+		<input ds_index="system_id" type="hidden">
+		<input ds_index="parent_id" type="hidden">
 	</div>
 	<div style="margin-bottom: 20px">
 		<span style="width: 130px; padding-left: 20px; display: inline-block">路径:</span>
-		<input ds_index="url" class="easyui-textbox" style="width: 200px; height: 60px" data-options="multiline:true">
+		<input ds_index="url" class="easyui-textbox" style="width: 200px; height: 60px" data-options="validType:'nospace',multiline:true">
 	</div>
 	<div style="margin-bottom: 20px">
 		<span style="width: 130px; padding-left: 20px; display: inline-block">备注:</span>
@@ -23,6 +25,8 @@
 		var queryString = '$queryString';
 		var windowId = '$windowId';
 		var id = $.ds.getQueryString(queryString, "id");
+		var system_id = $.ds.getQueryString(queryString, "system_id");
+		var parent_id = $.ds.getQueryString(queryString, "parent_id");
 		var this_window = $("#" + windowId);
 
 		var init = function() {
@@ -30,8 +34,13 @@
 				this_window.window('close');
 			});
 			this_window.DSFind("submit").click(function() {
+				if (!this_window.DSFind("form").form('validate')) {
+					return;
+				}
 				var json = {
 					id : this_window.DSFind("id").val(),
+					systemId : this_window.DSFind("system_id").val(),
+					parentId : this_window.DSFind("parent_id").val(),
 					permissionsName : this_window.DSFind("permissions_name").textbox('getValue'),
 					url : this_window.DSFind("url").textbox('getValue'),
 					remark : this_window.DSFind("remark").textbox('getValue')
@@ -63,8 +72,16 @@
 					this_window.DSFind("id").val(permissions.id);
 				});
 			}
+			if (system_id != null) {
+				this_window.DSFind("system_id").val(system_id);
+			}
+			if (parent_id != null) {
+				this_window.DSFind("parent_id").val(parent_id);
+			}
 		};
 
 		init();
+		this_window.DSFind("permissions_name").textbox();
+		alert(this_window.DSFind("permissions_name").textbox().next('span').find('input').focus());
 	});
 </script>

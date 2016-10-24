@@ -19,6 +19,7 @@ $(function() {
 			find_system_all : "user/findSystemAll.do",
 			find_permissions_by_id : "user/findPermissionsByID.do",
 			find_permissions_by_parent_id : "user/findPermissionsByParentID.do",
+			save_permissions : "user/savePermissions.do",
 			del_permissions : "user/delPermissions.do"
 		},
 		commons : {

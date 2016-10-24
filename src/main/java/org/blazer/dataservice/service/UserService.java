@@ -14,7 +14,7 @@ import org.blazer.dataservice.entity.USPermissions;
 import org.blazer.dataservice.entity.USRole;
 import org.blazer.dataservice.entity.USSystem;
 import org.blazer.dataservice.entity.USUser;
-import org.blazer.dataservice.exception.DuplicateUserName;
+import org.blazer.dataservice.exception.DuplicateKey;
 import org.blazer.dataservice.exception.NotAllowDeleteException;
 import org.blazer.dataservice.util.DesUtil;
 import org.blazer.dataservice.util.HMap;
@@ -202,14 +202,14 @@ public class UserService implements InitializingBean {
 		return user;
 	}
 
-	public void saveUser(USUser user, String roleIds) throws DuplicateUserName {
+	public void saveUser(USUser user, String roleIds) throws DuplicateKey {
 		// 验证是否重名
 		Integer userId = null;
 		if (user.getId() == null) {
 			String checkSql = "select 1 from us_user where enable=1 and user_name=? ";
 			List<Map<String, Object>> rst = jdbcTemplate.queryForList(checkSql, user.getUserName());
 			if (rst != null && rst.size() != 0) {
-				throw new DuplicateUserName("已经存在该用户名！");
+				throw new DuplicateKey("已经存在该用户名！");
 			}
 			// enable 数据库默认值1
 			String sql = "insert into us_user(user_name,user_name_cn,password,email,phone_number,remark) values(?,?,?,?,?,?)";
@@ -219,7 +219,7 @@ public class UserService implements InitializingBean {
 			String checkSql = "select 1 from us_user where enable=1 and user_name=? and id != ?";
 			List<Map<String, Object>> rst = jdbcTemplate.queryForList(checkSql, user.getUserName(), user.getId());
 			if (rst != null && rst.size() != 0) {
-				throw new DuplicateUserName("已经存在该用户名！");
+				throw new DuplicateKey("已经存在该用户名！");
 			}
 			userId = user.getId();
 			String sql = "update us_user set user_name=?,user_name_cn=?,email=?,phone_number=?,remark=? where id=? and enable=1";
@@ -376,16 +376,24 @@ public class UserService implements InitializingBean {
 
 	/**
 	 * TODO : 权限相关
+	 * @throws DuplicateKey 
 	 */
 
-	public void savePermissions(USPermissions permissions) {
+	public void savePermissions(USPermissions permissions) throws DuplicateKey {
 		if (permissions.getId() == null) {
+			String checkSql = "select 1 from us_permissions where enable=1 and system_id=? and url=?";
+			List<Map<String, Object>> rst = jdbcTemplate.queryForList(checkSql, permissions.getSystemId(), permissions.getUrl());
+			if (rst != null && rst.size() != 0) {
+				throw new DuplicateKey("已经存在该URL！");
+			}
 			// enable 数据库默认值1
 			String sql = "insert into us_permissions(system_id,parent_id,permissions_name,url,remark) values(?,?,?,?,?)";
 			jdbcTemplate.update(sql, permissions.getSystemId(), permissions.getParentId(), permissions.getPermissionsName(), permissions.getUrl(), permissions.getRemark());
+			logger.debug(SqlUtil.Show(sql, permissions.getSystemId(), permissions.getParentId(), permissions.getPermissionsName(), permissions.getUrl(), permissions.getRemark()));
 		} else {
 			String sql = "update us_permissions set permissions_name=?,url=?,remark=? where id=?";
 			jdbcTemplate.update(sql, permissions.getPermissionsName(), permissions.getUrl(), permissions.getRemark(), permissions.getId());
+			logger.debug(SqlUtil.Show(sql, permissions.getPermissionsName(), permissions.getUrl(), permissions.getRemark(), permissions.getId()));
 		}
 	}
 
@@ -432,7 +440,7 @@ public class UserService implements InitializingBean {
 	}
 
 	public USPermissions findPermissionsById(HashMap<String, String> params) {
-		String sql = "select * from us_role where id=? and enable=1";
+		String sql = "select * from us_permissions where id=? and enable=1";
 		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql, IntegerUtil.getInt0(params.get("id")));
 		USPermissions permissions = new USPermissions();
 		if (list.size() == 0) {
