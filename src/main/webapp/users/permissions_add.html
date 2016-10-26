@@ -28,7 +28,6 @@
 		var system_id = $.ds.getQueryString(queryString, "system_id");
 		var parent_id = $.ds.getQueryString(queryString, "parent_id");
 		var this_window = $("#" + windowId);
-
 		var init = function() {
 			this_window.DSFind("close").click(function() {
 				this_window.window('close');
@@ -79,9 +78,6 @@
 				this_window.DSFind("parent_id").val(parent_id);
 			}
 		};
-
 		init();
-		this_window.DSFind("permissions_name").textbox();
-		alert(this_window.DSFind("permissions_name").textbox().next('span').find('input').focus());
 	});
 </script>

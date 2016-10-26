@@ -34,7 +34,7 @@
 	<bean id="druid-stat-pointcut" class="org.springframework.aop.support.JdkRegexpMethodPointcut" scope="prototype">
 		<property name="patterns">
 			<list>
-				<value>org.blazer.dataservice.*</value>
+				<value>org.blazer.userservice.*</value>
 			</list>
 		</property>
 	</bean>
@@ -83,15 +83,4 @@
 		<property name="cacheManager" ref="ehCacheManagerFactory" />
 	</bean>
 
-<!-- 	<bean id="ehConfigCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean"> -->
-<!-- 		<property name="cacheName" value="config_cache" /> -->
-<!-- 		<property name="cacheManager" ref="ehCacheManager" /> -->
-<!-- 	</bean> -->
-
-<!-- 	<bean id="ehUserCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean"> -->
-<!-- 		<property name="cacheName" value="user_cache" /> -->
-<!-- 		<property name="cacheManager" ref="ehCacheManager" /> -->
-<!-- 	</bean> -->
-<!--       <bean id="dataSourceInit" class="org.blazer.dataservice.init.DataSourceInit"></bean> -->
-<!--       <bean id="configInit" class="org.blazer.dataservice.init.ConfigInit" depends-on="dataSourceInit"></bean> -->
 </beans>

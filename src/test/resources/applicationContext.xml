@@ -32,7 +32,7 @@
 	<bean id="druid-stat-pointcut" class="org.springframework.aop.support.JdkRegexpMethodPointcut" scope="prototype">
 		<property name="patterns">
 			<list>
-				<value>org.blazer.dataservice.*</value>
+				<value>org.blazer.userservice.*</value>
 			</list>
 		</property>
 	</bean>

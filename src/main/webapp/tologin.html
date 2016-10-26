@@ -1,0 +1,21 @@
+<html>
+<head>
+<script>
+	var getQueryString = function(name) {
+		var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+		var r = window.location.search.substr(1).match(reg);
+		if (r != null) {
+			return unescape(r[2]);
+		}
+		return null;
+	};
+	var url = getQueryString("url");
+	alert(url);
+	url = encodeURIComponent(url);
+	alert(url);
+	window.location.href = 'login.html?url=' + url;
+</script>
+</head>
+<body>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>user-service</title>
-<link rel="shortcut icon" type="image/ico" href="images/favicon.png">
+<link rel="shortcut icon" type="image/ico" href="images/favicon.ico">
 <!-- css引入顺序，不可置换。 -->
 <!-- easyui -->
 <link rel="stylesheet" type="text/css" href="themes/custom/easyui.css">
@@ -24,6 +24,7 @@
 <script type="text/javascript" src="js/locale/easyui-lang-zh_CN.js"></script>
 <script type="text/javascript" src="js/userservice.js"></script>
 <script>
+	var $userservice = new $userservice("user-service");
 	window.onload = function() {
 		// 初始化west
 		$("#north").panel('refresh', 'north.html');

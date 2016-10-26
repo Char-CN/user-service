@@ -1,6 +1,6 @@
 package org.blazer.test;
 
-import org.blazer.dataservice.util.ApplicationUtil;
+import org.blazer.userservice.util.ApplicationUtil;
 
 public class Test {
 
