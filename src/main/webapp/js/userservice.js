@@ -61,6 +61,11 @@ var $userservice = function(systemName) {
 //	};
 
 	var init = function() {
+//		var session_id = $.cookie(session_key);
+//		if (session_id == undefined || session_id == null) {
+//			alert("对不起，您没有登录，请您登录。");
+//			location.href = _getlogin + "?url=" + encodeURIComponent(location.href);
+//		}
 		userName = decodeURIComponent($.cookie("US_USER_NAME"));
 		userNameCn = decodeURIComponent($.cookie("US_USER_NAME_CN"));
 	};
