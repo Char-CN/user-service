@@ -31,7 +31,7 @@
 	<script type="text/javascript" src="js/supersized.custom.js"></script>
 	<script>
 		var domain = $domain.getDomain();
-		var cookie_id = "MYSESSIONID";
+		var session_key = "US_SESSION_ID";
 		var up = function() {
 			var userName = $("#userName").val();
 			var password = $("#password").val();
@@ -99,7 +99,7 @@
 		var removeCookie = function() {
 			var expires = new Date();
 			expires.setTime(expires.getTime() - (30 * 60 * 1000));
-			$.cookie(cookie_id, "", { path: "/", expires: expires, domain: domain});
+			$.cookie(session_key, "", { path: "/", expires: expires, domain: domain});
 		};
 	</script>
 </body>

@@ -10,9 +10,10 @@
 		return null;
 	};
 	var url = getQueryString("url");
-	alert(url);
+// 	alert(url);
 	url = encodeURIComponent(url);
-	alert(url);
+// 	alert(url);
+	alert("您的登录已失效，请重新登录。");
 	window.location.href = 'login.html?url=' + url;
 </script>
 </head>

@@ -2,68 +2,73 @@
 var $userservice = function(systemName) {
 //	var systemName = "user-service";
 	var _url = "http://bigdata.blazer.org:8030/user";
-	var _checkuser = _url + "/userservice/checkuser.do";
+//	var _checkuser = _url + "/userservice/checkuser.do";
 	var _checkurl = _url + "/userservice/checkurl.do";
-	var _getuser = _url + "/userservice/getuser.do";
+//	var _getuser = _url + "/userservice/getuser.do";
 	var _getlogin = _url + "/login.html";
 	var userName = null;
 	var userNameCn = null;
-	var cookie_id = "MYSESSIONID";
+	var session_key = "US_SESSION_ID";
 	// 如：.blazer.org
 	var domain = location.href.match(new RegExp("[http|https]://.*([.][a-zA-Z0-9]*[.][a-zA-Z0-9]*)/*.*"))[1];
+//	var init = function() {
+////		 alert(checkuser);
+//		$.ajax({
+//			url : _checkuser,
+//			type : "GET",
+//			async : false,
+//			data : {
+//				session_key : $.cookie(session_key)
+//			},
+//			success : function(data) {
+//				try {
+//					var datas = data.split(",", 2);
+//					if (data != undefined && datas[0] == "false") {
+//						alert("对不起，您没有登录，请您登录。");
+//						location.href = _getlogin + "?url=" + encodeURIComponent(location.href);
+//					} else if (data != undefined && datas[0] == "true") {
+//						var expires = new Date();
+//						expires.setTime(expires.getTime() + (30 * 60 * 1000));
+////						$.cookie(session_key, datas[1], { path: "/", expires: expires, domain : domain});
+//					}
+//				} catch (e) {
+//					alert("出现未知错误：" + e);
+//				}
+//			},
+//			error : function(XMLHttpRequest, textStatus, errorThrown) {
+//				alert('status：' + XMLHttpRequest.status + ',state：' + XMLHttpRequest.readyState + ',text：' + (textStatus || errorThrown));
+//			}
+//		});
+//		$.ajax({
+//			url : _getuser,
+//			type : "GET",
+//			async : false,
+//			data : {
+//				session_key : $.cookie(session_key)
+//			},
+//			success : function(data) {
+//				var datas = data.split(",", 6);
+//				userName = datas[2];
+//				userNameCn = datas[3];
+//			},
+//			error : function(XMLHttpRequest, textStatus, errorThrown) {
+////				alert(XMLHttpRequest.status);
+////				alert(XMLHttpRequest.readyState);
+////				alert(textStatus);
+//				alert('status：' + XMLHttpRequest.status + ',state：' + XMLHttpRequest.readyState + ',text：' + (textStatus || errorThrown));
+//			}
+//		});
+//	};
+
 	var init = function() {
-//		 alert(checkuser);
-		$.ajax({
-			url : _checkuser,
-			type : "GET",
-			async : false,
-			data : {
-				MYSESSIONID : $.cookie(cookie_id)
-			},
-			success : function(data) {
-				try {
-					var datas = data.split(",", 2);
-					if (data != undefined && datas[0] == "false") {
-						alert("对不起，您没有登录，请您登录。");
-						location.href = _getlogin + "?url=" + encodeURIComponent(location.href);
-					} else if (data != undefined && datas[0] == "true") {
-						var expires = new Date();
-						expires.setTime(expires.getTime() + (30 * 60 * 1000));
-//						$.cookie(cookie_id, datas[1], { path: "/", expires: expires, domain : domain});
-					}
-				} catch (e) {
-					alert("出现未知错误：" + e);
-				}
-			},
-			error : function(XMLHttpRequest, textStatus, errorThrown) {
-				alert('status：' + XMLHttpRequest.status + ',state：' + XMLHttpRequest.readyState + ',text：' + (textStatus || errorThrown));
-			}
-		});
-		$.ajax({
-			url : _getuser,
-			type : "GET",
-			async : false,
-			data : {
-				MYSESSIONID : $.cookie(cookie_id)
-			},
-			success : function(data) {
-				var datas = data.split(",", 6);
-				userName = datas[2];
-				userNameCn = datas[3];
-			},
-			error : function(XMLHttpRequest, textStatus, errorThrown) {
-//				alert(XMLHttpRequest.status);
-//				alert(XMLHttpRequest.readyState);
-//				alert(textStatus);
-				alert('status：' + XMLHttpRequest.status + ',state：' + XMLHttpRequest.readyState + ',text：' + (textStatus || errorThrown));
-			}
-		});
+		userName = decodeURIComponent($.cookie("US_USER_NAME"));
+		userNameCn = decodeURIComponent($.cookie("US_USER_NAME_CN"));
 	};
 
 	var logout = function() {
 		var r=confirm("您确定退出登录吗？");
 		if (r) {
-			$.cookie(cookie_id, "", { path: "/", expires: -1, domain : domain});
+			$.cookie(session_key, "", { path: "/", expires: -1, domain : domain});
 			location.href = _getlogin + "?url=" + encodeURIComponent(location.href);
 		}
 	};
@@ -75,7 +80,7 @@ var $userservice = function(systemName) {
 			type : "GET",
 			async : false,
 			data : {
-				MYSESSIONID : $.cookie(cookie_id),
+				session_key : $.cookie(session_key),
 				systemName : systemName,
 				url : url
 			},
@@ -93,7 +98,7 @@ var $userservice = function(systemName) {
 					flag = true;
 					var expires = new Date();
 					expires.setTime(expires.getTime() + (30 * 60 * 1000));
-//					$.cookie(cookie_id, datas[2], { path: "/", expires: expires, domain : domain});
+//					$.cookie(session_key, datas[2], { path: "/", expires: expires, domain : domain});
 				} catch (e) {
 					alert("出现未知错误：" + e);
 				}

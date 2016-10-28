@@ -16,7 +16,7 @@ import org.blazer.userservice.entity.USSystem;
 import org.blazer.userservice.entity.USUser;
 import org.blazer.userservice.exception.DuplicateKey;
 import org.blazer.userservice.exception.NotAllowDeleteException;
-import org.blazer.userservice.util.DesUtil;
+import org.blazer.userservice.core.util.DesUtil;
 import org.blazer.userservice.util.HMap;
 import org.blazer.userservice.util.IntegerUtil;
 import org.blazer.userservice.util.SqlUtil;

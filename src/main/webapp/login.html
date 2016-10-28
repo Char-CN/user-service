@@ -32,7 +32,7 @@
 	<script type="text/javascript" src="js/supersized.custom.js"></script>
 	<script>
 		var domain = $domain.getDomain();
-		var cookie_id = "MYSESSIONID";
+		var session_key = "US_SESSION_ID";
 		var getQueryString = function(name) {
 			var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
 			var r = window.location.search.substr(1).match(reg);
@@ -83,7 +83,7 @@
 				if (data.status == 200) {
 					var expires = new Date();
 					expires.setTime(expires.getTime() + (30 * 60 * 1000));
-					$.cookie(cookie_id, data.sessionId, {
+					$.cookie(session_key, data.sessionId, {
 						path : "/",
 						expires : expires,
 						domain : domain
@@ -116,7 +116,7 @@
 		var removeCookie = function() {
 			var expires = new Date();
 			expires.setTime(expires.getTime() - (30 * 60 * 1000));
-			$.cookie(cookie_id, "", {
+			$.cookie(session_key, "", {
 				path : "/",
 				expires : expires,
 				domain : domain
