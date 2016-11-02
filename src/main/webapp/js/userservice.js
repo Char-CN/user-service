@@ -85,7 +85,7 @@ var $userservice = function(systemName) {
 			type : "GET",
 			async : false,
 			data : {
-				session_key : $.cookie(session_key),
+				"US_SESSION_ID" : $.cookie(session_key),
 				systemName : systemName,
 				url : url
 			},

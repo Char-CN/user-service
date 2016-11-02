@@ -55,6 +55,7 @@
 				$.ds.show('请选择一个角色！');
 				return;
 			}
+			var left = ($(window).width() - 400) / 2;
 			$.ds.commons.openDialog("role_add", $.ds.icon.role, "角色编辑", "users/role_add.html", "id=" + selected.id, {
 				onClose : function() {
 					table.datagrid('reload');
@@ -62,21 +63,18 @@
 						table.datagrid('selectRow', idx);
 					}, 200);
 				}
-			}).dialog('resize', {
-				height : 220
-			});
+			}).dialog('resize',{width:'400px',height:'300px',top: 100,left:left});
 		});
 		// 增加
 		var a_add = $('<a href="javascript:void(0)" class="icon-add"></a>');
 		this_window.parent().find(" .panel-tool").prepend(a_add);
 		a_add.click(function() {
+			var left = ($(window).width() - 400) / 2;
 			$.ds.commons.openDialog("role_add", $.ds.icon.role, "角色增加", "users/role_add.html", null, {
 				onClose : function() {
 					table.datagrid('getPager').pagination('select', 99999999);
 				}
-			}).dialog('resize', {
-				height : 220
-			});
+			}).dialog('resize',{width:'400px',height:'300px',top: 100,left:left});
 		});
 
 		var table = this_window.DSFind("role_tables");

@@ -1,5 +1,6 @@
 package org.blazer.userservice.action;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
 import javax.servlet.http.Cookie;
@@ -16,6 +17,7 @@ import org.blazer.userservice.entity.USUser;
 import org.blazer.userservice.model.PermissionsModel;
 import org.blazer.userservice.model.UserModel;
 import org.blazer.userservice.service.UserService;
+import org.blazer.userservice.core.filter.PermissionsFilter;
 import org.blazer.userservice.core.model.LoginType;
 import org.blazer.userservice.core.model.SessionModel;
 import org.blazer.userservice.core.util.DesUtil;
@@ -63,7 +65,7 @@ public class UserServiceAction extends BaseAction {
 
 	@ResponseBody
 	@RequestMapping("/login")
-	public Body login(HttpServletRequest request, HttpServletResponse response) {
+	public Body login(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
 		String sessionStr = getSessionId(request);
 		SessionModel sessionModel = SessionUtil.decode(sessionStr);
 		if (checkUser(sessionModel)) {
@@ -89,6 +91,7 @@ public class UserServiceAction extends BaseAction {
 		if (um.getPassword().equals(DesUtil.encrypt(params.get("password")))) {
 			String sessionId = SessionUtil.encode(getExpire(), um.getId(), um.getUserName(), um.getUserNameCn(), um.getEmail(), um.getPhoneNumber(), LoginType.userName.index);
 //			String sessionId = DesUtil.encrypt(String.format(LOGGIN_FORMAT, LoginType.userName.index, um.getId(), um.getUserName(), getExpire()));
+			PermissionsFilter.delay(request, response, sessionId);
 			return new LoginBody().setSessionId(sessionId).setMessage("登录成功。");
 		}
 		// 密码不正确，登录失败
@@ -140,6 +143,7 @@ public class UserServiceAction extends BaseAction {
 	@ResponseBody
 	@RequestMapping("/checkurl")
 	public String checkUrl(HttpServletRequest request, HttpServletResponse response) {
+		logger.debug("request:" + request.toString());
 		String sessionStr = getSessionId(request);
 		SessionModel sessionModel = SessionUtil.decode(sessionStr);
 		HashMap<String, String> params = getParamMap(request);

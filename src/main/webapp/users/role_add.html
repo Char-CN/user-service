@@ -6,6 +6,11 @@
 		<input ds_index="id" type="hidden" name="id">
 	</div>
 	<div style="margin-bottom: 20px">
+		<span style="width: 130px; padding-left: 20px; display: inline-block">权限:</span>
+		<select ds_index="permissions" class="easyui-combotree" style="width: 200px;height:60px;" multiple="true" multiline="true" editable="false">
+		</select>
+	</div>
+	<div style="margin-bottom: 20px">
 		<span style="width: 130px; padding-left: 20px; display: inline-block">备注:</span>
 		<input ds_index="remark" class="easyui-textbox" style="width: 200px; height: 60px" data-options="multiline:true">
 	</div>
@@ -21,6 +26,16 @@
 		var id = $.ds.getQueryString(queryString, "id");
 		var this_window = $("#" + windowId);
 
+		this_window.DSFind("permissions").combotree({
+			url : $.ds.url.find_system_all,
+			onBeforeExpand : function(row) {
+				//动态设置展开查询的url
+// 				var url = $.ds.url.find_permissions_by_parent_id + "?parentId=" + row.id + "&systemId=" + systemId;
+// 				this_window.DSFind("permissions_table").treegrid("options").url = url;
+// 				return true;
+				alert(JSON.stringify(row));
+			}
+		});
 		var init = function() {
 			this_window.DSFind("close").click(function() {
 				this_window.window('close');
