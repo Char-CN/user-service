@@ -83,11 +83,11 @@
 				if (data.status == 200) {
 					var expires = new Date();
 					expires.setTime(expires.getTime() + (30 * 60 * 1000));
-					$.cookie(session_key, data.sessionId, {
-						path : "/",
-						expires : expires,
-						domain : domain
-					});
+// 					$.cookie(session_key, data.sessionId, {
+// 						path : "/",
+// 						expires : expires,
+// 						domain : domain
+// 					});
 					var url = getQueryString("url");
 					if (url == null) {
 						location.href = "index.html";
