@@ -417,7 +417,7 @@ public class UserService implements InitializingBean {
 		if (parentId == null || systemId == null) {
 			return new ArrayList<PermissionsTreeBody>();
 		}
-		String sql = "select * from us_permissions where enable=1 and parent_id=? and system_id=?";
+		String sql = "select *, permissions_name as text from us_permissions where enable=1 and parent_id=? and system_id=?";
 		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql, parentId, systemId);
 		logger.debug(SqlUtil.Show(sql, parentId, systemId));
 		List<PermissionsTreeBody> rst = null;

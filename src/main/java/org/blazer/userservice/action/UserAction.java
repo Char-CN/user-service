@@ -1,5 +1,6 @@
 package org.blazer.userservice.action;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -9,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.blazer.userservice.body.Body;
 import org.blazer.userservice.body.PageBody;
 import org.blazer.userservice.body.PermissionsTreeBody;
+import org.blazer.userservice.body.SystemTreeBody;
 import org.blazer.userservice.entity.USPermissions;
 import org.blazer.userservice.entity.USRole;
 import org.blazer.userservice.entity.USSystem;
@@ -43,6 +45,24 @@ public class UserAction extends BaseAction {
 	public List<USSystem> findSystemAll(HttpServletRequest request, HttpServletResponse response) {
 		logger.debug("map : " + getParamMap(request));
 		return userService.findSystemAll();
+	}
+
+	@ResponseBody
+	@RequestMapping("/findSystemAllTree")
+	public List<SystemTreeBody> findSystemAllTree(HttpServletRequest request, HttpServletResponse response) {
+		logger.debug("map : " + getParamMap(request));
+		List<USSystem> list = userService.findSystemAll();
+		List<SystemTreeBody> treeList = new ArrayList<SystemTreeBody>();
+		for (USSystem system : list) {
+			SystemTreeBody body = new SystemTreeBody();
+			body.setId(system.getId());
+			body.setText(system.getSystemName());
+			body.setState("closed");
+			body.setIconCls("fa fa-pagelines fa-1x fa-c");
+			body.setType("system");
+			treeList.add(body);
+		}
+		return treeList;
 	}
 
 	@ResponseBody
@@ -83,7 +103,7 @@ public class UserAction extends BaseAction {
 		}
 		return new Body().setMessage("删除成功！");
 	}
-	
+
 	/**
 	 * TODO : 用户相关
 	 */

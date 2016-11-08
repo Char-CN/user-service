@@ -7,6 +7,8 @@ public class PermissionsTreeBody {
 	private String systemName;
 	private Integer parentId;
 	private String permissionsName;
+	private String text; // permission easy ui
+							// 是用的treegrid，为了兼容combotree此属性和permissionsName值一样
 	private String url;
 	private String remark;
 	private String state;
@@ -52,6 +54,14 @@ public class PermissionsTreeBody {
 		this.permissionsName = permissionsName;
 	}
 
+	public String getText() {
+		return text;
+	}
+
+	public void setText(String text) {
+		this.text = text;
+	}
+
 	public String getUrl() {
 		return url;
 	}
@@ -86,8 +96,8 @@ public class PermissionsTreeBody {
 
 	@Override
 	public String toString() {
-		return "PermissionsTreeBody [id=" + id + ", systemId=" + systemId + ", parentId=" + parentId + ", permissionsName=" + permissionsName + ", url=" + url
-				+ ", remark=" + remark + ", state=" + state + ", iconCls=" + iconCls + "]";
+		return "PermissionsTreeBody [id=" + id + ", systemId=" + systemId + ", systemName=" + systemName + ", parentId=" + parentId + ", permissionsName="
+				+ permissionsName + ", text=" + text + ", url=" + url + ", remark=" + remark + ", state=" + state + ", iconCls=" + iconCls + "]";
 	}
 
 }
