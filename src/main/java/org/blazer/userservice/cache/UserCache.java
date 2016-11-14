@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import net.sf.ehcache.Element;
+
 /**
  * disk cache
  * 
@@ -30,7 +32,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component(value = "userCache")
-public class UserCache extends BaseCache implements InitializingBean {
+public class UserCache extends BaseCache2 implements InitializingBean {
 
 	private static Logger logger = LoggerFactory.getLogger(UserCache.class);
 
@@ -145,17 +147,20 @@ public class UserCache extends BaseCache implements InitializingBean {
 	}
 
 	private void clear() {
-		getCache().clear();
+//		getCache().clear();
+		getCache().removeAll();
 	}
 
 	public void add(UserModel userModel) {
 		logger.debug("add user cache : " + userModel);
-		getCache().put(userModel.getUserName(), userModel);
+//		getCache().put(userModel.getUserName(), userModel);
+		getCache().put(new Element(userModel.getUserName(), userModel));
 	}
 
 	public void remove(String userName) {
 		logger.debug("remove user : " + userName);
-		getCache().evict(userName);
+//		getCache().evict(userName);
+		getCache().remove(userName);
 	}
 
 	public boolean contains(String userName) {
@@ -170,7 +175,8 @@ public class UserCache extends BaseCache implements InitializingBean {
 		if (!contains(userName)) {
 			return null;
 		}
-		return (UserModel) getCache().get(userName).get();
+//		return (UserModel) getCache().get(userName).get();
+		return (UserModel) getCache().get(userName).getObjectValue();
 	}
 
 	@Override

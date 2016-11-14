@@ -15,8 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import net.sf.ehcache.Element;
+
 @Component(value = "permissionsCache")
-public class PermissionsCache extends BaseCache implements InitializingBean {
+public class PermissionsCache extends BaseCache2 implements InitializingBean {
 
 	private static Logger logger = LoggerFactory.getLogger(PermissionsCache.class);
 
@@ -80,17 +82,21 @@ public class PermissionsCache extends BaseCache implements InitializingBean {
 	}
 
 	public void clear() {
-		getCache().clear();
+//		getCache().clear();
+		getCache().removeAll();
 	}
 
 	public void add(PermissionsModel pModel) {
 		logger.debug("add : " + pModel);
-		getCache().put(pModel.getId(), pModel);
-		getCache().put(pModel.getSystemName() + "_" + pModel.getUrl(), pModel.getId());
+//		getCache().put(pModel.getId(), pModel);
+//		getCache().put(pModel.getSystemName() + "_" + pModel.getUrl(), pModel.getId());
+		getCache().put(new Element(pModel.getId(), pModel));
+		getCache().put(new Element(pModel.getSystemName() + "_" + pModel.getUrl(), pModel.getId()));
 	}
 
 	public void remove(Integer id) {
-		getCache().evict(id);
+//		getCache().evict(id);
+		getCache().remove(id);
 	}
 
 	public PermissionsModel get(Integer id) {
@@ -100,14 +106,15 @@ public class PermissionsCache extends BaseCache implements InitializingBean {
 			}
 			this.init(id);
 		}
-		return (PermissionsModel) getCache().get(id).get();
+//		return (PermissionsModel) getCache().get(id).get();
+		return (PermissionsModel) getCache().get(id).getObjectValue();
 	}
 
 	public Integer get(String systemName_Url) {
 		if (!contains(systemName_Url)) {
 			return null;
 		}
-		return (Integer) getCache().get(systemName_Url).get();
+		return (Integer) getCache().get(systemName_Url).getObjectValue();
 	}
 
 	public boolean contains(Integer id) {

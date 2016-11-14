@@ -66,6 +66,24 @@ public class UserAction extends BaseAction {
 	}
 
 	@ResponseBody
+	@RequestMapping("/findSystemAndPermissionsTree")
+	public List<SystemTreeBody> findSystemAndPermissionsTree(HttpServletRequest request, HttpServletResponse response) {
+		logger.debug("map : " + getParamMap(request));
+		List<USSystem> list = userService.findSystemAll();
+		List<SystemTreeBody> treeList = new ArrayList<SystemTreeBody>();
+		for (USSystem system : list) {
+			SystemTreeBody body = new SystemTreeBody();
+			body.setId(system.getId());
+			body.setText(system.getSystemName());
+			body.setState("closed");
+			body.setIconCls("fa fa-pagelines fa-1x fa-c");
+			body.setType("system");
+			treeList.add(body);
+		}
+		return treeList;
+	}
+
+	@ResponseBody
 	@RequestMapping("/findSystemByPage")
 	public PageBody<USSystem> findSystemByPage(HttpServletRequest request, HttpServletResponse response) {
 		logger.debug("map : " + getParamMap(request));

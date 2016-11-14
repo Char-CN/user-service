@@ -39,8 +39,12 @@
 					var url = $.ds.url.find_permissions_by_parent_id + "?parentId="+row.id+"&systemId=" + systemId;
 					this_window.DSFind("permissions_tree").combotree("tree").tree("options").url = url;
 				}
+			},
+			onCheck : function(row) {
+				alert(1);
 			}
 		});
+// 		this_window.DSFind("permissions_tree").combotree("tree").tree('expandAll');
 		var init = function() {
 			this_window.DSFind("close").click(function() {
 				this_window.window('close');

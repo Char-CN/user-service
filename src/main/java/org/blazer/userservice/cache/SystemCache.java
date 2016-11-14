@@ -15,8 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import net.sf.ehcache.Element;
+
 @Component(value = "systemCache")
-public class SystemCache extends BaseCache implements InitializingBean {
+public class SystemCache extends BaseCache2 implements InitializingBean {
 
 	private static Logger logger = LoggerFactory.getLogger(SystemCache.class);
 
@@ -75,16 +77,19 @@ public class SystemCache extends BaseCache implements InitializingBean {
 	}
 
 	public void clear() {
-		getCache().clear();
+//		getCache().clear();
+		getCache().removeAll();
 	}
 
 	public void add(SystemModel systemModel) {
 		logger.debug("add : " + systemModel);
-		getCache().put(systemModel.getId(), systemModel);
+//		getCache().put(systemModel.getId(), systemModel);
+		getCache().put(new Element(systemModel.getId(), systemModel));
 	}
 
 	public void remove(Integer id) {
-		getCache().evict(id);
+//		getCache().evict(id);
+		getCache().remove(id);
 	}
 
 	public SystemModel get(Integer id) {
@@ -94,7 +99,8 @@ public class SystemCache extends BaseCache implements InitializingBean {
 			}
 			this.init(id);
 		}
-		return (SystemModel) getCache().get(id).get();
+//		return (SystemModel) getCache().get(id).get();
+		return (SystemModel) getCache().get(id).getObjectValue();
 	}
 
 	public boolean contains(Integer id) {
