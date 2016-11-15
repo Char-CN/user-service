@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.blazer.userservice.body.PermissionsTreeBody;
 import org.blazer.userservice.entity.USPermissions;
-import org.blazer.userservice.exception.DuplicateKey;
+import org.blazer.userservice.exception.DuplicateKeyException;
 import org.blazer.userservice.exception.NotAllowDeleteException;
 import org.blazer.userservice.util.HMap;
 import org.blazer.userservice.util.IntegerUtil;
@@ -27,12 +27,12 @@ public class PermissionsService {
 	@Autowired
 	JdbcTemplate jdbcTemplate;
 
-	public void savePermissions(USPermissions permissions) throws DuplicateKey {
+	public void savePermissions(USPermissions permissions) throws DuplicateKeyException {
 		if (permissions.getId() == null) {
 			String checkSql = "select 1 from us_permissions where enable=1 and system_id=? and url=?";
 			List<Map<String, Object>> rst = jdbcTemplate.queryForList(checkSql, permissions.getSystemId(), permissions.getUrl());
 			if (rst != null && rst.size() != 0) {
-				throw new DuplicateKey("已经存在该URL！");
+				throw new DuplicateKeyException("已经存在该URL！");
 			}
 			// enable 数据库默认值1
 			String sql = "insert into us_permissions(system_id,parent_id,permissions_name,url,remark) values(?,?,?,?,?)";

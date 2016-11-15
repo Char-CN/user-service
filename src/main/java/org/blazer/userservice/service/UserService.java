@@ -11,7 +11,7 @@ import org.blazer.userservice.cache.SystemCache;
 import org.blazer.userservice.cache.UserCache;
 import org.blazer.userservice.core.util.DesUtil;
 import org.blazer.userservice.entity.USUser;
-import org.blazer.userservice.exception.DuplicateKey;
+import org.blazer.userservice.exception.DuplicateKeyException;
 import org.blazer.userservice.util.IntegerUtil;
 import org.blazer.userservice.util.SqlUtil;
 import org.blazer.userservice.util.StringUtil;
@@ -98,14 +98,14 @@ public class UserService implements InitializingBean {
 		return user;
 	}
 
-	public void saveUser(USUser user, String roleIds) throws DuplicateKey {
+	public void saveUser(USUser user, String roleIds) throws DuplicateKeyException {
 		// 验证是否重名
 		Integer userId = null;
 		if (user.getId() == null) {
 			String checkSql = "select 1 from us_user where enable=1 and user_name=? ";
 			List<Map<String, Object>> rst = jdbcTemplate.queryForList(checkSql, user.getUserName());
 			if (rst != null && rst.size() != 0) {
-				throw new DuplicateKey("已经存在该用户名！");
+				throw new DuplicateKeyException("已经存在该用户名！");
 			}
 			// enable 数据库默认值1
 			String sql = "insert into us_user(user_name,user_name_cn,password,email,phone_number,remark) values(?,?,?,?,?,?)";
@@ -115,7 +115,7 @@ public class UserService implements InitializingBean {
 			String checkSql = "select 1 from us_user where enable=1 and user_name=? and id != ?";
 			List<Map<String, Object>> rst = jdbcTemplate.queryForList(checkSql, user.getUserName(), user.getId());
 			if (rst != null && rst.size() != 0) {
-				throw new DuplicateKey("已经存在该用户名！");
+				throw new DuplicateKeyException("已经存在该用户名！");
 			}
 			userId = user.getId();
 			String sql = "update us_user set user_name=?,user_name_cn=?,email=?,phone_number=?,remark=? where id=? and enable=1";
