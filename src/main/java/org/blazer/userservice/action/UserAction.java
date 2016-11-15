@@ -1,19 +1,12 @@
 package org.blazer.userservice.action;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.blazer.userservice.body.Body;
 import org.blazer.userservice.body.PageBody;
-import org.blazer.userservice.body.PermissionsTreeBody;
-import org.blazer.userservice.body.SystemTreeBody;
-import org.blazer.userservice.entity.USPermissions;
-import org.blazer.userservice.entity.USRole;
-import org.blazer.userservice.entity.USSystem;
 import org.blazer.userservice.entity.USUser;
 import org.blazer.userservice.service.UserService;
 import org.blazer.userservice.util.HMap;
@@ -35,96 +28,6 @@ public class UserAction extends BaseAction {
 
 	@Autowired
 	UserService userService;
-
-	/**
-	 * TODO : 系统相关
-	 */
-
-	@ResponseBody
-	@RequestMapping("/findSystemAll")
-	public List<USSystem> findSystemAll(HttpServletRequest request, HttpServletResponse response) {
-		logger.debug("map : " + getParamMap(request));
-		return userService.findSystemAll();
-	}
-
-	@ResponseBody
-	@RequestMapping("/findSystemAllTree")
-	public List<SystemTreeBody> findSystemAllTree(HttpServletRequest request, HttpServletResponse response) {
-		logger.debug("map : " + getParamMap(request));
-		List<USSystem> list = userService.findSystemAll();
-		List<SystemTreeBody> treeList = new ArrayList<SystemTreeBody>();
-		for (USSystem system : list) {
-			SystemTreeBody body = new SystemTreeBody();
-			body.setId(system.getId());
-			body.setText(system.getSystemName());
-			body.setState("closed");
-			body.setIconCls("fa fa-pagelines fa-1x fa-c");
-			body.setType("system");
-			treeList.add(body);
-		}
-		return treeList;
-	}
-
-	@ResponseBody
-	@RequestMapping("/findSystemAndPermissionsTree")
-	public List<SystemTreeBody> findSystemAndPermissionsTree(HttpServletRequest request, HttpServletResponse response) {
-		logger.debug("map : " + getParamMap(request));
-		List<USSystem> list = userService.findSystemAll();
-		List<SystemTreeBody> treeList = new ArrayList<SystemTreeBody>();
-		for (USSystem system : list) {
-			SystemTreeBody body = new SystemTreeBody();
-			body.setId(system.getId());
-			body.setText(system.getSystemName());
-			body.setState("closed");
-			body.setIconCls("fa fa-pagelines fa-1x fa-c");
-			body.setType("system");
-			treeList.add(body);
-		}
-		return treeList;
-	}
-
-	@ResponseBody
-	@RequestMapping("/findSystemByPage")
-	public PageBody<USSystem> findSystemByPage(HttpServletRequest request, HttpServletResponse response) {
-		logger.debug("map : " + getParamMap(request));
-		return userService.findSystemByPage(getParamMap(request));
-	}
-
-	@ResponseBody
-	@RequestMapping("/findSystemById")
-	public USSystem findSystemById(HttpServletRequest request, HttpServletResponse response) {
-		logger.debug("map : " + getParamMap(request));
-		HashMap<String, String> params = getParamMap(request);
-		return userService.findSystemById(params);
-	}
-
-	@ResponseBody
-	@RequestMapping("/saveSystem")
-	public Body saveSystem(@RequestBody USSystem system) throws Exception {
-		logger.debug("system : " + system);
-		try {
-			userService.saveSystem(system);
-		} catch (Exception e) {
-			return new Body().error().setMessage("保存失败：" + e.getMessage());
-		}
-		return new Body().setMessage("保存成功！");
-	}
-
-	@ResponseBody
-	@RequestMapping("/delSystem")
-	public Body delSystem(@RequestParam Integer id) throws Exception {
-		logger.debug("system id : " + id);
-		try {
-			userService.delSystem(id);
-		} catch (Exception e) {
-			return new Body().error().setMessage("删除失败：" + e.getMessage());
-		}
-		return new Body().setMessage("删除成功！");
-	}
-
-	/**
-	 * TODO : 用户相关
-	 */
 
 	@ResponseBody
 	@RequestMapping("/findUserByPage")
@@ -186,98 +89,6 @@ public class UserAction extends BaseAction {
 			return new Body().error().setMessage("初始化密码失败：" + e.getMessage());
 		}
 		return new Body().setMessage("初始化密码成功！");
-	}
-
-	/**
-	 * TODO : 角色相关
-	 */
-
-	@ResponseBody
-	@RequestMapping("/findRoleAll")
-	public List<USRole> findRoleAll(HttpServletRequest request, HttpServletResponse response) {
-		logger.debug("map : " + getParamMap(request));
-		return userService.findRoleAll();
-	}
-
-	@ResponseBody
-	@RequestMapping("/findRoleByPage")
-	public PageBody<USRole> findRoleByPage(HttpServletRequest request, HttpServletResponse response) {
-		logger.debug("map : " + getParamMap(request));
-		return userService.findRoleByPage(getParamMap(request));
-	}
-
-	@ResponseBody
-	@RequestMapping("/findRoleById")
-	public USRole findRoleById(HttpServletRequest request, HttpServletResponse response) {
-		logger.debug("map : " + getParamMap(request));
-		HashMap<String, String> params = getParamMap(request);
-		return userService.findRoleById(params);
-	}
-
-	@ResponseBody
-	@RequestMapping("/saveRole")
-	public Body saveRole(@RequestBody USRole role) throws Exception {
-		logger.debug("role : " + role);
-		try {
-			userService.saveRole(role);
-		} catch (Exception e) {
-			return new Body().error().setMessage("保存失败：" + e.getMessage());
-		}
-		return new Body().setMessage("保存成功！");
-	}
-
-	@ResponseBody
-	@RequestMapping("/delRole")
-	public Body delRole(@RequestParam Integer id) throws Exception {
-		logger.debug("role id : " + id);
-		try {
-			userService.delRole(id);
-		} catch (Exception e) {
-			return new Body().error().setMessage("删除失败：" + e.getMessage());
-		}
-		return new Body().setMessage("删除成功！");
-	}
-
-	/**
-	 * TODO : 权限相关
-	 */
-
-	@ResponseBody
-	@RequestMapping("/findPermissionsByParentID")
-	public List<PermissionsTreeBody> findPermissionsByParentID(HttpServletRequest request, HttpServletResponse response) {
-		logger.debug("map : " + getParamMap(request));
-		return userService.findPermissionsByParentID(getParamMap(request));
-	}
-
-	@ResponseBody
-	@RequestMapping("/findPermissionsByID")
-	public USPermissions findPermissionsByID(HttpServletRequest request, HttpServletResponse response) {
-		logger.debug("map : " + getParamMap(request));
-		return userService.findPermissionsById(getParamMap(request));
-	}
-
-	@ResponseBody
-	@RequestMapping("/savePermissions")
-	public Body savePermissions(@RequestBody USPermissions permissions) throws Exception {
-		logger.debug("permissions : " + permissions);
-		try {
-			userService.savePermissions(permissions);
-		} catch (Exception e) {
-			return new Body().error().setMessage("保存失败：" + e.getMessage());
-		}
-		return new Body().setMessage("保存成功！");
-	}
-
-	@ResponseBody
-	@RequestMapping("/delPermissions")
-	public Body delPermissions(@RequestParam Integer id) throws Exception {
-		logger.debug("permissions id : " + id);
-		try {
-			userService.delPermissions(id);
-		} catch (Exception e) {
-			return new Body().error().setMessage("删除失败：" + e.getMessage());
-		}
-		return new Body().setMessage("删除成功！");
 	}
 
 }
