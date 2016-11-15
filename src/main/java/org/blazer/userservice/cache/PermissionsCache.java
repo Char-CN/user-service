@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 import net.sf.ehcache.Element;
 
 @Component(value = "permissionsCache")
-public class PermissionsCache extends BaseCache2 implements InitializingBean {
+public class PermissionsCache extends BaseCache implements InitializingBean {
 
 	private static Logger logger = LoggerFactory.getLogger(PermissionsCache.class);
 
@@ -32,7 +32,7 @@ public class PermissionsCache extends BaseCache2 implements InitializingBean {
 		init();
 		timeUtil.printMs("加载权限");
 	}
-
+ 
 	private void init() {
 		// 先清空
 		this.clear();

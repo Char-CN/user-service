@@ -10,18 +10,17 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.blazer.userservice.body.Body;
 import org.blazer.userservice.body.LoginBody;
-import org.blazer.userservice.cache.CookieSecondsCache;
 import org.blazer.userservice.cache.PermissionsCache;
 import org.blazer.userservice.cache.UserCache;
-import org.blazer.userservice.entity.USUser;
-import org.blazer.userservice.model.PermissionsModel;
-import org.blazer.userservice.model.UserModel;
-import org.blazer.userservice.service.UserService;
 import org.blazer.userservice.core.filter.PermissionsFilter;
 import org.blazer.userservice.core.model.LoginType;
 import org.blazer.userservice.core.model.SessionModel;
 import org.blazer.userservice.core.util.DesUtil;
 import org.blazer.userservice.core.util.SessionUtil;
+import org.blazer.userservice.entity.USUser;
+import org.blazer.userservice.model.PermissionsModel;
+import org.blazer.userservice.model.UserModel;
+import org.blazer.userservice.service.UserService;
 import org.blazer.userservice.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,9 +45,6 @@ public class UserServiceAction extends BaseAction {
 
 	@Autowired
 	PermissionsCache permissionsCache;
-
-	@Autowired
-	CookieSecondsCache cookieSecondsCache;
 
 	@RequestMapping("/getlogin")
 	public String getLogin(HttpServletRequest request, HttpServletResponse response) {

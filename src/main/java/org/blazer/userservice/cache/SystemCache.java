@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 import net.sf.ehcache.Element;
 
 @Component(value = "systemCache")
-public class SystemCache extends BaseCache2 implements InitializingBean {
+public class SystemCache extends BaseCache implements InitializingBean {
 
 	private static Logger logger = LoggerFactory.getLogger(SystemCache.class);
 

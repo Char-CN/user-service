@@ -32,7 +32,7 @@ import net.sf.ehcache.Element;
  *
  */
 @Component(value = "userCache")
-public class UserCache extends BaseCache2 implements InitializingBean {
+public class UserCache extends BaseCache implements InitializingBean {
 
 	private static Logger logger = LoggerFactory.getLogger(UserCache.class);
 
