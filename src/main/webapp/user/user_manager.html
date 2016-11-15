@@ -76,7 +76,7 @@
 				$.ds.show('请选择一个用户！');
 				return;
 			}
-			$.ds.commons.openDialog("user_add", $.ds.icon.user, "用户编辑", "users/user_add.html", "id=" + selected.id, {
+			$.ds.commons.openDialog("user_add", $.ds.icon.user, "用户编辑", "user/user_add.html", "id=" + selected.id, {
 				onClose : function() {
 					table.datagrid('reload');
 					setTimeout(function() {
@@ -84,19 +84,21 @@
 					}, 200);
 				}
 			}).dialog('resize', {
-				height : 420
+				height : 420,
+				top: 100
 			});
 		});
 		// 增加
 		var a_add = $('<a href="javascript:void(0)" class="icon-add easyui-tooltip" title="新增"></a>');
 		this_window.parent().find(" .panel-tool").prepend(a_add);
 		a_add.click(function() {
-			$.ds.commons.openDialog("user_add", $.ds.icon.user, "用户增加", "users/user_add.html", null, {
+			$.ds.commons.openDialog("user_add", $.ds.icon.user, "用户增加", "user/user_add.html", null, {
 				onClose : function() {
 					table.datagrid('getPager').pagination('select', 99999999);
 				}
 			}).dialog('resize', {
-				height : 420
+				height : 420,
+				top: 100
 			});
 		});
 

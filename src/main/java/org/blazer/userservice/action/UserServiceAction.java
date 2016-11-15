@@ -29,6 +29,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+/**
+ * 对公共系统提供的接口
+ * 
+ * @author hyy
+ *
+ */
 @Controller
 @RequestMapping("/userservice")
 public class UserServiceAction extends BaseAction {
@@ -85,8 +91,11 @@ public class UserServiceAction extends BaseAction {
 			logger.debug("params password : " + DesUtil.encrypt(params.get("password")));
 		}
 		if (um.getPassword().equals(DesUtil.encrypt(params.get("password")))) {
-			String sessionId = SessionUtil.encode(getExpire(), um.getId(), um.getUserName(), um.getUserNameCn(), um.getEmail(), um.getPhoneNumber(), LoginType.userName.index);
-//			String sessionId = DesUtil.encrypt(String.format(LOGGIN_FORMAT, LoginType.userName.index, um.getId(), um.getUserName(), getExpire()));
+			String sessionId = SessionUtil.encode(getExpire(), um.getId(), um.getUserName(), um.getUserNameCn(), um.getEmail(), um.getPhoneNumber(),
+					LoginType.userName.index);
+			// String sessionId = DesUtil.encrypt(String.format(LOGGIN_FORMAT,
+			// LoginType.userName.index, um.getId(), um.getUserName(),
+			// getExpire()));
 			PermissionsFilter.delay(request, response, sessionId);
 			return new LoginBody().setSessionId(sessionId).setMessage("登录成功。");
 		}
@@ -144,10 +153,10 @@ public class UserServiceAction extends BaseAction {
 		SessionModel sessionModel = SessionUtil.decode(sessionStr);
 		HashMap<String, String> params = getParamMap(request);
 		String newSession = newSessionId(sessionModel, response, request);
-//		if (!checkUser(sessionModel)) {
-//			logger.debug("checkurl by 1 false");
-//			return output(false, false, newSession);
-//		}
+		// if (!checkUser(sessionModel)) {
+		// logger.debug("checkurl by 1 false");
+		// return output(false, false, newSession);
+		// }
 		UserModel um = getUser(sessionModel);
 		logger.debug("um : " + um);
 		if (um == null) {
@@ -200,8 +209,11 @@ public class UserServiceAction extends BaseAction {
 		}
 		String domain = StringUtil.findOneStrByReg(request.getRequestURL().toString(), "[http|https]://([a-zA-Z0-9.]*).*");
 		logger.debug("domain : " + domain);
-//		String newSessionId = DesUtil.encrypt(String.format(LOGGIN_FORMAT, LoginType.userName.index, um.getId(), um.getUserName(), getExpire()));
-		String newSessionId = SessionUtil.encode(getExpire(), um.getId(), um.getUserName(), um.getUserNameCn(), um.getEmail(), um.getPhoneNumber(), LoginType.userName.index);
+		// String newSessionId = DesUtil.encrypt(String.format(LOGGIN_FORMAT,
+		// LoginType.userName.index, um.getId(), um.getUserName(),
+		// getExpire()));
+		String newSessionId = SessionUtil.encode(getExpire(), um.getId(), um.getUserName(), um.getUserNameCn(), um.getEmail(), um.getPhoneNumber(),
+				LoginType.userName.index);
 		logger.info("sessionid length : " + newSessionId.length());
 		if (newSessionId.length() > 2048) {
 			logger.warn("[NOTICE] : sessionid > 2k , please you check...");

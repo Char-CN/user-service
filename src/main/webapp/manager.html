@@ -7,22 +7,22 @@
 		// 			$.ds.alert('抱歉，该功能暂未开放，配置数据源请联系管理员。');
 		// 		});
 		this_window.DSFind('user').bind('click', function() {
-			$.ds.commons.openWindow("user_manager", $.ds.icon.user, "用户管理", "users/user_manager.html").window('resize', {
+			$.ds.commons.openWindow("user_manager", $.ds.icon.user, "用户管理", "user/user_manager.html").window('resize', {
 				height : 390
 			});
 		});
 		this_window.DSFind('role').bind('click', function() {
-			$.ds.commons.openWindow("role_manager", $.ds.icon.user, "角色管理", "users/role_manager.html").window('resize', {
+			$.ds.commons.openWindow("role_manager", $.ds.icon.user, "角色管理", "role/role_manager.html").window('resize', {
 				height : 410
 			});
 		});
 		this_window.DSFind('system').bind('click', function() {
-			$.ds.commons.openWindow("system_manager", $.ds.icon.user, "系统管理", "users/system_manager.html").window('resize', {
+			$.ds.commons.openWindow("system_manager", $.ds.icon.user, "系统管理", "system/system_manager.html").window('resize', {
 				height : 390
 			});
 		});
 		this_window.DSFind('premissions').bind('click', function() {
-			$.ds.commons.openWindow("permissions_manager", $.ds.icon.permissions, "权限管理", "users/permissions_manager.html");
+			$.ds.commons.openWindow("permissions_manager", $.ds.icon.permissions, "权限管理", "permissions/permissions_manager.html");
 		});
 	});
 </script>

@@ -47,7 +47,7 @@
 				$.ds.show('请选择一个权限！');
 				return;
 			}
-			$.ds.commons.openDialog("permissions_add", $.ds.icon.role, "权限编辑", "users/permissions_add.html", "id=" + selected.id, {
+			$.ds.commons.openDialog("permissions_add", $.ds.icon.role, "权限编辑", "permissions/permissions_add.html", "id=" + selected.id, {
 				onClose : function() {
 					table.treegrid('reload');
 					setTimeout(function() {
@@ -55,7 +55,8 @@
 					}, 200);
 				}
 			}).dialog('resize', {
-				height : 320
+				height : 320,
+				top: 100
 			});
 		});
 		// 增加
@@ -67,24 +68,26 @@
 			if (selected == undefined || selected == null) {
 				$.ds.confirm('您没有选择权限，默认是添加到根目录。', function() {
 					var params = "system_id=" + systemId + "&parent_id=-1";
-					$.ds.commons.openDialog("permissions_add", $.ds.icon.role, "权限增加", "users/permissions_add.html", params, {
+					$.ds.commons.openDialog("permissions_add", $.ds.icon.role, "权限增加", "permissions/permissions_add.html", params, {
 						onClose : function() {
 							table.treegrid('reload');
 // 							table.treegrid('getPager').pagination('select', 99999999);
 						}
 					}).dialog('resize', {
-						height : 320
+						height : 320,
+						top: 100
 					});
 				});
 			} else {
 				var params = "system_id=" + systemId + "&parent_id=" + selected.id;
-				$.ds.commons.openDialog("permissions_add", $.ds.icon.role, "权限增加", "users/permissions_add.html", params, {
+				$.ds.commons.openDialog("permissions_add", $.ds.icon.role, "权限增加", "permissions/permissions_add.html", params, {
 					onClose : function() {
 						table.treegrid('reload', selected.id);
 // 						table.treegrid('getPager').pagination('select', 99999999);
 					}
 				}).dialog('resize', {
-					height : 320
+					height : 320,
+					top: 100
 				});
 			}
 		});

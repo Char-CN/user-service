@@ -53,7 +53,7 @@
 				$.ds.show('请选择一个系统！');
 				return;
 			}
-			$.ds.commons.openDialog("system_add", $.ds.icon.system, "系统编辑", "users/system_add.html", "id=" + selected.id, {
+			$.ds.commons.openDialog("system_add", $.ds.icon.system, "系统编辑", "system/system_add.html", "id=" + selected.id, {
 				onClose : function() {
 					table.datagrid('reload');
 					setTimeout(function() {
@@ -61,19 +61,21 @@
 					}, 200);
 				}
 			}).dialog('resize', {
-				height : 280
+				height : 280,
+				top: 100
 			});
 		});
 		// 增加
 		var a_add = $('<a href="javascript:void(0)" class="icon-add"></a>');
 		this_window.parent().find(" .panel-tool").prepend(a_add);
 		a_add.click(function() {
-			$.ds.commons.openDialog("system_add", $.ds.icon.system, "系统增加", "users/system_add.html", null, {
+			$.ds.commons.openDialog("system_add", $.ds.icon.system, "系统增加", "system/system_add.html", null, {
 				onClose : function() {
 					table.datagrid('getPager').pagination('select', 99999999);
 				}
 			}).dialog('resize', {
-				height : 280
+				height : 280,
+				top: 100
 			});
 		});
 
