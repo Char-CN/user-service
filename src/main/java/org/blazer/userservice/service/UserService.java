@@ -100,7 +100,7 @@ public class UserService implements InitializingBean {
 
 	public void saveUser(USUser user, String roleIds) throws DuplicateKeyException {
 		// 验证是否重名
-		Integer userId = null;
+		Integer userId = user.getId();
 		if (user.getId() == null) {
 			String checkSql = "select 1 from us_user where enable=1 and user_name=? ";
 			List<Map<String, Object>> rst = jdbcTemplate.queryForList(checkSql, user.getUserName());
@@ -117,7 +117,6 @@ public class UserService implements InitializingBean {
 			if (rst != null && rst.size() != 0) {
 				throw new DuplicateKeyException("已经存在该用户名！");
 			}
-			userId = user.getId();
 			String sql = "update us_user set user_name=?,user_name_cn=?,email=?,phone_number=?,remark=? where id=? and enable=1";
 			jdbcTemplate.update(sql, user.getUserName(), user.getUserNameCn(), user.getEmail(), user.getPhoneNumber(), user.getRemark(), user.getId());
 		}

@@ -2,9 +2,9 @@ package org.blazer.userservice.entity;
 
 public class USRole {
 
-	private Integer id;
-	private String roleName;
-	private String remark;
+	protected Integer id;
+	protected String roleName;
+	protected String remark;
 
 	public Integer getId() {
 		return id;

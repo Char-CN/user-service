@@ -1,5 +1,6 @@
 package org.blazer.userservice.action;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -8,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.blazer.userservice.body.Body;
 import org.blazer.userservice.body.PageBody;
+import org.blazer.userservice.body.RoleBody;
 import org.blazer.userservice.entity.USRole;
 import org.blazer.userservice.service.RoleService;
 import org.slf4j.Logger;
@@ -36,31 +38,47 @@ public class RoleAction extends BaseAction {
 	@RequestMapping("/findRoleAll")
 	public List<USRole> findRoleAll(HttpServletRequest request, HttpServletResponse response) {
 		logger.debug("map : " + getParamMap(request));
-		return roleService.findRoleAll();
+		try {
+			return roleService.findRoleAll();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return new ArrayList<USRole>();
 	}
 
 	@ResponseBody
 	@RequestMapping("/findRoleByPage")
 	public PageBody<USRole> findRoleByPage(HttpServletRequest request, HttpServletResponse response) {
 		logger.debug("map : " + getParamMap(request));
-		return roleService.findRoleByPage(getParamMap(request));
+		try {
+			return roleService.findRoleByPage(getParamMap(request));
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return new PageBody<USRole>();
 	}
 
 	@ResponseBody
 	@RequestMapping("/findRoleById")
-	public USRole findRoleById(HttpServletRequest request, HttpServletResponse response) {
+	public RoleBody findRoleById(HttpServletRequest request, HttpServletResponse response) {
 		logger.debug("map : " + getParamMap(request));
-		HashMap<String, String> params = getParamMap(request);
-		return roleService.findRoleById(params);
+		try {
+			HashMap<String, String> params = getParamMap(request);
+			return roleService.findRoleById(params);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return new RoleBody();
 	}
 
 	@ResponseBody
 	@RequestMapping("/saveRole")
-	public Body saveRole(@RequestBody USRole role) throws Exception {
+	public Body saveRole(@RequestBody RoleBody role) throws Exception {
 		logger.debug("role : " + role);
 		try {
 			roleService.saveRole(role);
 		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 			return new Body().error().setMessage("保存失败：" + e.getMessage());
 		}
 		return new Body().setMessage("保存成功！");
@@ -73,6 +91,7 @@ public class RoleAction extends BaseAction {
 		try {
 			roleService.delRole(id);
 		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 			return new Body().error().setMessage("删除失败：" + e.getMessage());
 		}
 		return new Body().setMessage("删除成功！");

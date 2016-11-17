@@ -18,6 +18,7 @@ $(function() {
 			del_system : "system/delSystem.do",
 			find_system_all : "system/findSystemAll.do",
 			find_system_all_tree : "system/findSystemAllTree.do",
+			find_system_and_permissions_tree : "system/findSystemAndPermissionsTree.do",
 			find_permissions_by_id : "permissions/findPermissionsByID.do",
 			find_permissions_by_parent_id : "permissions/findPermissionsByParentID.do",
 			save_permissions : "permissions/savePermissions.do",

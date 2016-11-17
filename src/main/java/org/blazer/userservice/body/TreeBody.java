@@ -1,20 +1,14 @@
 package org.blazer.userservice.body;
 
-public class SystemTreeBody {
+import java.util.List;
+
+public class TreeBody {
 
 	private Integer id;
 	private String text;
 	private String state;
 	private String iconCls;
-	private String type;
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
+	private List<TreeBody> children;
 
 	public Integer getId() {
 		return id;
@@ -46,6 +40,19 @@ public class SystemTreeBody {
 
 	public void setIconCls(String iconCls) {
 		this.iconCls = iconCls;
+	}
+
+	public List<TreeBody> getChildren() {
+		return children;
+	}
+
+	public void setChildren(List<TreeBody> children) {
+		this.children = children;
+	}
+
+	@Override
+	public String toString() {
+		return "TreeBody [id=" + id + ", text=" + text + ", state=" + state + ", iconCls=" + iconCls + ", children=" + children + "]";
 	}
 
 }

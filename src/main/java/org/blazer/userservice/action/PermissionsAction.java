@@ -1,5 +1,6 @@
 package org.blazer.userservice.action;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,14 +32,24 @@ public class PermissionsAction extends BaseAction {
 	@RequestMapping("/findPermissionsByParentID")
 	public List<PermissionsTreeBody> findPermissionsByParentID(HttpServletRequest request, HttpServletResponse response) {
 		logger.debug("map : " + getParamMap(request));
-		return permissionsService.findPermissionsByParentID(getParamMap(request));
+		try {
+			return permissionsService.findPermissionsByParentID(getParamMap(request));
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return new ArrayList<PermissionsTreeBody>();
 	}
 
 	@ResponseBody
 	@RequestMapping("/findPermissionsByID")
 	public USPermissions findPermissionsByID(HttpServletRequest request, HttpServletResponse response) {
 		logger.debug("map : " + getParamMap(request));
-		return permissionsService.findPermissionsById(getParamMap(request));
+		try {
+			return permissionsService.findPermissionsById(getParamMap(request));
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return new USPermissions();
 	}
 
 	@ResponseBody
@@ -48,6 +59,7 @@ public class PermissionsAction extends BaseAction {
 		try {
 			permissionsService.savePermissions(permissions);
 		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 			return new Body().error().setMessage("保存失败：" + e.getMessage());
 		}
 		return new Body().setMessage("保存成功！");
@@ -60,6 +72,7 @@ public class PermissionsAction extends BaseAction {
 		try {
 			permissionsService.delPermissions(id);
 		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 			return new Body().error().setMessage("删除失败：" + e.getMessage());
 		}
 		return new Body().setMessage("删除成功！");

@@ -1,7 +1,6 @@
 package org.blazer.userservice.action;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -9,7 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.blazer.userservice.body.Body;
 import org.blazer.userservice.body.PageBody;
-import org.blazer.userservice.body.SystemTreeBody;
+import org.blazer.userservice.body.TreeBody;
 import org.blazer.userservice.entity.USSystem;
 import org.blazer.userservice.service.SystemService;
 import org.slf4j.Logger;
@@ -34,58 +33,48 @@ public class SystemAction extends BaseAction {
 	@RequestMapping("/findSystemAll")
 	public List<USSystem> findSystemAll(HttpServletRequest request, HttpServletResponse response) {
 		logger.debug("map : " + getParamMap(request));
-		return systemService.findSystemAll();
-	}
-
-	@ResponseBody
-	@RequestMapping("/findSystemAllTree")
-	public List<SystemTreeBody> findSystemAllTree(HttpServletRequest request, HttpServletResponse response) {
-		logger.debug("map : " + getParamMap(request));
-		List<USSystem> list = systemService.findSystemAll();
-		List<SystemTreeBody> treeList = new ArrayList<SystemTreeBody>();
-		for (USSystem system : list) {
-			SystemTreeBody body = new SystemTreeBody();
-			body.setId(system.getId());
-			body.setText(system.getSystemName());
-			body.setState("closed");
-			body.setIconCls("fa fa-pagelines fa-1x fa-c");
-			body.setType("system");
-			treeList.add(body);
+		try {
+			return systemService.findSystemAll();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
-		return treeList;
+		return new ArrayList<USSystem>();
 	}
 
 	@ResponseBody
 	@RequestMapping("/findSystemAndPermissionsTree")
-	public List<SystemTreeBody> findSystemAndPermissionsTree(HttpServletRequest request, HttpServletResponse response) {
+	public List<TreeBody> findSystemAndPermissionsTree(HttpServletRequest request, HttpServletResponse response) {
 		logger.debug("map : " + getParamMap(request));
-		List<USSystem> list = systemService.findSystemAll();
-		List<SystemTreeBody> treeList = new ArrayList<SystemTreeBody>();
-		for (USSystem system : list) {
-			SystemTreeBody body = new SystemTreeBody();
-			body.setId(system.getId());
-			body.setText(system.getSystemName());
-			body.setState("closed");
-			body.setIconCls("fa fa-pagelines fa-1x fa-c");
-			body.setType("system");
-			treeList.add(body);
+		try {
+			return systemService.findSystemAndPermissionsTree();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
-		return treeList;
+		return new ArrayList<TreeBody>();
 	}
 
 	@ResponseBody
 	@RequestMapping("/findSystemByPage")
 	public PageBody<USSystem> findSystemByPage(HttpServletRequest request, HttpServletResponse response) {
 		logger.debug("map : " + getParamMap(request));
-		return systemService.findSystemByPage(getParamMap(request));
+		try {
+			return systemService.findSystemByPage(getParamMap(request));
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return new PageBody<USSystem>();
 	}
 
 	@ResponseBody
 	@RequestMapping("/findSystemById")
 	public USSystem findSystemById(HttpServletRequest request, HttpServletResponse response) {
 		logger.debug("map : " + getParamMap(request));
-		HashMap<String, String> params = getParamMap(request);
-		return systemService.findSystemById(params);
+		try {
+			return systemService.findSystemById(getParamMap(request));
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return new USSystem();
 	}
 
 	@ResponseBody
@@ -95,6 +84,7 @@ public class SystemAction extends BaseAction {
 		try {
 			systemService.saveSystem(system);
 		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 			return new Body().error().setMessage("保存失败：" + e.getMessage());
 		}
 		return new Body().setMessage("保存成功！");
@@ -107,6 +97,7 @@ public class SystemAction extends BaseAction {
 		try {
 			systemService.delSystem(id);
 		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 			return new Body().error().setMessage("删除失败：" + e.getMessage());
 		}
 		return new Body().setMessage("删除成功！");

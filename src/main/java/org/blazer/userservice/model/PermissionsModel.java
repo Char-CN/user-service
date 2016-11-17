@@ -7,6 +7,7 @@ public class PermissionsModel implements Serializable {
 	private static final long serialVersionUID = -5468934981914473709L;
 	private Integer id;
 	private Integer systemId;
+	private Integer parentId;
 	private String systemName;
 	private String permissionsName;
 	private String url;
@@ -25,6 +26,14 @@ public class PermissionsModel implements Serializable {
 
 	public void setSystemId(Integer systemId) {
 		this.systemId = systemId;
+	}
+
+	public Integer getParentId() {
+		return parentId;
+	}
+
+	public void setParentId(Integer parentId) {
+		this.parentId = parentId;
 	}
 
 	public String getSystemName() {

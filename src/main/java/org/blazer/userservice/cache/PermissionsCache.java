@@ -1,6 +1,7 @@
 package org.blazer.userservice.cache;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +38,7 @@ public class PermissionsCache extends BaseCache implements InitializingBean {
 		// 先清空
 		this.clear();
 		// 查询所有权限
-		String sql = "select up.id,up.permissions_name,up.url,us.system_name,us.id as system_id from us_permissions up inner join us_system us on up.system_id=us.id where us.enable=1 and up.enable=1";
+		String sql = "select up.id,up.permissions_name,up.url,us.system_name,us.id as system_id,up.parent_id from us_permissions up inner join us_system us on up.system_id=us.id where us.enable=1 and up.enable=1";
 		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
 		for (Map<String, Object> map : list) {
 			PermissionsModel permissionsModel = new PermissionsModel();
@@ -46,6 +47,7 @@ public class PermissionsCache extends BaseCache implements InitializingBean {
 			permissionsModel.setUrl(StringUtil.getStrEmpty(map.get("url")));
 			permissionsModel.setSystemId(IntegerUtil.getInt0(map.get("system_id")));
 			permissionsModel.setSystemName(StringUtil.getStrEmpty(map.get("system_name")));
+			permissionsModel.setParentId(IntegerUtil.getInt0(map.get("parent_id")));
 			this.add(permissionsModel);
 			logger.info("init permissions : " + permissionsModel);
 		}
@@ -55,7 +57,7 @@ public class PermissionsCache extends BaseCache implements InitializingBean {
 	private void init(Integer id) {
 		// 查询所有权限
 		try {
-			String sql = "select up.id,up.permissions_name,up.url,us.system_name,us.id as system_id from us_permissions up inner join us_system us on up.system_id=us.id where us.enable=1 and up.enable=1 and up.id=?";
+			String sql = "select up.id,up.permissions_name,up.url,us.system_name,us.id as system_id,up.parent_id from us_permissions up inner join us_system us on up.system_id=us.id where us.enable=1 and up.enable=1 and up.id=?";
 			List<Map<String, Object>> list = jdbcTemplate.queryForList(sql, id);
 			if (list.size() == 0) {
 				throw new SQLException("not found permissions id : " + id);
@@ -67,6 +69,7 @@ public class PermissionsCache extends BaseCache implements InitializingBean {
 			permissionsModel.setUrl(StringUtil.getStrEmpty(map.get("url")));
 			permissionsModel.setSystemId(IntegerUtil.getInt0(map.get("system_id")));
 			permissionsModel.setSystemName(StringUtil.getStrEmpty(map.get("system_name")));
+			permissionsModel.setParentId(IntegerUtil.getInt0(map.get("parent_id")));
 			this.add(permissionsModel);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -110,11 +113,11 @@ public class PermissionsCache extends BaseCache implements InitializingBean {
 		return (PermissionsModel) getCache().get(id).getObjectValue();
 	}
 
-	public Integer get(String systemName_Url) {
+	public PermissionsModel getBySystemNameAndUrl(String systemName_Url) {
 		if (!contains(systemName_Url)) {
 			return null;
 		}
-		return (Integer) getCache().get(systemName_Url).getObjectValue();
+		return get((Integer) getCache().get(systemName_Url).getObjectValue());
 	}
 
 	public boolean contains(Integer id) {
@@ -123,6 +126,19 @@ public class PermissionsCache extends BaseCache implements InitializingBean {
 
 	public boolean contains(String systemName_Url) {
 		return getCache().get(systemName_Url) != null;
+	}
+
+	public List<PermissionsModel> findByParentIdAndSystemName(String systemName, Integer parentId) {
+		List<PermissionsModel> list = new ArrayList<PermissionsModel>();
+		for (Object obj : getCache().getKeys()) {
+			if (obj instanceof java.lang.Integer) {
+				PermissionsModel pm = get((Integer) obj);
+				if (pm.getSystemName().equals(systemName) && pm.getParentId() == parentId) {
+					list.add(pm);
+				}
+			}
+		}
+		return list;
 	}
 
 	@Override

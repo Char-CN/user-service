@@ -1,5 +1,5 @@
 <div style="margin-top: 10px"></div>
-<form method="post" url="">
+<form ds_index="form" method="post" url="">
 	<div style="margin-bottom: 20px">
 		<span style="width: 130px; padding-left: 20px; display: inline-block">用户名:</span>
 		<input ds_index="user_name" class="easyui-textbox" style="width: 200px" data-options="validType:'nospace'">
@@ -63,6 +63,9 @@
 				this_window.window('close');
 			});
 			this_window.DSFind("submit").click(function() {
+				if (!this_window.DSFind("form").form('validate')) {
+					return;
+				}
 				var roleIds = "";
 				var vals = this_window.DSFind("role").combobox("getValues");
 				for (var i in vals) {

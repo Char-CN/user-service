@@ -1,5 +1,5 @@
 <div style="margin-top: 10px"></div>
-<form method="post" url="">
+<form ds_index="form" method="post" url="">
 	<div style="margin-bottom: 20px">
 		<span style="width: 130px; padding-left: 20px; display: inline-block">系统名:</span>
 		<input ds_index="system_name" class="easyui-textbox" style="width: 200px" data-options="validType:'nospace'">
@@ -30,6 +30,9 @@
 				this_window.window('close');
 			});
 			this_window.DSFind("submit").click(function() {
+				if (!this_window.DSFind("form").form('validate')) {
+					return;
+				}
 				var json = {
 					id : this_window.DSFind("id").val(),
 					indexUrl : this_window.DSFind("index_url").textbox('getValue'),

@@ -1,5 +1,5 @@
 <div style="margin-top: 10px"></div>
-<form method="post" url="">
+<form ds_index="form" method="post" url="">
 	<div style="margin-bottom: 20px">
 		<span style="width: 130px; padding-left: 20px; display: inline-block">角色名:</span>
 		<input ds_index="role_name" class="easyui-textbox" style="width: 200px" data-options="validType:'nospace'">
@@ -27,32 +27,31 @@
 		var this_window = $("#" + windowId);
 
 		this_window.DSFind("permissions_tree").combotree({
-			url : $.ds.url.find_system_all_tree,
-			onBeforeExpand : function(row) {
-				//动态设置展开查询的url
-// 				alert(JSON.stringify(row));
-				if (row.type == "system") {
-					var url = $.ds.url.find_permissions_by_parent_id + "?parentId=-1&systemId=" + row.id;
-					this_window.DSFind("permissions_tree").combotree("tree").tree("options").url = url;
-				} else {
-					var systemId = this_window.DSFind("permissions_tree").combotree("tree").tree("getRoot").id;
-					var url = $.ds.url.find_permissions_by_parent_id + "?parentId="+row.id+"&systemId=" + systemId;
-					this_window.DSFind("permissions_tree").combotree("tree").tree("options").url = url;
-				}
-			},
-			onCheck : function(row) {
-				alert(1);
+			url : $.ds.url.find_system_and_permissions_tree,
+			onLoadSuccess : function(node, data) {
+				this_window.DSFind("permissions_tree").combotree("tree").tree("options").url = '';
+				this_window.DSFind("permissions_tree").combotree("tree").tree('collapseAll');
+				init();
 			}
 		});
-// 		this_window.DSFind("permissions_tree").combotree("tree").tree('expandAll');
+		var flag = false;
 		var init = function() {
+			if (flag) {
+				return;
+			}
+			flag = true;
 			this_window.DSFind("close").click(function() {
 				this_window.window('close');
 			});
 			this_window.DSFind("submit").click(function() {
+				if (!this_window.DSFind("form").form('validate')) {
+					return;
+				}
+				var ids = this_window.DSFind("permissions_tree").combotree("getValues");
 				var json = {
 					id : this_window.DSFind("id").val(),
 					roleName : this_window.DSFind("role_name").textbox('getValue'),
+					ids : ids,
 					remark : this_window.DSFind("remark").textbox('getValue')
 				};
 				$.ajax({
@@ -79,10 +78,10 @@
 					this_window.DSFind("role_name").textbox('setValue', role.roleName);
 					this_window.DSFind("remark").textbox('setValue', role.remark);
 					this_window.DSFind("id").val(role.id);
+					this_window.DSFind("permissions_tree").combotree("setValues", role.ids);
 				});
 			}
 		};
 
-		init();
 	});
 </script>

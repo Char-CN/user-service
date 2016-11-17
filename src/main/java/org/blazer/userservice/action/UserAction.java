@@ -33,17 +33,26 @@ public class UserAction extends BaseAction {
 	@RequestMapping("/findUserByPage")
 	public PageBody<USUser> findUserByPage(HttpServletRequest request, HttpServletResponse response) {
 		logger.debug("map : " + getParamMap(request));
-		return userService.findUserByPage(getParamMap(request));
+		try {
+			return userService.findUserByPage(getParamMap(request));
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return new PageBody<USUser>();
 	}
 
 	@ResponseBody
 	@RequestMapping("/findUserById")
 	public HashMap<String, Object> findUserById(HttpServletRequest request, HttpServletResponse response) {
-		HashMap<String, Object> map = new HashMap<String, Object>();
 		logger.debug("map : " + getParamMap(request));
-		HashMap<String, String> params = getParamMap(request);
-		map.put("user", userService.findUserById(params));
-		map.put("role_ids", userService.findRoleByUserId(IntegerUtil.getInt0(params.get("id"))));
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		try {
+			HashMap<String, String> params = getParamMap(request);
+			map.put("user", userService.findUserById(params));
+			map.put("role_ids", userService.findRoleByUserId(IntegerUtil.getInt0(params.get("id"))));
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
 		return map;
 	}
 
@@ -52,8 +61,6 @@ public class UserAction extends BaseAction {
 	public Body saveUser(@RequestBody HashMap<String, Object> params) throws Exception {
 		USUser user = HMap.to(params.get("user"), USUser.class);
 		String roleIds = (String) params.get("roleIds");
-		// USUser user = ((Map<String, Object>)
-		// params.get("user")).to(USUser.class);
 		logger.debug("user : " + user);
 		logger.debug("user : " + roleIds);
 		try {

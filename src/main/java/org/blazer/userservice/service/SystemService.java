@@ -6,8 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.blazer.userservice.body.PageBody;
+import org.blazer.userservice.body.TreeBody;
+import org.blazer.userservice.cache.PermissionsCache;
 import org.blazer.userservice.entity.USSystem;
 import org.blazer.userservice.exception.NotAllowDeleteException;
+import org.blazer.userservice.model.PermissionsModel;
 import org.blazer.userservice.util.HMap;
 import org.blazer.userservice.util.IntegerUtil;
 import org.blazer.userservice.util.SqlUtil;
@@ -25,6 +28,51 @@ public class SystemService {
 
 	@Autowired
 	JdbcTemplate jdbcTemplate;
+
+	@Autowired
+	PermissionsCache permissionsCache;
+
+	public List<TreeBody> findSystemAndPermissionsTree() {
+		List<USSystem> list = findSystemAll();
+		List<TreeBody> treeList = new ArrayList<TreeBody>();
+		for (USSystem system : list) {
+			TreeBody body = new TreeBody();
+			String systemName = system.getSystemName();
+			body.setId(null);
+			body.setText(systemName);
+			body.setState("open");
+			List<TreeBody> childList = findByParentIdAndSystemName(systemName, -1);
+			body.setChildren(childList);
+			if (childList.size() == 0) {
+				body.setIconCls("fa fa-pied-piper fa-1x fa-c");
+			} else {
+				body.setIconCls("fa fa-pagelines fa-1x fa-c");
+			}
+			treeList.add(body);
+		}
+		logger.debug(treeList.toString());
+		return treeList;
+	}
+
+	public List<TreeBody> findByParentIdAndSystemName(String systemName, Integer parentId) {
+		List<PermissionsModel> list = permissionsCache.findByParentIdAndSystemName(systemName, parentId);
+		List<TreeBody> treeList = new ArrayList<TreeBody>();
+		for (PermissionsModel pm : list) {
+			TreeBody body = new TreeBody();
+			body.setId(pm.getId());
+			body.setText(pm.getPermissionsName());
+			body.setState("open");
+			List<TreeBody> childList = findByParentIdAndSystemName(systemName, pm.getId());
+			body.setChildren(childList);
+			if (childList.size() == 0) {
+				body.setIconCls("fa fa-pied-piper fa-1x fa-c");
+			} else {
+				body.setIconCls("fa fa-pagelines fa-1x fa-c");
+			}
+			treeList.add(body);
+		}
+		return treeList;
+	}
 
 	public List<USSystem> findSystemAll() {
 		try {

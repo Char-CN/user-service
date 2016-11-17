@@ -163,7 +163,7 @@ public class UserServiceAction extends BaseAction {
 			logger.debug("checkurl user is not invalid");
 			return output(false, false, newSession);
 		}
-		PermissionsModel permissionsModel = permissionsCache.get(permissionsCache.get(getSystemName_Url(params)));
+		PermissionsModel permissionsModel = permissionsCache.getBySystemNameAndUrl(getSystemName_Url(params));
 		logger.debug("url key : " + getSystemName_Url(params));
 		logger.debug("permissionsModel : " + permissionsModel);
 		logger.debug("bitmap : " + um.getPermissionsBitmap());
