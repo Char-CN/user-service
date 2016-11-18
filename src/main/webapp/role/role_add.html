@@ -2,7 +2,7 @@
 <form ds_index="form" method="post" url="">
 	<div style="margin-bottom: 20px">
 		<span style="width: 130px; padding-left: 20px; display: inline-block">角色名:</span>
-		<input ds_index="role_name" class="easyui-textbox" style="width: 200px" data-options="validType:'nospace'">
+		<input ds_index="role_name" class="easyui-textbox" style="width: 200px" data-options="required:true,validType:'nospace'">
 		<input ds_index="id" type="hidden" name="id">
 	</div>
 	<div style="margin-bottom: 20px">
@@ -19,13 +19,23 @@
 		<a href="javascript:void(0)" class="easyui-linkbutton" ds_index="close" style="width: 80px">关闭</a>
 	</div>
 </form>
+<div ds_index="loading">
+</div>
 <script>
 	$(function() {
 		var queryString = '$queryString';
 		var windowId = '$windowId';
 		var id = $.ds.getQueryString(queryString, "id");
 		var this_window = $("#" + windowId);
-
+		this_window.DSFind("loading").dialog({
+		    title: 'loading...',
+		    width: 400,
+		    height: 200,
+		    closed: false,
+		    cache: false,
+		    modal: true,
+		    content: 'loading...'
+		});
 		this_window.DSFind("permissions_tree").combotree({
 			url : $.ds.url.find_system_and_permissions_tree,
 			onLoadSuccess : function(node, data) {
@@ -47,6 +57,7 @@
 				if (!this_window.DSFind("form").form('validate')) {
 					return;
 				}
+				this_window.DSFind("loading").dialog('open');
 				var ids = this_window.DSFind("permissions_tree").combotree("getValues");
 				var json = {
 					id : this_window.DSFind("id").val(),

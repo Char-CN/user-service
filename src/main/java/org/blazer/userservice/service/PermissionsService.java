@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.blazer.userservice.body.PermissionsTreeBody;
+import org.blazer.userservice.cache.PermissionsCache;
 import org.blazer.userservice.entity.USPermissions;
 import org.blazer.userservice.exception.DuplicateKeyException;
 import org.blazer.userservice.exception.NotAllowDeleteException;
@@ -26,9 +28,17 @@ public class PermissionsService {
 
 	@Autowired
 	JdbcTemplate jdbcTemplate;
+	
+	@Autowired
+	PermissionsCache permissionsCache;
+
+	@Autowired
+	SystemService systemService;
 
 	public void savePermissions(USPermissions permissions) throws DuplicateKeyException {
-		if (permissions.getId() == null) {
+		String systemName = systemService.findSystemById(permissions.getSystemId()).getSystemName();
+		Integer permissionsId = permissions.getId();
+		if (permissionsId == null) {
 			String checkSql = "select 1 from us_permissions where enable=1 and system_id=? and url=?";
 			List<Map<String, Object>> rst = jdbcTemplate.queryForList(checkSql, permissions.getSystemId(), permissions.getUrl());
 			if (rst != null && rst.size() != 0) {
@@ -38,11 +48,20 @@ public class PermissionsService {
 			String sql = "insert into us_permissions(system_id,parent_id,permissions_name,url,remark) values(?,?,?,?,?)";
 			jdbcTemplate.update(sql, permissions.getSystemId(), permissions.getParentId(), permissions.getPermissionsName(), permissions.getUrl(), permissions.getRemark());
 			logger.debug(SqlUtil.Show(sql, permissions.getSystemId(), permissions.getParentId(), permissions.getPermissionsName(), permissions.getUrl(), permissions.getRemark()));
+			permissionsId = IntegerUtil.getInt0(jdbcTemplate.queryForMap("select max(id) as id from us_permissions where enable=1").get("id"));
 		} else {
+			// 清除原来url的cache
+			String oldUrl = StringUtil.getStrEmpty(jdbcTemplate.queryForMap("select url from us_permissions where enable=1 and id=?", permissionsId).get("url"));
+			String systemName_Url = systemName + "_" + oldUrl;
+			if (StringUtils.isNotBlank(oldUrl)) {
+				permissionsCache.remove(systemName_Url);
+			}
 			String sql = "update us_permissions set permissions_name=?,url=?,remark=? where id=?";
 			jdbcTemplate.update(sql, permissions.getPermissionsName(), permissions.getUrl(), permissions.getRemark(), permissions.getId());
 			logger.debug(SqlUtil.Show(sql, permissions.getPermissionsName(), permissions.getUrl(), permissions.getRemark(), permissions.getId()));
 		}
+		// 初始化cache，存在则覆盖
+		permissionsCache.init(permissionsId);
 	}
 
 	public void delPermissions(Integer id) throws NotAllowDeleteException {

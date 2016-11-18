@@ -101,7 +101,7 @@ public class UserService implements InitializingBean {
 	public void saveUser(USUser user, String roleIds) throws DuplicateKeyException {
 		// 验证是否重名
 		Integer userId = user.getId();
-		if (user.getId() == null) {
+		if (userId == null) {
 			String checkSql = "select 1 from us_user where enable=1 and user_name=? ";
 			List<Map<String, Object>> rst = jdbcTemplate.queryForList(checkSql, user.getUserName());
 			if (rst != null && rst.size() != 0) {

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.blazer.userservice.model.PermissionsModel;
 import org.blazer.userservice.util.IntegerUtil;
 import org.blazer.userservice.util.StringUtil;
@@ -54,7 +55,7 @@ public class PermissionsCache extends BaseCache implements InitializingBean {
 		logger.info("init permissions size : " + list.size());
 	}
 
-	private void init(Integer id) {
+	public void init(Integer id) {
 		// 查询所有权限
 		try {
 			String sql = "select up.id,up.permissions_name,up.url,us.system_name,us.id as system_id,up.parent_id from us_permissions up inner join us_system us on up.system_id=us.id where us.enable=1 and up.enable=1 and up.id=?";
@@ -94,12 +95,17 @@ public class PermissionsCache extends BaseCache implements InitializingBean {
 //		getCache().put(pModel.getId(), pModel);
 //		getCache().put(pModel.getSystemName() + "_" + pModel.getUrl(), pModel.getId());
 		getCache().put(new Element(pModel.getId(), pModel));
-		getCache().put(new Element(pModel.getSystemName() + "_" + pModel.getUrl(), pModel.getId()));
+		if (StringUtils.isNotBlank(pModel.getUrl())) {
+			getCache().put(new Element(pModel.getSystemName() + "_" + pModel.getUrl(), pModel.getId()));
+		}
 	}
 
 	public void remove(Integer id) {
-//		getCache().evict(id);
 		getCache().remove(id);
+	}
+
+	public void remove(String systemName_Url) {
+		getCache().remove(systemName_Url);
 	}
 
 	public PermissionsModel get(Integer id) {
