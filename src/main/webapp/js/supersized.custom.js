@@ -1,5 +1,5 @@
 jQuery(document).ready(function() {
-	var arrs = [4,5,6,7,8];
+	var arrs = [1,2,3];
 	var slides = [];
 	for (var i in arrs) {
 		slides.push({
