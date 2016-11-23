@@ -73,12 +73,17 @@
 		<!-- 用户登录存活周期，单位是秒 -->
 		<init-param>
 			<param-name>cookieSeconds</param-name>
-			<param-value>300</param-value>
+			<param-value>1500</param-value>
 		</init-param>
 		<!-- 过滤url -->
 		<init-param>
 			<param-name>ignoreUrls</param-name>
-			<param-value></param-value>
+			<param-value>/userservice/*</param-value>
+		</init-param>
+		<!-- js模板生成 -->
+		<init-param>
+			<param-name>templateJs</param-name>
+			<param-value>/js/userservice_template.js:/js/userservice.js,/js/domainhelp_template.js:/js/domainhelp.js</param-value>
 		</init-param>
 	</filter>
 	<filter-mapping>

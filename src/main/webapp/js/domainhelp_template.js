@@ -1,6 +1,6 @@
 var $domain = function() {
 	var getDomain = function() {
-		var reg_str = "[http|https]://.*([.][a-zA-Z0-9]*[.][a-zA-Z0-9]*)/*.*";
+		var reg_str = "${DOMAIN_REG}";
 		var domain = location.href.match(new RegExp(reg_str))[1];
 		return domain;
 	};

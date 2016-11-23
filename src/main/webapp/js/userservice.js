@@ -64,5 +64,6 @@ var $userservice = function(systemName) {
 	obj.userNameCn = userNameCn;
 	obj.logout = logout;
 	obj.checkurl = checkurl;
+	obj.domain = domain;
 	return obj;
 };
