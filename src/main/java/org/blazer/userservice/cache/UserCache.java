@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -43,6 +44,12 @@ public class UserCache extends BaseCache implements InitializingBean {
 	@Autowired
 	JdbcTemplate jdbcTemplate;
 
+	@Value("${systemProperties.thread_scan_sleep_millisecond:10000}")
+	private Integer thread_scan_sleep_millisecond;
+
+	@Value("${systemProperties.thread_update_cache_sleep_millisecond:5000}")
+	private Integer thread_update_cache_sleep_millisecond;
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		init();
@@ -53,7 +60,7 @@ public class UserCache extends BaseCache implements InitializingBean {
 				while(true) {
 					try {
 						if (queue.size() == 0) {
-							Thread.sleep(2000);
+							Thread.sleep(thread_scan_sleep_millisecond);
 						} else {
 							Iterator<UserModel> iterator = queue.iterator();
 							if (iterator.hasNext()) {
@@ -62,7 +69,7 @@ public class UserCache extends BaseCache implements InitializingBean {
 								init(um.getId());
 								iterator.remove();
 							}
-							Thread.sleep(100);
+							Thread.sleep(thread_update_cache_sleep_millisecond);
 						}
 					} catch (InterruptedException e) {
 						logger.error(e.getMessage(), e);

@@ -177,7 +177,7 @@ public class UserService implements InitializingBean {
 
 	public void updateUserCacheByRoleId(Integer roleId) {
 		logger.debug("roleId " + roleId);
-		String sql = "select user_name from us_user_role where role_id=?";
+		String sql = "select uur.user_id, uu.user_name from us_user_role uur inner join us_user uu on uu.id=uur.user_id where uur.role_id=?";
 		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql, roleId);
 		StringBuilder userIds = new StringBuilder();
 		for (Map<String, Object> map : list) {
