@@ -3,11 +3,9 @@ package org.blazer.userservice.action;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
 import org.blazer.userservice.body.Body;
 import org.blazer.userservice.body.LoginBody;
 import org.blazer.userservice.cache.PermissionsCache;
