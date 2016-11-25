@@ -21,6 +21,7 @@ import org.blazer.userservice.entity.USUser;
 import org.blazer.userservice.model.PermissionsModel;
 import org.blazer.userservice.model.UserModel;
 import org.blazer.userservice.service.UserService;
+import org.blazer.userservice.util.SqlUtil;
 import org.blazer.userservice.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,8 +41,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class UserServiceAction extends BaseAction {
 
 	private static Logger logger = LoggerFactory.getLogger(UserServiceAction.class);
-	private static final String SESSION_KEY = "US_SESSION_ID";
-	private static final int COOKIE_SECONDS = 60 * 30;
 
 	@Autowired
 	UserCache userCache;
@@ -60,7 +59,7 @@ public class UserServiceAction extends BaseAction {
 	@ResponseBody
 	@RequestMapping("/logout")
 	public String logout(HttpServletRequest request, HttpServletResponse response) {
-		String sessionId = getSessionId(request);
+		String sessionId = PermissionsFilter.getSessionId(request);
 		logger.debug("logout session id : " + sessionId);
 		return output(true, "");
 	}
@@ -68,7 +67,7 @@ public class UserServiceAction extends BaseAction {
 	@ResponseBody
 	@RequestMapping("/login")
 	public Body login(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
-		String sessionStr = getSessionId(request);
+		String sessionStr = PermissionsFilter.getSessionId(request);
 		SessionModel sessionModel = SessionUtil.decode(sessionStr);
 		if (checkUser(sessionModel)) {
 			newSessionId(sessionModel, response, request);
@@ -93,6 +92,8 @@ public class UserServiceAction extends BaseAction {
 		if (um.getPassword().equals(DesUtil.encrypt(params.get("password")))) {
 			String sessionId = SessionUtil.encode(getExpire(), um.getId(), um.getUserName(), um.getUserNameCn(), um.getEmail(), um.getPhoneNumber(),
 					LoginType.userName.index);
+			logger.debug(SqlUtil.Show(SessionUtil.FORMAT.replaceAll("%s", "?"), getExpire(), um.getId(), um.getUserName(), um.getUserNameCn(), um.getEmail(), um.getPhoneNumber(),
+					LoginType.userName.index));
 			// String sessionId = DesUtil.encrypt(String.format(LOGGIN_FORMAT,
 			// LoginType.userName.index, um.getId(), um.getUserName(),
 			// getExpire()));
@@ -107,7 +108,7 @@ public class UserServiceAction extends BaseAction {
 	@RequestMapping("/getuser")
 	public String getUser(HttpServletRequest request, HttpServletResponse response) {
 		response.setContentType("text/html;charset=utf-8");
-		String sessionStr = getSessionId(request);
+		String sessionStr = PermissionsFilter.getSessionId(request);
 		SessionModel sessionModel = SessionUtil.decode(sessionStr);
 		// 检查用户
 		boolean flag = checkUser(sessionModel);
@@ -130,7 +131,7 @@ public class UserServiceAction extends BaseAction {
 	@ResponseBody
 	@RequestMapping("/checkuser")
 	public String checkUser(HttpServletRequest request, HttpServletResponse response) {
-		String sessionStr = getSessionId(request);
+		String sessionStr = PermissionsFilter.getSessionId(request);
 		SessionModel sessionModel = SessionUtil.decode(sessionStr);
 		boolean flag = checkUser(sessionModel);
 		return output(flag, (flag ? newSessionId(sessionModel, response, request) : ""));
@@ -139,7 +140,7 @@ public class UserServiceAction extends BaseAction {
 	@ResponseBody
 	@RequestMapping("/delay")
 	public String delay(HttpServletRequest request, HttpServletResponse response) {
-		String sessionStr = getSessionId(request);
+		String sessionStr = PermissionsFilter.getSessionId(request);
 		SessionModel sessionModel = SessionUtil.decode(sessionStr);
 		String newSession = newSessionId(sessionModel, response, request);
 		return output(newSession != null, newSession);
@@ -149,7 +150,7 @@ public class UserServiceAction extends BaseAction {
 	@RequestMapping("/checkurl")
 	public String checkUrl(HttpServletRequest request, HttpServletResponse response) {
 		logger.debug("request:" + request.toString());
-		String sessionStr = getSessionId(request);
+		String sessionStr = PermissionsFilter.getSessionId(request);
 		SessionModel sessionModel = SessionUtil.decode(sessionStr);
 		HashMap<String, String> params = getParamMap(request);
 		String newSession = newSessionId(sessionModel, response, request);
@@ -222,7 +223,9 @@ public class UserServiceAction extends BaseAction {
 	}
 
 	private long getExpire() {
-		return COOKIE_SECONDS * 1000 + System.currentTimeMillis();
+//		return COOKIE_SECONDS * 1000 + System.currentTimeMillis();
+		System.out.println(PermissionsFilter.getCookieSeconds());
+		return PermissionsFilter.getCookieSeconds() + System.currentTimeMillis();
 	}
 
 	private String getSystemName_Url(HashMap<String, String> params) {
@@ -237,24 +240,24 @@ public class UserServiceAction extends BaseAction {
 		return params.get("url");
 	}
 
-	private String getSessionId(HttpServletRequest request) {
-		String paramKey = getParamMap(request).get(SESSION_KEY);
-		if (StringUtils.isNotBlank(paramKey)) {
-			return paramKey;
-		}
-		Cookie[] cookies = request.getCookies();
-		Cookie sessionCookie = null;
-		if (cookies != null) {
-			for (Cookie cookie : cookies) {
-				if (SESSION_KEY.equals(cookie.getName())) {
-					logger.debug("cookie : " + cookie.getName() + " | " + cookie.getValue());
-					sessionCookie = cookie;
-					break;
-				}
-			}
-		}
-		return sessionCookie == null ? null : sessionCookie.getValue();
-	}
+//	private String getSessionId(HttpServletRequest request) {
+//		String paramKey = getParamMap(request).get(SESSION_KEY);
+//		if (StringUtils.isNotBlank(paramKey)) {
+//			return paramKey;
+//		}
+//		Cookie[] cookies = request.getCookies();
+//		Cookie sessionCookie = null;
+//		if (cookies != null) {
+//			for (Cookie cookie : cookies) {
+//				if (SESSION_KEY.equals(cookie.getName())) {
+//					logger.debug("cookie : " + cookie.getName() + " | " + cookie.getValue());
+//					sessionCookie = cookie;
+//					break;
+//				}
+//			}
+//		}
+//		return sessionCookie == null ? null : sessionCookie.getValue();
+//	}
 
 	@ResponseBody
 	@RequestMapping("/uppwd")
