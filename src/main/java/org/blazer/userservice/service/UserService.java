@@ -12,6 +12,7 @@ import org.blazer.userservice.cache.UserCache;
 import org.blazer.userservice.core.util.DesUtil;
 import org.blazer.userservice.entity.USUser;
 import org.blazer.userservice.exception.DuplicateKeyException;
+import org.blazer.userservice.model.UserModel;
 import org.blazer.userservice.util.IntegerUtil;
 import org.blazer.userservice.util.SqlUtil;
 import org.blazer.userservice.util.StringUtil;
@@ -172,6 +173,26 @@ public class UserService implements InitializingBean {
 		String roleIds = list.size() == 0 ? "" : StringUtil.getStrEmpty(list.get(0).get("roleids"));
 		logger.debug(roleIds);
 		return roleIds;
+	}
+
+	public void updateUserCacheByRoleId(Integer roleId) {
+		logger.debug("roleId " + roleId);
+		String sql = "select user_name from us_user_role where role_id=?";
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql, roleId);
+		StringBuilder userIds = new StringBuilder();
+		for (Map<String, Object> map : list) {
+			UserModel um = new UserModel();
+			String userName = StringUtil.getStrEmpty(map.get("user_name"));
+			Integer userId = IntegerUtil.getInt0(map.get("user_id"));
+			um.setUserName(userName);
+			um.setId(userId);
+			userCache.addQueue(um);
+			userIds.append(userId).append(",");
+		}
+		if (userIds.length() != 0) {
+			userIds.deleteCharAt(userIds.length()-1);
+		}
+		logger.info("userIds : " + userIds);
 	}
 
 }

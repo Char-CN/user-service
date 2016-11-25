@@ -1,7 +1,9 @@
 package org.blazer.userservice.cache;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.commons.lang3.StringUtils;
 import org.blazer.userservice.model.UserModel;
@@ -36,12 +38,47 @@ public class UserCache extends BaseCache implements InitializingBean {
 
 	private static Logger logger = LoggerFactory.getLogger(UserCache.class);
 
+	private LinkedBlockingQueue<UserModel> queue = new LinkedBlockingQueue<UserModel>();
+
 	@Autowired
 	JdbcTemplate jdbcTemplate;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		init();
+		// 轮询检查
+		Thread t = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				while(true) {
+					try {
+						if (queue.size() == 0) {
+							Thread.sleep(2000);
+						} else {
+							Iterator<UserModel> iterator = queue.iterator();
+							if (iterator.hasNext()) {
+								UserModel um = iterator.next();
+								logger.debug("init [{}] [{}]", um.getUserName(), um.getId());
+								init(um.getId());
+								iterator.remove();
+							}
+							Thread.sleep(100);
+						}
+					} catch (InterruptedException e) {
+						logger.error(e.getMessage(), e);
+					}
+				}
+			}
+		});
+		t.start();
+	}
+
+	public void addQueue(UserModel um) {
+		queue.add(um);
+	}
+
+	public LinkedBlockingQueue<UserModel> getQueue() {
+		return queue;
 	}
 
 	public void init() {

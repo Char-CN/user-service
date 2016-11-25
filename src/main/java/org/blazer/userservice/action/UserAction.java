@@ -1,13 +1,17 @@
 package org.blazer.userservice.action;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.blazer.userservice.body.Body;
 import org.blazer.userservice.body.PageBody;
+import org.blazer.userservice.cache.UserCache;
 import org.blazer.userservice.entity.USUser;
+import org.blazer.userservice.model.UserModel;
 import org.blazer.userservice.service.UserService;
 import org.blazer.userservice.util.HMap;
 import org.blazer.userservice.util.IntegerUtil;
@@ -28,6 +32,15 @@ public class UserAction extends BaseAction {
 
 	@Autowired
 	UserService userService;
+
+	@Autowired
+	UserCache userCache;
+
+	@ResponseBody
+	@RequestMapping("/findWaitingUpdateUserCache")
+	public LinkedBlockingQueue<UserModel> findWaitingUpdateUserCache(HttpServletRequest request, HttpServletResponse response) {
+		return userCache.getQueue();
+	}
 
 	@ResponseBody
 	@RequestMapping("/findUserByPage")

@@ -28,6 +28,9 @@ public class RoleService {
 	@Autowired
 	JdbcTemplate jdbcTemplate;
 
+	@Autowired
+	UserService userService;
+
 	public List<USRole> findRoleAll() {
 		try {
 			String sql = "select * from us_role where enable=1";
@@ -114,6 +117,24 @@ public class RoleService {
 		jdbcTemplate.batchUpdate(sql, params);
 		long l2 = System.currentTimeMillis();
 		logger.info("saveRole waste time : " + (l2-l1));
+		// 更新用户缓存
+		userService.updateUserCacheByRoleId(roleId);
+//		WaitUpdateUserCache wuuc = new WaitUpdateUserCache();
+//		wuuc.setTotal(60);
+//		List<Integer> list = new ArrayList<Integer>();
+//		for (int i = 1; i <= 60; i ++) {
+//			list.add(i);
+//		}
+//		wuuc.setWaitForUpdateUserList(list);
+//		updateUserCacheMap.put("test", wuuc);
+//		for (int i = list.size() - 1; i >= 0; i --) {
+//			try {
+//				Thread.sleep(1000);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//			wuuc.getWaitForUpdateUserList().remove(i);
+//		}
 	}
 
 	public void delRole(Integer id) throws Exception {
