@@ -1,7 +1,6 @@
 package org.blazer.userservice.action;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.servlet.http.HttpServletRequest;
