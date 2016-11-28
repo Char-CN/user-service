@@ -9,6 +9,7 @@ import org.blazer.userservice.body.PageBody;
 import org.blazer.userservice.body.TreeBody;
 import org.blazer.userservice.cache.PermissionsCache;
 import org.blazer.userservice.entity.USSystem;
+import org.blazer.userservice.exception.DuplicateKeyException;
 import org.blazer.userservice.exception.NotAllowDeleteException;
 import org.blazer.userservice.model.PermissionsModel;
 import org.blazer.userservice.util.HMap;
@@ -119,13 +120,23 @@ public class SystemService {
 		return pb;
 	}
 
-	public void saveSystem(USSystem system) {
+	public void saveSystem(USSystem system) throws DuplicateKeyException {
 		logger.debug("system " + system);
 		if (system.getId() == null) {
+			String checkSql = "select 1 from us_system where enable=1 and system_name=?";
+			List<Map<String, Object>> rst = jdbcTemplate.queryForList(checkSql, system.getSystemName());
+			if (rst != null && rst.size() != 0) {
+				throw new DuplicateKeyException("已经存在该系统名！");
+			}
 			// enable 数据库默认值1
 			String sql = "insert into us_system(system_name,index_url,remark) values(?,?,?)";
 			jdbcTemplate.update(sql, system.getSystemName(), system.getIndexUrl(), system.getRemark());
 		} else {
+			String checkSql = "select 1 from us_system where enable=1 and system_name=? and id != ?";
+			List<Map<String, Object>> rst = jdbcTemplate.queryForList(checkSql, system.getSystemName(), system.getId());
+			if (rst != null && rst.size() != 0) {
+				throw new DuplicateKeyException("已经存在该系统名！");
+			}
 			String sql = "update us_system set system_name=?,index_url=?,remark=? where id=?";
 			jdbcTemplate.update(sql, system.getSystemName(), system.getIndexUrl(), system.getRemark(), system.getId());
 		}
@@ -138,7 +149,7 @@ public class SystemService {
 		Integer count = IntegerUtil.getInt0(jdbcTemplate.queryForList(sql, id).get(0).get("ct"));
 		logger.debug("permissions count : " + count);
 		if (count != 0) {
-			throw new NotAllowDeleteException("该系统下有[" + count + "]个权限，不能删除。");
+			throw new NotAllowDeleteException("该系统下有[" + count + "]个权限，不能删除。如需删除必先解除关联的权限。");
 		}
 		sql = "update us_system set enable=0 where id=?";
 		logger.debug(SqlUtil.Show(sql, id));

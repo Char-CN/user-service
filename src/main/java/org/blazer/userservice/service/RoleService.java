@@ -144,7 +144,7 @@ public class RoleService {
 		Integer count = IntegerUtil.getInt0(jdbcTemplate.queryForList(sql, id).get(0).get("ct"));
 		logger.debug("user count : " + count);
 		if (count != 0) {
-			throw new NotAllowDeleteException("该角色下有[" + count + "]个用户，不能删除。");
+			throw new NotAllowDeleteException("该角色下有[" + count + "]个用户，不能删除。如需删除必先解除关联的用户。");
 		}
 		sql = "update us_role set enable=0 where id=?";
 		logger.debug(SqlUtil.Show(sql, id));

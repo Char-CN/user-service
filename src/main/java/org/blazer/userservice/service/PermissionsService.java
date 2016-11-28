@@ -28,7 +28,7 @@ public class PermissionsService {
 
 	@Autowired
 	JdbcTemplate jdbcTemplate;
-	
+
 	@Autowired
 	PermissionsCache permissionsCache;
 
@@ -71,7 +71,7 @@ public class PermissionsService {
 		Integer count = IntegerUtil.getInt0(jdbcTemplate.queryForList(sql, id).get(0).get("ct"));
 		logger.debug("role count : " + count);
 		if (count != 0) {
-			throw new NotAllowDeleteException("该权限被分配[" + count + "]个角色，不能删除。");
+			throw new NotAllowDeleteException("该权限被分配[" + count + "]个角色，不能删除。如需删除必先解除关联的角色。");
 		}
 		sql = "update us_permissions set enable=0 where id=?";
 		logger.debug(SqlUtil.Show(sql, id));

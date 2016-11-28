@@ -78,7 +78,7 @@
 		<!-- 过滤url -->
 		<init-param>
 			<param-name>ignoreUrls</param-name>
-			<param-value>/userservice/*,login.html,/pwd.html</param-value>
+			<param-value>/userservice/*,/login.html,/pwd.html</param-value>
 		</init-param>
 		<!-- js模板生成 -->
 		<init-param>

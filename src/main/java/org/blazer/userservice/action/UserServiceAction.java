@@ -223,7 +223,7 @@ public class UserServiceAction extends BaseAction {
 	private long getExpire() {
 //		return COOKIE_SECONDS * 1000 + System.currentTimeMillis();
 		System.out.println(PermissionsFilter.getCookieSeconds());
-		return PermissionsFilter.getCookieSeconds() + System.currentTimeMillis();
+		return PermissionsFilter.getCookieSeconds() * 1000 + System.currentTimeMillis();
 	}
 
 	private String getSystemName_Url(HashMap<String, String> params) {
@@ -237,25 +237,6 @@ public class UserServiceAction extends BaseAction {
 	private String getUrl(HashMap<String, String> params) {
 		return params.get("url");
 	}
-
-//	private String getSessionId(HttpServletRequest request) {
-//		String paramKey = getParamMap(request).get(SESSION_KEY);
-//		if (StringUtils.isNotBlank(paramKey)) {
-//			return paramKey;
-//		}
-//		Cookie[] cookies = request.getCookies();
-//		Cookie sessionCookie = null;
-//		if (cookies != null) {
-//			for (Cookie cookie : cookies) {
-//				if (SESSION_KEY.equals(cookie.getName())) {
-//					logger.debug("cookie : " + cookie.getName() + " | " + cookie.getValue());
-//					sessionCookie = cookie;
-//					break;
-//				}
-//			}
-//		}
-//		return sessionCookie == null ? null : sessionCookie.getValue();
-//	}
 
 	@ResponseBody
 	@RequestMapping("/uppwd")

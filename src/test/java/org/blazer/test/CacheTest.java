@@ -1,4 +1,4 @@
-package org.blazer.userservice.service;
+package org.blazer.test;
 
 import org.blazer.userservice.model.RoleModel;
 import org.blazer.userservice.util.ApplicationUtil;
