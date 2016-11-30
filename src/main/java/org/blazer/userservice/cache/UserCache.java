@@ -65,7 +65,7 @@ public class UserCache extends BaseCache implements InitializingBean {
 							Iterator<UserModel> iterator = queue.iterator();
 							if (iterator.hasNext()) {
 								UserModel um = iterator.next();
-								logger.debug("init [{}] [{}]", um.getUserName(), um.getId());
+								logger.debug("Queue Update User : [{}] [{}]", um.getId(), um.getUserName());
 								init(um.getId());
 								iterator.remove();
 							}
