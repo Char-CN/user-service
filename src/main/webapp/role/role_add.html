@@ -2,17 +2,17 @@
 <form ds_index="form" method="post" url="">
 	<div style="margin-bottom: 20px">
 		<span style="width: 130px; padding-left: 20px; display: inline-block">角色名:</span>
-		<input ds_index="role_name" class="easyui-textbox" style="width: 200px" data-options="required:true,validType:'nospace'">
+		<input ds_index="role_name" class="easyui-textbox" style="width: 300px" data-options="required:true,validType:'nospace'">
 		<input ds_index="id" type="hidden" name="id">
 	</div>
 	<div style="margin-bottom: 20px">
 		<span style="width: 130px; padding-left: 20px; display: inline-block">权限:</span>
-		<select ds_index="permissions_tree" class="easyui-combotree" style="width: 200px;height:60px;" multiple="true" multiline="true" editable="false">
+		<select ds_index="permissions_tree" class="easyui-combotree" style="width: 500px;height:160px;" multiple="true" multiline="true" editable="false">
 		</select>
 	</div>
 	<div style="margin-bottom: 20px">
 		<span style="width: 130px; padding-left: 20px; display: inline-block">备注:</span>
-		<input ds_index="remark" class="easyui-textbox" style="width: 200px; height: 60px" data-options="multiline:true">
+		<input ds_index="remark" class="easyui-textbox" style="width: 500px; height: 60px" data-options="multiline:true">
 	</div>
 	<div style="text-align: center; padding: 5px 0">
 		<a href="javascript:void(0)" class="easyui-linkbutton" ds_index="submit" style="width: 80px">提交</a>
@@ -27,36 +27,6 @@
 		var windowId = '$windowId';
 		var id = $.ds.getQueryString(queryString, "id");
 		var this_window = $("#" + windowId);
-// 		setTimeout(function() {
-// 			$.messager.progress('close');
-// 			$.messager.progress({ 
-// 				title:'请稍后', 
-// 				msg:'正在更新受影响的用户...',
-// 				text:'20%',
-// 				interval:0
-// 			});
-// 			$.messager.progress('bar').progressbar('setValue', '20');
-// 		}, 1000);
-// 		setTimeout(function() {
-// 			$.messager.progress('close');
-// 			$.messager.progress({ 
-// 				title:'请稍后', 
-// 				msg:'正在更新受影响的用户...',
-// 				text:'30%',
-// 				interval:0
-// 			});
-// 			$.messager.progress('bar').progressbar('setValue', '30');
-// 		}, 2000);
-// 		setTimeout(function() {
-// 			$.messager.progress('close');
-// 			$.messager.progress({ 
-// 				title:'请稍后', 
-// 				msg:'正在更新受影响的用户...',
-// 				text:'40%',
-// 				interval:0
-// 			});
-// 			$.messager.progress('bar').progressbar('setValue', '40');
-// 		}, 3000);
 		this_window.DSFind("permissions_tree").combotree({
 			url : $.ds.url.find_system_and_permissions_tree,
 			onLoadSuccess : function(node, data) {

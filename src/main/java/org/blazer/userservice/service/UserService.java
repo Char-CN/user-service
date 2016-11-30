@@ -122,7 +122,11 @@ public class UserService implements InitializingBean {
 			jdbcTemplate.update(sql, user.getUserName(), user.getUserNameCn(), user.getEmail(), user.getPhoneNumber(), user.getRemark(), user.getId());
 		}
 		addUserRole(userId, roleIds);
-		userCache.init(userId);
+//		userCache.init(userId);
+		UserModel um = new UserModel();
+		um.setId(userId);
+		um.setUserName(user.getUserName());
+		userCache.addQueue(um);
 	}
 
 	public void updatePwd(USUser user) {
