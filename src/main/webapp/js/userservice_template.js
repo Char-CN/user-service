@@ -72,18 +72,30 @@ var $userservice = function(systemName) {
 	var _getlogin = _url + "/login.html";
 	var userName = null;
 	var userNameCn = null;
+
+	//	var domain = location.href.match(new RegExp("${DOMAIN_REG}"))[1];
 	// 如：.blazer.org
-	var domain = location.href.match(new RegExp("${DOMAIN_REG}"))[1];
+	var getDomain = function() {
+		var _domain = location.href.match(new RegExp("${DOMAIN_REG}"));
+		if (_domain == null || _domain == undefined) {
+			alert("对不起，域名不正确。");
+			return null;
+		}
+		return _domain[1];
+	};
 
 	var init = function() {
 		userName = decodeURIComponent(config("${NAME_KEY}"));
 		userNameCn = decodeURIComponent(config("${NAME_CN_KEY}"));
 	};
 
+	var domain = getDomain();
 	var logout = function() {
 		var r=confirm("您确定退出登录吗？");
 		if (r) {
 			config("${SESSION_KEY}", "", { path: "/", expires: -1, domain : domain});
+			config("${NAME_KEY}", "", { path: "/", expires: -1, domain : domain});
+			config("${NAME_CN_KEY}", "", { path: "/", expires: -1, domain : domain});
 			location.href = _getlogin + "?url=" + encodeURIComponent(location.href);
 		}
 	};
@@ -131,6 +143,6 @@ var $userservice = function(systemName) {
 	obj.userNameCn = userNameCn;
 	obj.logout = logout;
 	obj.checkurl = checkurl;
-	obj.domain = domain;
+	obj.getDomain = getDomain;
 	return obj;
 };

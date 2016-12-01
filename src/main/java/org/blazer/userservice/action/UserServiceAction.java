@@ -241,6 +241,7 @@ public class UserServiceAction extends BaseAction {
 	@ResponseBody
 	@RequestMapping("/uppwd")
 	public String uppwd(HttpServletRequest request, HttpServletResponse response) {
+		response.setContentType("text/html;charset=utf-8");
 		HashMap<String, String> params = getParamMap(request);
 		logger.debug("user name : " + params.get("userName"));
 		if (!params.containsKey("userName")) {

@@ -83,7 +83,8 @@
 		<!-- js模板生成 -->
 		<init-param>
 			<param-name>templateJs</param-name>
-			<param-value>/js/userservice_template.js:/js/userservice.js,/js/domainhelp_template.js:/js/domainhelp.js</param-value>
+<!-- 			<param-value>/js/userservice_template.js:/js/userservice.js,/js/domainhelp_template.js:/js/domainhelp.js</param-value> -->
+			<param-value>/js/userservice_template.js:/js/userservice.js</param-value>
 		</init-param>
 	</filter>
 	<filter-mapping>

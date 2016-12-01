@@ -27,11 +27,11 @@
 	<!-- Javascript -->
 	<script type="text/javascript" src="js/jquery.min.js"></script>
 	<script type="text/javascript" src="js/jquery.cookie.js"></script>
-	<script type="text/javascript" src="js/domainhelp.js"></script>
+	<script type="text/javascript" src="js/userservice.js"></script>
 	<script type="text/javascript" src="js/supersized.3.2.7.min.js"></script>
 	<script type="text/javascript" src="js/supersized.custom.js"></script>
 	<script>
-		var domain = $domain.getDomain();
+		var domain = new $userservice().getDomain();
 		var session_key = "US_SESSION_ID";
 		var getQueryString = function(name) {
 			var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
