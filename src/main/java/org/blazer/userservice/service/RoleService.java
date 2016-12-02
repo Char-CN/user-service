@@ -47,7 +47,7 @@ public class RoleService {
 		return new ArrayList<USRole>();
 	}
 
-	public PageBody<USRole> findRoleByPage(HashMap<String, String> params) {
+	public PageBody<USRole> findRoleByPage(HashMap<String, String> params) throws Exception {
 		PageBody<USRole> pb = new PageBody<USRole>();
 		String where = " where 1=1 and enable = 1 ";
 		String roleName = StringUtil.getStr(params.get("roleName"));
@@ -61,14 +61,14 @@ public class RoleService {
 		logger.debug("end : " + end);
 		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql, start, end);
 		logger.debug("list size : " + list.size());
-		List<USRole> roleList = new ArrayList<USRole>();
-		for (Map<String, Object> map : list) {
-			USRole role = new USRole();
-			role.setId(IntegerUtil.getInt0(map.get("id")));
-			role.setRoleName(StringUtil.getStrEmpty(map.get("role_name")));
-			role.setRemark(StringUtil.getStrEmpty(map.get("remark")));
-			roleList.add(role);
-		}
+		List<USRole> roleList = HMap.toList(list, USRole.class);
+//		for (Map<String, Object> map : list) {
+//			USRole role = new USRole();
+//			role.setId(IntegerUtil.getInt0(map.get("id")));
+//			role.setRoleName(StringUtil.getStrEmpty(map.get("role_name")));
+//			role.setRemark(StringUtil.getStrEmpty(map.get("remark")));
+//			roleList.add(role);
+//		}
 		pb.setTotal(IntegerUtil.getInt0(jdbcTemplate.queryForList("select count(0) as ct from us_role " + where).get(0).get("ct")));
 		pb.setRows(roleList);
 		logger.debug(pb.toString());
@@ -119,22 +119,6 @@ public class RoleService {
 		logger.info("saveRole waste time : " + (l2-l1));
 		// 更新用户缓存
 		userService.updateUserCacheByRoleId(roleId);
-//		WaitUpdateUserCache wuuc = new WaitUpdateUserCache();
-//		wuuc.setTotal(60);
-//		List<Integer> list = new ArrayList<Integer>();
-//		for (int i = 1; i <= 60; i ++) {
-//			list.add(i);
-//		}
-//		wuuc.setWaitForUpdateUserList(list);
-//		updateUserCacheMap.put("test", wuuc);
-//		for (int i = list.size() - 1; i >= 0; i --) {
-//			try {
-//				Thread.sleep(1000);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//			wuuc.getWaitForUpdateUserList().remove(i);
-//		}
 	}
 
 	public void delRole(Integer id) throws Exception {

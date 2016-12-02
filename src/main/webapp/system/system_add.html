@@ -6,7 +6,11 @@
 		<input ds_index="id" type="hidden" name="id">
 	</div>
 	<div style="margin-bottom: 20px">
-		<span style="width: 130px; padding-left: 20px; display: inline-block">首页:</span>
+		<span style="width: 130px; padding-left: 20px; display: inline-block">显示标题:</span>
+		<input ds_index="title" class="easyui-textbox" style="width: 200px;" data-options="multiline:false">
+	</div>
+	<div style="margin-bottom: 20px">
+		<span style="width: 130px; padding-left: 20px; display: inline-block">首页索引:</span>
 		<input ds_index="index_url" class="easyui-textbox" style="width: 200px;" data-options="multiline:false">
 	</div>
 	<div style="margin-bottom: 20px">
@@ -35,6 +39,7 @@
 				}
 				var json = {
 					id : this_window.DSFind("id").val(),
+					title : this_window.DSFind("title").textbox('getValue'),
 					indexUrl : this_window.DSFind("index_url").textbox('getValue'),
 					systemName : this_window.DSFind("system_name").textbox('getValue'),
 					remark : this_window.DSFind("remark").textbox('getValue')
@@ -61,6 +66,7 @@
 					id : id
 				}, function(system) {
 					this_window.DSFind("system_name").textbox('setValue', system.systemName);
+					this_window.DSFind("title").textbox('setValue', system.title);
 					this_window.DSFind("index_url").textbox('setValue', system.indexUrl);
 					this_window.DSFind("remark").textbox('setValue', system.remark);
 					this_window.DSFind("id").val(system.id);

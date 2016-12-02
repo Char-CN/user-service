@@ -3,6 +3,7 @@ package org.blazer.userservice.entity;
 public class USSystem {
 
 	private Integer id;
+	private String title;
 	private String systemName;
 	private String indexUrl;
 	private String remark;
@@ -13,6 +14,14 @@ public class USSystem {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	public String getSystemName() {

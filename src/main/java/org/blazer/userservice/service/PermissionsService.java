@@ -35,7 +35,7 @@ public class PermissionsService {
 	@Autowired
 	SystemService systemService;
 
-	public void savePermissions(USPermissions permissions) throws DuplicateKeyException {
+	public void savePermissions(USPermissions permissions) throws Exception {
 		String systemName = systemService.findSystemById(permissions.getSystemId()).getSystemName();
 		Integer permissionsId = permissions.getId();
 		if (permissionsId == null) {
@@ -106,21 +106,14 @@ public class PermissionsService {
 		return rst;
 	}
 
-	public USPermissions findPermissionsById(HashMap<String, String> params) {
+	public USPermissions findPermissionsById(HashMap<String, String> params) throws Exception {
 		String sql = "select * from us_permissions where id=? and enable=1";
 		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql, IntegerUtil.getInt0(params.get("id")));
 		USPermissions permissions = new USPermissions();
 		if (list.size() == 0) {
 			return permissions;
 		}
-		Map<String, Object> map = list.get(0);
-		permissions.setId(IntegerUtil.getInt0(map.get("id")));
-		permissions.setSystemId(IntegerUtil.getInt0(map.get("system_id")));
-		permissions.setParentId(IntegerUtil.getInt0(map.get("parent_id")));
-		permissions.setPermissionsName(StringUtil.getStrEmpty(map.get("permissions_name")));
-		permissions.setUrl(StringUtil.getStrEmpty(map.get("url")));
-		permissions.setRemark(StringUtil.getStrEmpty(map.get("remark")));
-		return permissions;
+		return HMap.to(list.get(0), USPermissions.class);
 	}
 
 }

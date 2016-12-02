@@ -9,16 +9,75 @@
 <!-- CSS -->
 <link rel="stylesheet" href="css/login.css">
 <link rel="stylesheet" href="css/supersized.css">
+<!-- Javascript -->
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/jquery.cookie.js"></script>
+<script type="text/javascript" src="js/jquery.easyui.commons.js"></script>
+<script type="text/javascript" src="js/supersized.3.2.7.min.js"></script>
+<script type="text/javascript" src="js/supersized.custom.js"></script>
+<style>
+h1 {
+}
+.myli {
+	float: left;
+	margin: 5px;
+	border: 3px solid #C6E2FF;
+	vertical-align: middle;
+	cursor: pointer;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	user-select: none;
+}
+</style>
+<script>
+	$(window).load(function() {
+		var contentWidth = $(window).width() - 400;
+		$("#content").width(contentWidth + 24);
+		$("#content").height(100);
+		$.get($.ds.url.find_system_all_by_display, function(data) {
+			for (var i in data) {
+				var title = data[i].title;
+				if (title == null) {
+					title = data[i].systemName;
+				}
+				var li = $("<li><h3>" + title + "</h3></li>");
+				li.addClass("myli");
+				li.width((contentWidth - 40) / 4);
+				li.height(100);
+				li.css('line-height', '100px');
+				li.hover(function(){
+				    $(this).css("filter", "alpha(opacity=10)");
+				    $(this).css("-moz-opacity", "0.9");
+				    $(this).css("-khtml-opacity", "0.9");
+				    $(this).css("opacity", "0.9");
+				    $(this).css("background-color", "#C6E2FF");
+				},function(){
+				    $(this).css("filter", "");
+				    $(this).css("-moz-opacity", "");
+				    $(this).css("-khtml-opacity", "");
+				    $(this).css("opacity", "");
+				    $(this).css("background-color", "");
+				});
+				li.click({indexUrl: data[i].indexUrl}, function(event) {
+					if (event.data.indexUrl == null) {
+						alert("对不起，该系统没有配置Url。");
+						return;
+					}
+					window.open(event.data.indexUrl);
+				});
+				$("#content>ul").append(li);
+			}
+		});
+	});
+</script>
 </head>
 <body>
-	<h1>系统列表</h1>
-	<div class="page-container">
+	<h1 style="margin: 20px; text-align: center;">系统列表</h1>
+	<div id="content" style="text-align:center; margin:0 auto;">
+		<ul style="list-style: none; float: left;">
+		</ul>
 	</div>
-	<!-- Javascript -->
-	<script type="text/javascript" src="js/jquery.min.js"></script>
-	<script type="text/javascript" src="js/jquery.cookie.js"></script>
-	<script type="text/javascript" src="js/supersized.3.2.7.min.js"></script>
-	<script type="text/javascript" src="js/supersized.custom.js"></script>
+	<div style="clear: both;"></div> 
 </body>
 </html>
 

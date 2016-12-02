@@ -40,6 +40,18 @@ public class SystemAction extends BaseAction {
 		}
 		return new ArrayList<USSystem>();
 	}
+	
+	@ResponseBody
+	@RequestMapping("/findSystemAllByDisplay")
+	public List<USSystem> findSystemAllByDisplay(HttpServletRequest request, HttpServletResponse response) {
+		logger.debug("map : " + getParamMap(request));
+		try {
+			return systemService.findSystemAllByDisplay();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return new ArrayList<USSystem>();
+	}
 
 	@ResponseBody
 	@RequestMapping("/findSystemAndPermissionsTree")

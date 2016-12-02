@@ -61,7 +61,7 @@
 					}, 200);
 				}
 			}).dialog('resize', {
-				height : 280,
+				height : 330,
 				top: 100
 			});
 		});
@@ -74,7 +74,7 @@
 					table.datagrid('getPager').pagination('select', 99999999);
 				}
 			}).dialog('resize', {
-				height : 280,
+				height : 330,
 				top: 100
 			});
 		});
@@ -92,15 +92,19 @@
 				hidden : true
 			}, {
 				field : 'systemName',
-				width : "25%",
+				width : "20%",
 				title : '系统名'
 			}, {
+				field : 'title',
+				width : "20%",
+				title : '显示标题'
+			}, {
 				field : 'indexUrl',
-				width : "30%",
-				title : '首页'
+				width : "35%",
+				title : '首页索引'
 			}, {
 				field : 'remark',
-				width : "40%",
+				width : "20%",
 				title : '备注'
 			} ] ],
 			rownumbers : true,

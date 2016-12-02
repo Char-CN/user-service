@@ -81,9 +81,6 @@ public class SystemService {
 			List<Map<String, Object>> rst = jdbcTemplate.queryForList(sql);
 			List<USSystem> list = HMap.toList(rst, USSystem.class);
 			logger.debug("rst size : " + rst.size());
-			if (list.size() > 0) {
-				logger.debug("system : " + list.get(0));
-			}
 			return list;
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -91,7 +88,20 @@ public class SystemService {
 		return new ArrayList<USSystem>();
 	}
 
-	public PageBody<USSystem> findSystemByPage(HashMap<String, String> params) {
+	public List<USSystem> findSystemAllByDisplay() {
+		try {
+			String sql = "select * from us_system where enable=1 and display=1";
+			List<Map<String, Object>> rst = jdbcTemplate.queryForList(sql);
+			List<USSystem> list = HMap.toList(rst, USSystem.class);
+			logger.debug("rst size : " + rst.size());
+			return list;
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return new ArrayList<USSystem>();
+	}
+
+	public PageBody<USSystem> findSystemByPage(HashMap<String, String> params) throws Exception {
 		PageBody<USSystem> pb = new PageBody<USSystem>();
 		String where = " where 1=1 and enable=1 ";
 		String systemName = StringUtil.getStr(params.get("systemName"));
@@ -105,15 +115,15 @@ public class SystemService {
 		logger.debug("end : " + end);
 		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql, start, end);
 		logger.debug("list size : " + list.size());
-		List<USSystem> systemList = new ArrayList<USSystem>();
-		for (Map<String, Object> map : list) {
-			USSystem system = new USSystem();
-			system.setId(IntegerUtil.getInt0(map.get("id")));
-			system.setIndexUrl(StringUtil.getStrEmpty(map.get("index_url")));
-			system.setSystemName(StringUtil.getStrEmpty(map.get("system_name")));
-			system.setRemark(StringUtil.getStrEmpty(map.get("remark")));
-			systemList.add(system);
-		}
+		List<USSystem> systemList = HMap.toList(list, USSystem.class);
+//		for (Map<String, Object> map : list) {
+//			USSystem system = new USSystem();
+//			system.setId(IntegerUtil.getInt0(map.get("id")));
+//			system.setIndexUrl(StringUtil.getStrEmpty(map.get("index_url")));
+//			system.setSystemName(StringUtil.getStrEmpty(map.get("system_name")));
+//			system.setRemark(StringUtil.getStrEmpty(map.get("remark")));
+//			systemList.add(system);
+//		}
 		pb.setTotal(IntegerUtil.getInt0(jdbcTemplate.queryForList("select count(0) as ct from us_system " + where).get(0).get("ct")));
 		pb.setRows(systemList);
 		logger.debug(pb.toString());
@@ -129,16 +139,16 @@ public class SystemService {
 				throw new DuplicateKeyException("已经存在该系统名！");
 			}
 			// enable 数据库默认值1
-			String sql = "insert into us_system(system_name,index_url,remark) values(?,?,?)";
-			jdbcTemplate.update(sql, system.getSystemName(), system.getIndexUrl(), system.getRemark());
+			String sql = "insert into us_system(system_name,title,index_url,remark) values(?,?,?,?)";
+			jdbcTemplate.update(sql, system.getSystemName(), system.getTitle(), system.getIndexUrl(), system.getRemark());
 		} else {
 			String checkSql = "select 1 from us_system where enable=1 and system_name=? and id != ?";
 			List<Map<String, Object>> rst = jdbcTemplate.queryForList(checkSql, system.getSystemName(), system.getId());
 			if (rst != null && rst.size() != 0) {
 				throw new DuplicateKeyException("已经存在该系统名！");
 			}
-			String sql = "update us_system set system_name=?,index_url=?,remark=? where id=?";
-			jdbcTemplate.update(sql, system.getSystemName(), system.getIndexUrl(), system.getRemark(), system.getId());
+			String sql = "update us_system set system_name=?,title=?,index_url=?,remark=? where id=?";
+			jdbcTemplate.update(sql, system.getSystemName(), system.getTitle(), system.getIndexUrl(), system.getRemark(), system.getId());
 		}
 	}
 
@@ -156,22 +166,24 @@ public class SystemService {
 		jdbcTemplate.update(sql, id);
 	}
 
-	public USSystem findSystemById(Integer id) {
+	public USSystem findSystemById(Integer id) throws Exception {
 		String sql = "select * from us_system where id=? and enable=1";
 		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql, id);
 		USSystem system = new USSystem();
 		if (list.size() == 0) {
 			return system;
 		}
-		Map<String, Object> map = list.get(0);
-		system.setId(IntegerUtil.getInt0(map.get("id")));
-		system.setSystemName(StringUtil.getStrEmpty(map.get("system_name")));
-		system.setIndexUrl(StringUtil.getStrEmpty(map.get("index_url")));
-		system.setRemark(StringUtil.getStrEmpty(map.get("remark")));
-		return system;
+		List<USSystem> systemList = HMap.toList(list, USSystem.class);
+//		Map<String, Object> map = list.get(0);
+//		system.setId(IntegerUtil.getInt0(map.get("id")));
+//		system.setTitle(StringUtil.getStrEmpty(map.get("title")));
+//		system.setSystemName(StringUtil.getStrEmpty(map.get("system_name")));
+//		system.setIndexUrl(StringUtil.getStrEmpty(map.get("index_url")));
+//		system.setRemark(StringUtil.getStrEmpty(map.get("remark")));
+		return systemList.get(0);
 	}
 
-	public USSystem findSystemById(HashMap<String, String> params) {
+	public USSystem findSystemById(HashMap<String, String> params) throws Exception {
 		return findSystemById(IntegerUtil.getInt0(params.get("id")));
 	}
 
