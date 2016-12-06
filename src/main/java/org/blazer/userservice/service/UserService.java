@@ -100,23 +100,40 @@ public class UserService implements InitializingBean {
 	}
 
 	public void saveUser(USUser user, String roleIds) throws DuplicateKeyException {
-		// 验证是否重名
+		// 验证是否重名、重复电话号码、重复邮箱
 		Integer userId = user.getId();
 		if (userId == null) {
-			String checkSql = "select 1 from us_user where enable=1 and user_name=? ";
-			List<Map<String, Object>> rst = jdbcTemplate.queryForList(checkSql, user.getUserName());
-			if (rst != null && rst.size() != 0) {
-				throw new DuplicateKeyException("已经存在该用户名！");
+//			String checkSql = "select 1 from us_user where enable=1 and (user_name=? or email=? or phone_number=?)";
+			String checkSql = "select sum(case when user_name='' then 0 when user_name=? then 1 else 0 end) as r1,"
+					+ " sum(case when email='' then 0 when email=? then 1 else 0 end) as r2,"
+					+ " sum(case when phone_number='' then 0 when phone_number=? then 1 else 0 end) as r3"
+					+ " from us_user where enable=1"
+					+ " and (user_name=? or email=? or phone_number=?)";
+			List<Map<String, Object>> rst = jdbcTemplate.queryForList(checkSql, user.getUserName(), user.getEmail(), user.getPhoneNumber(), user.getUserName(), user.getEmail(), user.getPhoneNumber());
+			Integer r1 = IntegerUtil.getInt0(rst.get(0).get("r1"));
+			Integer r2 = IntegerUtil.getInt0(rst.get(0).get("r2"));
+			Integer r3 = IntegerUtil.getInt0(rst.get(0).get("r3"));
+			if (r1 != 0 || r2 != 0 || r3 != 0) {
+				throw new DuplicateKeyException(String.format("存在[%s]个重复用户名，存在[%s]个重复邮箱，存在[%s]个重复手机号码。", r1, r2, r3));
 			}
 			// enable 数据库默认值1
 			String sql = "insert into us_user(user_name,user_name_cn,password,email,phone_number,remark) values(?,?,?,?,?,?)";
 			jdbcTemplate.update(sql, user.getUserName(), user.getUserNameCn(), newUserDefaultPassword, user.getEmail(), user.getPhoneNumber(), user.getRemark());
 			userId = IntegerUtil.getInt0(jdbcTemplate.queryForMap("select max(id) as id from us_user where enable=1").get("id"));
 		} else {
-			String checkSql = "select 1 from us_user where enable=1 and user_name=? and id != ?";
-			List<Map<String, Object>> rst = jdbcTemplate.queryForList(checkSql, user.getUserName(), user.getId());
-			if (rst != null && rst.size() != 0) {
-				throw new DuplicateKeyException("已经存在该用户名！");
+//			String checkSql = "select 1 from us_user where enable=1 and user_name=? and id != ?";
+			String checkSql = "select sum(case when user_name='' then 0 when user_name=? then 1 else 0 end) as r1,"
+					+ " sum(case when email='' then 0 when email=? then 1 else 0 end) as r2,"
+					+ " sum(case when phone_number='' then 0 when phone_number=? then 1 else 0 end) as r3"
+					+ " from us_user where enable=1"
+					+ " and id != ?"
+					+ " and (user_name=? or email=? or phone_number=?)";
+			List<Map<String, Object>> rst = jdbcTemplate.queryForList(checkSql, user.getUserName(), user.getEmail(), user.getPhoneNumber(), user.getId(), user.getUserName(), user.getEmail(), user.getPhoneNumber());
+			Integer r1 = IntegerUtil.getInt0(rst.get(0).get("r1"));
+			Integer r2 = IntegerUtil.getInt0(rst.get(0).get("r2"));
+			Integer r3 = IntegerUtil.getInt0(rst.get(0).get("r3"));
+			if (r1 != 0 || r2 != 0 || r3 != 0) {
+				throw new DuplicateKeyException(String.format("存在[%s]个重复用户名，存在[%s]个重复邮箱，存在[%s]个重复手机号码。", r1, r2, r3));
 			}
 			String sql = "update us_user set user_name=?,user_name_cn=?,email=?,phone_number=?,remark=? where id=? and enable=1";
 			jdbcTemplate.update(sql, user.getUserName(), user.getUserNameCn(), user.getEmail(), user.getPhoneNumber(), user.getRemark(), user.getId());

@@ -91,7 +91,10 @@
 					success : function(data) {
 // 						$.ds.alert(data.message);
 						$.messager.alert('提示', data.message, 'info', function() {
-							this_window.window('close');
+							if (data.status == 200) {
+								this_window.window('close');
+							} else {
+							}
 						});
 					},
 					error : function(XMLHttpRequest, textStatus, errorThrown) {
