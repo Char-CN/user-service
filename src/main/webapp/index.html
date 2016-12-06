@@ -21,18 +21,21 @@ h1 {
 .myli {
 	float: left;
 	margin: 5px;
-	border: 3px solid #C6E2FF;
+	border: 1px solid #C6E2FF;
 	vertical-align: middle;
 	cursor: pointer;
 	-moz-user-select: none;
 	-webkit-user-select: none;
 	user-select: none;
+	-moz-border-radius: 20px;
+	-webkit-border-radius: 20px;
+	border-radius: 20px;
 }
 </style>
 <script>
 	$(window).load(function() {
 		var contentWidth = $(window).width() - 400;
-		$("#content").width(contentWidth + 24);
+		$("#content").width(contentWidth + 8);
 		$("#content").height(100);
 		$.get($.ds.url.find_system_all_by_display, function(data) {
 			for (var i in data) {

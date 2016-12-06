@@ -42,7 +42,7 @@ public class PermissionsService {
 			String checkSql = "select 1 from us_permissions where enable=1 and system_id=? and url=?";
 			List<Map<String, Object>> rst = jdbcTemplate.queryForList(checkSql, permissions.getSystemId(), permissions.getUrl());
 			if (rst != null && rst.size() != 0) {
-				throw new DuplicateKeyException("已经存在该URL！");
+				throw new DuplicateKeyException("已经存在该路径地址！");
 			}
 			// enable 数据库默认值1
 			String sql = "insert into us_permissions(system_id,parent_id,permissions_name,url,remark) values(?,?,?,?,?)";

@@ -2,9 +2,19 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>没有权限！</title>
+<!-- commons -->
+<link rel="stylesheet" type="text/css" href="css/commons.css">
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<title>没有访问权限！</title>
+<script>
+	$(window).load(function() {
+		$("#content").height($(window).height() - 20);
+	});
+</script>
 </head>
 <body>
-对不起，您没有权限！ <a href="javascript:history.go(-1);">返回</a>
+	<div id="content">
+		对不起，您没有访问权限！ <a href="javascript:history.go(-1);">返回</a>
+	</div>
 </body>
 </html>
