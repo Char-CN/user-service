@@ -39,6 +39,9 @@ public class UserCache extends BaseCache implements InitializingBean {
 
 	private static Logger logger = LoggerFactory.getLogger(UserCache.class);
 
+	/**
+	 * 等待更新的队列
+	 */
 	private LinkedBlockingQueue<UserModel> queue = new LinkedBlockingQueue<UserModel>();
 
 	@Autowired
