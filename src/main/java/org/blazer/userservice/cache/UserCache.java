@@ -62,16 +62,20 @@ public class UserCache extends BaseCache implements InitializingBean {
 			public void run() {
 				while(true) {
 					try {
-						if (queue.size() == 0) {
+						if (queue.isEmpty()) {
 							Thread.sleep(thread_scan_sleep_millisecond);
 						} else {
-							Iterator<UserModel> iterator = queue.iterator();
-							if (iterator.hasNext()) {
-								UserModel um = iterator.next();
-								logger.debug("Queue Update User : [{}] [{}]", um.getId(), um.getUserName());
-								init(um.getId());
-								iterator.remove();
-							}
+//							Iterator<UserModel> iterator = queue.iterator();
+//							if (iterator.hasNext()) {
+//								UserModel um = iterator.next();
+//								logger.debug("Queue Update User : [{}] [{}]", um.getId(), um.getUserName());
+//								init(um.getId());
+//								iterator.remove();
+//							}
+							UserModel um = queue.element();
+							logger.debug("Queue Update User : [{}] [{}]", um.getId(), um.getUserName());
+							init(um.getId());
+							queue.remove();
 							Thread.sleep(thread_update_cache_sleep_millisecond);
 						}
 					} catch (InterruptedException e) {
