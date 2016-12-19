@@ -1,7 +1,9 @@
 package org.blazer.userservice.action;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -100,6 +102,20 @@ public class UserServiceAction extends BaseAction {
 		}
 		// 密码不正确，登录失败
 		return new Body().setStatus("201").setMessage("登录失败。");
+	}
+
+	@ResponseBody
+	@RequestMapping("/getuserall")
+	public List<org.blazer.userservice.core.model.UserModel> getUserAll(HttpServletRequest request, HttpServletResponse response) {
+		List<org.blazer.userservice.core.model.UserModel> list = null;
+		try {
+			list = userService.findUserBySystemAndUrl(getParamMap(request));
+		} catch (Exception e) {
+			list = new ArrayList<org.blazer.userservice.core.model.UserModel>();
+			e.printStackTrace();
+		}
+		logger.debug("list:" + list);
+		return list;
 	}
 
 	@ResponseBody

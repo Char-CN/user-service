@@ -13,6 +13,7 @@ import org.blazer.userservice.core.util.DesUtil;
 import org.blazer.userservice.entity.USUser;
 import org.blazer.userservice.exception.DuplicateKeyException;
 import org.blazer.userservice.model.UserModel;
+import org.blazer.userservice.util.HMap;
 import org.blazer.userservice.util.IntegerUtil;
 import org.blazer.userservice.util.SqlUtil;
 import org.blazer.userservice.util.StringUtil;
@@ -97,6 +98,22 @@ public class UserService implements InitializingBean {
 		user.setEmail(StringUtil.getStrEmpty(map.get("email")));
 		user.setRemark(StringUtil.getStrEmpty(map.get("remark")));
 		return user;
+	}
+
+	public List<org.blazer.userservice.core.model.UserModel> findUserBySystemAndUrl(HashMap<String, String> params) throws Exception {
+		StringBuilder sql = new StringBuilder();
+		sql.append("SELECT uu.id, uu.user_name, uu.email, uu.`password` as `password`, uu.phone_number, uu.user_name_cn, group_concat(up.id) as permissions_ids");
+		sql.append(" FROM us_user uu");
+		sql.append(" INNER JOIN us_user_role uur ON uu.id = uur.user_id");
+		sql.append(" INNER JOIN (SELECT * FROM us_role WHERE `enable`=1 and role_name not in('超级管理员')) ur ON ur.id = uur.role_id");
+		sql.append(" INNER JOIN us_role_permissions urp ON urp.role_id = ur.id");
+		sql.append(" INNER JOIN (SELECT * FROM us_permissions WHERE `enable`=1 and url=?) up ON urp.permissions_id = up.id");
+		sql.append(" INNER JOIN (SELECT * FROM us_system WHERE `enable`=1 and system_name=?) us ON up.system_id = us.id");
+		sql.append(" WHERE uu.`enable`=1 GROUP BY uu.id");
+		logger.debug(SqlUtil.Show(sql.toString(), params.get("url"),  params.get("systemName")));
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql.toString(), params.get("url"),  params.get("systemName"));
+		List<org.blazer.userservice.core.model.UserModel> rst = HMap.toList(list, org.blazer.userservice.core.model.UserModel.class);
+		return rst;
 	}
 
 	public void saveUser(USUser user, String roleIds) throws DuplicateKeyException {

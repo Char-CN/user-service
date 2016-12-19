@@ -1,5 +1,6 @@
 package org.blazer.userservice.cache;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -227,6 +228,22 @@ public class UserCache extends BaseCache implements InitializingBean {
 		}
 //		return (UserModel) getCache().get(userName).get();
 		return (UserModel) getCache().get(userName).getObjectValue();
+	}
+
+	public List<org.blazer.userservice.core.model.UserModel> getAll() {
+		List<org.blazer.userservice.core.model.UserModel> list = new ArrayList<org.blazer.userservice.core.model.UserModel>();
+		for (Object key : getCache().getKeys()) {
+			UserModel old = get(key.toString());
+			org.blazer.userservice.core.model.UserModel um = new org.blazer.userservice.core.model.UserModel();
+			um.setEmail(old.getEmail());
+			um.setId(old.getId());
+			um.setPassword(old.getPassword());
+			um.setPhoneNumber(old.getPhoneNumber());
+			um.setUserName(old.getUserName());
+			um.setUserNameCn(old.getUserNameCn());
+			list.add(um);
+		}
+		return list;
 	}
 
 	@Override
