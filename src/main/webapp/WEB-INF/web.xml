@@ -60,11 +60,6 @@
 			<param-name>serviceUrl</param-name>
 			<param-value>http://bigdata.blazer.org:8030</param-value>
 		</init-param>
-		<!-- innerServiceUrl不配置默认应用serviceUrl的值 -->
-		<init-param>
-			<param-name>innerServiceUrl</param-name>
-			<param-value>http://bigdata.blazer.org:8030</param-value>
-		</init-param>
 		<!-- 没有权限时的显示页面 -->
 		<init-param>
 			<param-name>noPermissionsPage</param-name>

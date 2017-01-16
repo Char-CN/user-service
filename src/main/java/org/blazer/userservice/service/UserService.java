@@ -110,8 +110,10 @@ public class UserService implements InitializingBean {
 		sql.append(" INNER JOIN (SELECT * FROM us_permissions WHERE `enable`=1 and url=?) up ON urp.permissions_id = up.id");
 		sql.append(" INNER JOIN (SELECT * FROM us_system WHERE `enable`=1 and system_name=?) us ON up.system_id = us.id");
 		sql.append(" WHERE uu.`enable`=1 GROUP BY uu.id");
-		logger.debug(SqlUtil.Show(sql.toString(), params.get("url"),  params.get("systemName")));
-		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql.toString(), params.get("url"),  params.get("systemName"));
+//		logger.debug(SqlUtil.Show(sql.toString(), params.get("url"),  params.get("systemName")));
+		logger.debug(params.get("url"));
+		logger.debug(params.get("systemName"));
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql.toString(), StringUtil.getStrEmpty(params.get("url")),  StringUtil.getStrEmpty(params.get("systemName")));
 		List<org.blazer.userservice.core.model.UserModel> rst = HMap.toList(list, org.blazer.userservice.core.model.UserModel.class);
 		return rst;
 	}

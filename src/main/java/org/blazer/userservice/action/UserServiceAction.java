@@ -8,6 +8,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.blazer.userservice.body.Body;
 import org.blazer.userservice.body.LoginBody;
 import org.blazer.userservice.cache.PermissionsCache;
@@ -16,6 +17,7 @@ import org.blazer.userservice.core.filter.PermissionsFilter;
 import org.blazer.userservice.core.model.LoginType;
 import org.blazer.userservice.core.model.SessionModel;
 import org.blazer.userservice.core.util.DesUtil;
+import org.blazer.userservice.core.util.IntegerUtil;
 import org.blazer.userservice.core.util.SessionUtil;
 import org.blazer.userservice.entity.USUser;
 import org.blazer.userservice.model.PermissionsModel;
@@ -116,6 +118,26 @@ public class UserServiceAction extends BaseAction {
 		}
 		logger.debug("list:" + list);
 		return list;
+	}
+
+	@ResponseBody
+	@RequestMapping("/getmailsbyuserids")
+	public String getMailsByUserIds(HttpServletRequest request, HttpServletResponse response) {
+		HashMap<String, String> map = getParamMap(request);
+		String ids = StringUtil.getStrEmpty(map.get("userids"));
+		StringBuilder sb = new StringBuilder();
+		for (String id : StringUtils.splitByWholeSeparator(ids, ",")) {
+			UserModel um = userCache.get(IntegerUtil.getInt0(id));
+			if (um == null) {
+				logger.error("um is null, id : " + id);
+				continue;
+			}
+			if (sb.length() != 0) {
+				sb.append(",");
+			}
+			sb.append(um.getEmail());
+		}
+		return sb.toString();
 	}
 
 	@ResponseBody

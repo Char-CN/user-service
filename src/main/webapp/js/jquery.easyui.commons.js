@@ -76,7 +76,8 @@ $(function() {
 			openWindow : function(id, icon, title, url, queryString) {
 				if ($("#" + id).length != 0) {
 					$("#" + id).window('open');
-					return $.ds.show("[" + icon + title + "]已经存在。");
+					$.ds.show("[" + icon + title + "]已经存在。");
+					return null;
 				}
 				var _window = $('<div></div>');
 				_window.attr("id", id);

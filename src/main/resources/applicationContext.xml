@@ -13,9 +13,29 @@
 
 	<context:component-scan base-package="org.blazer.**"></context:component-scan>
 
-	<util:properties id="dataSourceProperties" location="classpath:datasource.properties"></util:properties>
+<!-- 	<util:properties id="dataSourceProperties" location="classpath:datasource.properties"></util:properties> -->
+
+	<bean id="dataSourceProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="ignoreResourceNotFound" value="true"/>
+		<property name="locations">
+			<list>
+				<value>classpath:datasource.properties</value>
+				<value>file:/root/jetty-9.3.10/resources/datasource.properties</value>
+			</list>
+		</property>
+	</bean>
 
 	<util:properties id="systemProperties" location="classpath:system.properties"></util:properties>
+
+	<bean id="systemProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="ignoreResourceNotFound" value="true"/>
+		<property name="locations">
+			<list>
+				<value>classpath:system.properties</value>
+				<value>file:/root/jetty-9.3.10/resources/system.properties</value>
+			</list>
+		</property>
+	</bean>
 
 	<bean id="propertyConfigurer4Server" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="ignoreResourceNotFound" value="true" />
@@ -23,6 +43,7 @@
 		<property name="locations">
 			<list>
 				<value>classpath:datasource.properties</value>
+				<value>file:/root/jetty-9.3.10/resources/datasource.properties</value>
 			</list>
 		</property>
 	</bean>
