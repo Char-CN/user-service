@@ -260,7 +260,7 @@ public class UserServiceAction extends BaseAction {
 
 	private long getExpire() {
 //		return COOKIE_SECONDS * 1000 + System.currentTimeMillis();
-		System.out.println(PermissionsFilter.getCookieSeconds());
+//		System.out.println(PermissionsFilter.getCookieSeconds());
 		return PermissionsFilter.getCookieSeconds() * 1000 + System.currentTimeMillis();
 	}
 

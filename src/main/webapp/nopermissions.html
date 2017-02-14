@@ -5,16 +5,36 @@
 <!-- commons -->
 <link rel="stylesheet" type="text/css" href="css/commons.css">
 <script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/userservice.js"></script>
 <title>没有访问权限！</title>
 <script>
+	var $userservice = new $userservice("user-service");
+	var getQueryString = function(name) {
+		var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+		var r = window.location.search.substr(1).match(reg);
+		if (r != null) {
+			return unescape(r[2]);
+		}
+		return null;
+	};
 	$(window).load(function() {
+		var url = getQueryString("url");
+		if (url == null) {
+			alert("为何你要独自打开这个页面？");
+		}
 		$("#content").height($(window).height() - 20);
+		var logout = $('<a href="javascript:void(0);">登出</a>');
+		logout.click(function() {
+			$userservice.logout(url);
+		});
+		$("#userName").html($userservice.userName + "["+$userservice.userNameCn+"]");
+		$("#logout").html(logout);
 	});
 </script>
 </head>
 <body>
 	<div id="content">
-		对不起，您没有访问权限！ <a href="javascript:history.go(-1);">返回</a>
+		对不起，<span id="userName"></span>，您没有访问权限！ <a href="javascript:history.go(-1);">返回</a> <span id="logout"></span>
 	</div>
 </body>
 </html>

@@ -67,9 +67,9 @@ var $userservice = function(systemName) {
 	/**
 	 * UserServiceJs核心内容
 	 */
-	var _url = "http://bigdata.blazer.org:8030";
-	var _checkurl = _url + "/userservice/checkurl.do";
-	var _getlogin = _url + "/login.html";
+	var s_url = "http://dev.xiwanglife.com:8030";
+	var s_checkurl = s_url + "/userservice/checkurl.do";
+	var s_getlogin = s_url + "/login.html";
 	var userName = null;
 	var userNameCn = null;
 
@@ -90,33 +90,33 @@ var $userservice = function(systemName) {
 	};
 
 	var domain = getDomain();
-	var logout = function() {
+	var logout = function(_url) {
 		var r=confirm("您确定退出登录吗？");
 		if (r) {
 			config("US_SESSION_ID", "", { path: "/", expires: -1, domain : domain});
 			config("US_USER_NAME", "", { path: "/", expires: -1, domain : domain});
 			config("US_USER_NAME_CN", "", { path: "/", expires: -1, domain : domain});
-			location.href = _getlogin + "?url=" + encodeURIComponent(location.href);
+			location.href = s_getlogin + "?url=" + encodeURIComponent(_url ? _url : location.href);
 		}
 	};
 
-	var checkurl = function(url) {
+	var checkurl = function(_url) {
 		var flag = false;
 		$.ajax({
-			url : _checkurl,
+			url : s_checkurl,
 			type : "GET",
 			async : false,
 			data : {
 				"US_SESSION_ID" : config("US_SESSION_ID"),
 				systemName : systemName,
-				url : url
+				url : _url
 			},
 			success : function(data) {
 				try {
 					var datas = data.split(",", 3);
 					if (data != undefined && datas[0] == "false") {
 						alert("对不起，您没有登录，请您登录。");
-						location.href = _getlogin + "?url=" + encodeURIComponent(location.href);
+						location.href = s_getlogin + "?url=" + encodeURIComponent(location.href);
 						return;
 					} else if (data != undefined && datas[1] == "false") {
 						// 没有权限
