@@ -66,7 +66,7 @@ public class PermissionsService {
 
 	public void delPermissions(Integer id) throws NotAllowDeleteException {
 		logger.debug("del permissions id " + id);
-		String sql = "select count(0) as ct from us_permissions up inner join us_role_permissions urp on urp.permissions_id=up.id where up.id=?";
+		String sql = "select count(0) as ct from (select * from us_permissions where enable=1) up inner join us_role_permissions urp on urp.permissions_id=up.id where up.id=?";
 		logger.debug(SqlUtil.Show(sql, id));
 		Integer count = IntegerUtil.getInt0(jdbcTemplate.queryForList(sql, id).get(0).get("ct"));
 		logger.debug("role count : " + count);
@@ -76,6 +76,7 @@ public class PermissionsService {
 		sql = "update us_permissions set enable=0 where id=?";
 		logger.debug(SqlUtil.Show(sql, id));
 		jdbcTemplate.update(sql, id);
+		permissionsCache.remove(id);
 	}
 
 	public List<PermissionsTreeBody> findPermissionsByParentID(HashMap<String, String> params) {
