@@ -121,6 +121,33 @@ public class UserServiceAction extends BaseAction {
 	}
 
 	@ResponseBody
+	@RequestMapping("/getuserbyuserids")
+	public List<org.blazer.userservice.core.model.UserModel> getUserByUserIds(HttpServletRequest request, HttpServletResponse response) {
+		List<org.blazer.userservice.core.model.UserModel> list = new ArrayList<org.blazer.userservice.core.model.UserModel>();
+		try {
+			String ids = StringUtil.getStrEmpty(getParamMap(request).get("ids"));
+			for (String id : StringUtils.splitByWholeSeparatorPreserveAllTokens(ids, ",")) {
+				org.blazer.userservice.core.model.UserModel um = new org.blazer.userservice.core.model.UserModel();
+				UserModel um2 = userCache.get(IntegerUtil.getInt0(id));
+				if (um2 != null) {
+					um.setId(um2.getId());
+					um.setEmail(um2.getEmail());
+					um.setPassword(um2.getPassword());
+					um.setPhoneNumber(um2.getPhoneNumber());
+					um.setUserName(um2.getUserName());
+					um.setUserNameCn(um2.getUserNameCn());
+				}
+				list.add(um);
+			}
+		} catch (Exception e) {
+			list = new ArrayList<org.blazer.userservice.core.model.UserModel>();
+			e.printStackTrace();
+		}
+		logger.debug("list:" + list);
+		return list;
+	}
+
+	@ResponseBody
 	@RequestMapping("/getmailsbyuserids")
 	public String getMailsByUserIds(HttpServletRequest request, HttpServletResponse response) {
 		HashMap<String, String> map = getParamMap(request);
