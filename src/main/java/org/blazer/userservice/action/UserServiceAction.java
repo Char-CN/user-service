@@ -61,16 +61,15 @@ public class UserServiceAction extends BaseAction {
 	@ResponseBody
 	@RequestMapping("/logout")
 	public String logout(HttpServletRequest request, HttpServletResponse response) {
-		String sessionId = PermissionsFilter.getSessionId(request);
-		logger.debug("logout session id : " + sessionId);
+		SessionModel sessionModel = PermissionsFilter.getSessionModel(request);
+		logger.debug("logout session model : " + sessionModel);
 		return output(true, "");
 	}
 
 	@ResponseBody
 	@RequestMapping("/login")
 	public Body login(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
-		String sessionStr = PermissionsFilter.getSessionId(request);
-		SessionModel sessionModel = SessionUtil.decode(sessionStr);
+		SessionModel sessionModel = PermissionsFilter.getSessionModel(request);
 		if (checkUser(sessionModel)) {
 			newSessionId(sessionModel, response, request);
 			String un = getUser(sessionModel).getUserName();
@@ -171,8 +170,7 @@ public class UserServiceAction extends BaseAction {
 	@RequestMapping("/getuser")
 	public String getUser(HttpServletRequest request, HttpServletResponse response) {
 		response.setContentType("text/html;charset=utf-8");
-		String sessionStr = PermissionsFilter.getSessionId(request);
-		SessionModel sessionModel = SessionUtil.decode(sessionStr);
+		SessionModel sessionModel = PermissionsFilter.getSessionModel(request);
 		// 检查用户
 		boolean flag = checkUser(sessionModel);
 		if (!flag) {
@@ -194,8 +192,7 @@ public class UserServiceAction extends BaseAction {
 	@ResponseBody
 	@RequestMapping("/checkuser")
 	public String checkUser(HttpServletRequest request, HttpServletResponse response) {
-		String sessionStr = PermissionsFilter.getSessionId(request);
-		SessionModel sessionModel = SessionUtil.decode(sessionStr);
+		SessionModel sessionModel = PermissionsFilter.getSessionModel(request);
 		boolean flag = checkUser(sessionModel);
 		return output(flag, (flag ? newSessionId(sessionModel, response, request) : ""));
 	}
@@ -203,8 +200,7 @@ public class UserServiceAction extends BaseAction {
 	@ResponseBody
 	@RequestMapping("/delay")
 	public String delay(HttpServletRequest request, HttpServletResponse response) {
-		String sessionStr = PermissionsFilter.getSessionId(request);
-		SessionModel sessionModel = SessionUtil.decode(sessionStr);
+		SessionModel sessionModel = PermissionsFilter.getSessionModel(request);
 		String newSession = newSessionId(sessionModel, response, request);
 		return output(newSession != null, newSession);
 	}
@@ -213,8 +209,7 @@ public class UserServiceAction extends BaseAction {
 	@RequestMapping("/checkurl")
 	public String checkUrl(HttpServletRequest request, HttpServletResponse response) {
 		logger.debug("request:" + request.toString());
-		String sessionStr = PermissionsFilter.getSessionId(request);
-		SessionModel sessionModel = SessionUtil.decode(sessionStr);
+		SessionModel sessionModel = PermissionsFilter.getSessionModel(request);
 		HashMap<String, String> params = getParamMap(request);
 		String newSession = newSessionId(sessionModel, response, request);
 		// if (!checkUser(sessionModel)) {
