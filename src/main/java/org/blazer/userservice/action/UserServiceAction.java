@@ -93,8 +93,8 @@ public class UserServiceAction extends BaseAction {
 		if (um.getPassword().equals(DesUtil.encrypt(params.get("password")))) {
 			String sessionId = SessionUtil.encode(getExpire(), um.getId(), um.getUserName(), um.getUserNameCn(), um.getEmail(), um.getPhoneNumber(),
 					LoginType.userName.index);
-			logger.debug(SqlUtil.Show(SessionUtil.FORMAT.replaceAll("%s", "?"), getExpire(), um.getId(), um.getUserName(), um.getUserNameCn(), um.getEmail(), um.getPhoneNumber(),
-					LoginType.userName.index));
+			logger.debug(SqlUtil.Show(SessionUtil.FORMAT.replaceAll("%s", "?"), getExpire(), um.getId(), um.getUserName(), um.getUserNameCn(), um.getEmail(),
+					um.getPhoneNumber(), LoginType.userName.index));
 			// String sessionId = DesUtil.encrypt(String.format(LOGGIN_FORMAT,
 			// LoginType.userName.index, um.getId(), um.getUserName(),
 			// getExpire()));
@@ -131,7 +131,7 @@ public class UserServiceAction extends BaseAction {
 				if (um2 != null) {
 					um.setId(um2.getId());
 					um.setEmail(um2.getEmail());
-					um.setPassword(um2.getPassword());
+					// um.setPassword(um2.getPassword());
 					um.setPhoneNumber(um2.getPhoneNumber());
 					um.setUserName(um2.getUserName());
 					um.setUserNameCn(um2.getUserNameCn());
@@ -281,8 +281,8 @@ public class UserServiceAction extends BaseAction {
 	}
 
 	private long getExpire() {
-//		return COOKIE_SECONDS * 1000 + System.currentTimeMillis();
-//		System.out.println(PermissionsFilter.getCookieSeconds());
+		// return COOKIE_SECONDS * 1000 + System.currentTimeMillis();
+		// System.out.println(PermissionsFilter.getCookieSeconds());
 		return PermissionsFilter.getCookieSeconds() * 1000 + System.currentTimeMillis();
 	}
 
