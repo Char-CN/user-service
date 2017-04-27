@@ -1,4 +1,4 @@
 /target/
 /logs/
 /ehcache/
-*.DS_Store
+.DS_Store
