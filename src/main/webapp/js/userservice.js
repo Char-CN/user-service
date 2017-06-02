@@ -144,5 +144,6 @@ var $userservice = function(systemName) {
 	obj.logout = logout;
 	obj.checkurl = checkurl;
 	obj.getDomain = getDomain;
+	obj.sessionKey = "US_SESSION_ID";
 	return obj;
 };

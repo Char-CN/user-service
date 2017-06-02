@@ -139,6 +139,9 @@ var $userservice = function(systemName) {
 	init(); // 初始化
 
 	var obj = new Object();
+	obj.sessionKey = "${SESSION_KEY}";
+	obj.nameKey = "${NAME_KEY}";
+	obj.nameCnKey = "${NAME_CN_KEY}";
 	obj.userName = userName;
 	obj.userNameCn = userNameCn;
 	obj.logout = logout;
