@@ -139,11 +139,13 @@ var $userservice = function(systemName) {
 	init(); // 初始化
 
 	var obj = new Object();
+	obj.sessionKey = "US_SESSION_ID";
+	obj.nameKey = "US_USER_NAME";
+	obj.nameCnKey = "US_USER_NAME_CN";
 	obj.userName = userName;
 	obj.userNameCn = userNameCn;
 	obj.logout = logout;
 	obj.checkurl = checkurl;
 	obj.getDomain = getDomain;
-	obj.sessionKey = "US_SESSION_ID";
 	return obj;
 };
