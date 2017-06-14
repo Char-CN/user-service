@@ -17,9 +17,10 @@ body {
 }
 
 .page-container {
-	width: 350px;
+	width: 90%;
 	height: auto;
-	margin: 100px auto 0 auto;
+	margin: 30px auto 0 auto;
+	text-align: center;
 }
 
 h1 {
@@ -30,13 +31,13 @@ h1 {
 
 form {
 	position: relative;
-	width: 350px;
+	width: 90%;
 	margin: 15px auto 0 auto;
 	text-align: center;
 }
 
 input {
-	width: 270px;
+	width: 50%;
 	height: 42px;
 	margin-top: 25px;
 	padding: 0 15px;
@@ -81,7 +82,7 @@ input:focus {
 
 button {
 	cursor: pointer;
-	width: 300px;
+	width: 90%;
 	height: 44px;
 	margin-top: 25px;
 	padding: 0;

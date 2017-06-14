@@ -9,19 +9,26 @@
 <!-- CSS -->
 <link rel="stylesheet" href="css/login.css">
 <link rel="stylesheet" href="css/supersized.css">
+<script>
+	window.onload = function() {
+// 		if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+		if (/Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+		} else {
+			$(".page-container").width("300");
+		}
+	};
+</script>
 </head>
 <body>
-	<div class="page-container">
+	<div class="page-container" style="text-align: center;">
 		<h1>登录（Login）</h1>
-		<input type="text" id="userName" placeholder="请输入您的用户名！" style="width: 300px; float: left;">
-		<input type="password" id="password" placeholder="请输入您的用户密码！" style="width: 300px; float: left;">
+		<input type="text" id="userName" placeholder="请输入您的用户名！" style="width: 90%; float: left;">
+		<input type="password" id="password" placeholder="请输入您的用户密码！" style="width: 90%; float: left;">
 		<!-- 			<input type="text" name="Captcha" placeholder="请输入验证码！" style="width:200px; float:left;"> -->
-		<button type="button" style="font-size: 24px; width: 200px; outline: none;" onclick="login()">登&nbsp;&nbsp;&nbsp;&nbsp;录</button>
-		<span id="is_login_span" style="display: none; margin-top: 5px; margin-left: 15px; width: 300px; float: left;">
-			　您可以<a href="javascript:void(0);" id="forward_a" style="color:#BCEE68">进入系统</a>或<a href="javascript:void(0);" id="forward_b" style="color:#CDCD00">注销</a>
-		</span>
-		<span id="update_pw" style="margin-top: 5px; margin-left: 20px; width: 300px; float: left;">
-			<a href="pwd.html" id="forward_pw" style="color:#E0EEE0">修改密码</a>
+		<button type="button" style="font-size: 24px; width: 60%; outline: none;" onclick="login()">登&nbsp;&nbsp;&nbsp;&nbsp;录</button>
+		<span id="is_login_span" style="display: none; margin-top: 5px; width: 100%; float: left;"> 您可以<a href="javascript:void(0);" id="forward_a"
+			style="color: #BCEE68">进入系统</a>或<a href="javascript:void(0);" id="forward_b" style="color: #CDCD00">注销</a>
+		</span> <span id="update_pw" style="margin-top: 5px; width: 100%; float: left;"> <a href="pwd.html" id="forward_pw" style="color: #E0EEE0">修改密码</a>
 		</span>
 	</div>
 	<!-- Javascript -->
@@ -83,11 +90,11 @@
 				if (data.status == 200) {
 					var expires = new Date();
 					expires.setTime(expires.getTime() + (30 * 60 * 1000));
-// 					$.cookie(session_key, data.sessionId, {
-// 						path : "/",
-// 						expires : expires,
-// 						domain : domain
-// 					});
+					// 					$.cookie(session_key, data.sessionId, {
+					// 						path : "/",
+					// 						expires : expires,
+					// 						domain : domain
+					// 					});
 					var url = getQueryString("url");
 					if (url == null) {
 						location.href = "index.html";

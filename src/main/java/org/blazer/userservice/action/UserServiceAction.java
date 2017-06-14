@@ -53,11 +53,25 @@ public class UserServiceAction extends BaseAction {
 	@Autowired
 	PermissionsCache permissionsCache;
 
+	/**
+	 * 获得登录页面
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping("/getlogin")
 	public String getLogin(HttpServletRequest request, HttpServletResponse response) {
 		return "/login.html";
 	}
 
+	/**
+	 * 登出
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@ResponseBody
 	@RequestMapping("/logout")
 	public String logout(HttpServletRequest request, HttpServletResponse response) {
@@ -66,6 +80,14 @@ public class UserServiceAction extends BaseAction {
 		return output(true, "");
 	}
 
+	/**
+	 * 登录
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
 	@ResponseBody
 	@RequestMapping("/login")
 	public Body login(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
@@ -105,6 +127,48 @@ public class UserServiceAction extends BaseAction {
 		return new Body().setStatus("201").setMessage("登录失败。");
 	}
 
+	/**
+	 * 修改密码
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping("/uppwd")
+	public String uppwd(HttpServletRequest request, HttpServletResponse response) {
+		response.setContentType("text/html;charset=utf-8");
+		HashMap<String, String> params = getParamMap(request);
+		logger.debug("user name : " + params.get("userName"));
+		if (!params.containsKey("userName")) {
+			return output(true, "修改失败");
+		}
+		UserModel um = userCache.get(params.get("userName").toString());
+		if (um == null) {
+			return output(true, "找不到账号，修改失败");
+		}
+		if (logger.isDebugEnabled()) {
+			logger.debug("user password : " + um.getPassword());
+			logger.debug("params password : " + DesUtil.encrypt(params.get("password")));
+		}
+		if (um.getPassword().equals(DesUtil.encrypt(params.get("password")))) {
+			String newPassword1 = DesUtil.encrypt(params.get("newPassword1"));
+			USUser usUser = new USUser();
+			usUser.setId(um.getId());
+			usUser.setPassword(newPassword1);
+			userService.updatePwd(usUser);
+			return output(true, "修改成功");
+		}
+		return output(true, "密码错误，修改失败");
+	}
+
+	/**
+	 * 获取拥有该权限的所有用户 请求参数systemName和url 代表为某system的url是否有权限
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@ResponseBody
 	@RequestMapping("/getuserall")
 	public List<org.blazer.userservice.core.model.UserModel> getUserAll(HttpServletRequest request, HttpServletResponse response) {
@@ -119,6 +183,13 @@ public class UserServiceAction extends BaseAction {
 		return list;
 	}
 
+	/**
+	 * 根据一组userids获取一组usermodel对象
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@ResponseBody
 	@RequestMapping("/getuserbyuserids")
 	public List<org.blazer.userservice.core.model.UserModel> getUserByUserIds(HttpServletRequest request, HttpServletResponse response) {
@@ -146,6 +217,13 @@ public class UserServiceAction extends BaseAction {
 		return list;
 	}
 
+	/**
+	 * 根据一组userids 获取一组emails 返回格式emails1,emails2,emails3...
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@ResponseBody
 	@RequestMapping("/getmailsbyuserids")
 	public String getMailsByUserIds(HttpServletRequest request, HttpServletResponse response) {
@@ -166,6 +244,13 @@ public class UserServiceAction extends BaseAction {
 		return sb.toString();
 	}
 
+	/**
+	 * 根据session获取用户
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@ResponseBody
 	@RequestMapping("/getuser")
 	public String getUser(HttpServletRequest request, HttpServletResponse response) {
@@ -189,6 +274,13 @@ public class UserServiceAction extends BaseAction {
 		return output(true, newSession, um.getUserName(), um.getUserNameCn(), um.getPhoneNumber(), um.getEmail());
 	}
 
+	/**
+	 * 根据session检查用户是否有效
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@ResponseBody
 	@RequestMapping("/checkuser")
 	public String checkUser(HttpServletRequest request, HttpServletResponse response) {
@@ -197,6 +289,13 @@ public class UserServiceAction extends BaseAction {
 		return output(flag, (flag ? newSessionId(sessionModel, response, request) : ""));
 	}
 
+	/**
+	 * Session延期，返回一个新的true|false,Session
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@ResponseBody
 	@RequestMapping("/delay")
 	public String delay(HttpServletRequest request, HttpServletResponse response) {
@@ -205,6 +304,13 @@ public class UserServiceAction extends BaseAction {
 		return output(newSession != null, newSession);
 	}
 
+	/**
+	 * 检查是否有权限 请求参数systemName和url 代表为某system的url是否有权限
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@ResponseBody
 	@RequestMapping("/checkurl")
 	public String checkUrl(HttpServletRequest request, HttpServletResponse response) {
@@ -235,6 +341,33 @@ public class UserServiceAction extends BaseAction {
 		return output(true, true, newSession);
 	}
 
+	/**
+	 * 获取一个新的sessionId
+	 * 
+	 * @param sessionModel
+	 * @param response
+	 * @param request
+	 * @return
+	 */
+	private String newSessionId(SessionModel sessionModel, HttpServletResponse response, HttpServletRequest request) {
+		UserModel um = getUser(sessionModel);
+		if (um == null) {
+			return null;
+		}
+		String domain = StringUtil.findOneStrByReg(request.getRequestURL().toString(), "[http|https]://([a-zA-Z0-9.]*).*");
+		logger.debug("domain : " + domain);
+		// String newSessionId = DesUtil.encrypt(String.format(LOGGIN_FORMAT,
+		// LoginType.userName.index, um.getId(), um.getUserName(),
+		// getExpire()));
+		String newSessionId = SessionUtil.encode(getExpire(), um.getId(), um.getUserName(), um.getUserNameCn(), um.getEmail(), um.getPhoneNumber(),
+				LoginType.userName.index);
+		logger.info("sessionid length : " + newSessionId.length());
+		if (newSessionId.length() > 2048) {
+			logger.warn("[NOTICE] : sessionid > 2k , please you check...");
+		}
+		return newSessionId;
+	}
+
 	private UserModel getUser(SessionModel sessionModel) {
 		if (!sessionModel.isValid()) {
 			return null;
@@ -261,25 +394,6 @@ public class UserServiceAction extends BaseAction {
 		return true;
 	}
 
-	public String newSessionId(SessionModel sessionModel, HttpServletResponse response, HttpServletRequest request) {
-		UserModel um = getUser(sessionModel);
-		if (um == null) {
-			return null;
-		}
-		String domain = StringUtil.findOneStrByReg(request.getRequestURL().toString(), "[http|https]://([a-zA-Z0-9.]*).*");
-		logger.debug("domain : " + domain);
-		// String newSessionId = DesUtil.encrypt(String.format(LOGGIN_FORMAT,
-		// LoginType.userName.index, um.getId(), um.getUserName(),
-		// getExpire()));
-		String newSessionId = SessionUtil.encode(getExpire(), um.getId(), um.getUserName(), um.getUserNameCn(), um.getEmail(), um.getPhoneNumber(),
-				LoginType.userName.index);
-		logger.info("sessionid length : " + newSessionId.length());
-		if (newSessionId.length() > 2048) {
-			logger.warn("[NOTICE] : sessionid > 2k , please you check...");
-		}
-		return newSessionId;
-	}
-
 	private long getExpire() {
 		// return COOKIE_SECONDS * 1000 + System.currentTimeMillis();
 		// System.out.println(PermissionsFilter.getCookieSeconds());
@@ -298,35 +412,7 @@ public class UserServiceAction extends BaseAction {
 		return params.get("url");
 	}
 
-	@ResponseBody
-	@RequestMapping("/uppwd")
-	public String uppwd(HttpServletRequest request, HttpServletResponse response) {
-		response.setContentType("text/html;charset=utf-8");
-		HashMap<String, String> params = getParamMap(request);
-		logger.debug("user name : " + params.get("userName"));
-		if (!params.containsKey("userName")) {
-			return output(true, "修改失败");
-		}
-		UserModel um = userCache.get(params.get("userName").toString());
-		if (um == null) {
-			return output(true, "找不到账号，修改失败");
-		}
-		if (logger.isDebugEnabled()) {
-			logger.debug("user password : " + um.getPassword());
-			logger.debug("params password : " + DesUtil.encrypt(params.get("password")));
-		}
-		if (um.getPassword().equals(DesUtil.encrypt(params.get("password")))) {
-			String newPassword1 = DesUtil.encrypt(params.get("newPassword1"));
-			USUser usUser = new USUser();
-			usUser.setId(um.getId());
-			usUser.setPassword(newPassword1);
-			userService.updatePwd(usUser);
-			return output(true, "修改成功");
-		}
-		return output(true, "密码错误，修改失败");
-	}
-
-	public static String output(Object... objs) {
+	private static String output(Object... objs) {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < objs.length; i++) {
 			if (i != 0) {
