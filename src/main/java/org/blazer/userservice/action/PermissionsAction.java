@@ -28,6 +28,13 @@ public class PermissionsAction extends BaseAction {
 	@Autowired
 	PermissionsService permissionsService;
 
+	/**
+	 * 根据parentId和systemId查找权限
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@ResponseBody
 	@RequestMapping("/findPermissionsByParentID")
 	public List<PermissionsTreeBody> findPermissionsByParentID(HttpServletRequest request, HttpServletResponse response) {
@@ -40,6 +47,13 @@ public class PermissionsAction extends BaseAction {
 		return new ArrayList<PermissionsTreeBody>();
 	}
 
+	/**
+	 * 根据id查找权限
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@ResponseBody
 	@RequestMapping("/findPermissionsByID")
 	public USPermissions findPermissionsByID(HttpServletRequest request, HttpServletResponse response) {
@@ -52,6 +66,13 @@ public class PermissionsAction extends BaseAction {
 		return new USPermissions();
 	}
 
+	/**
+	 * 保存权限
+	 * 
+	 * @param permissions
+	 * @return
+	 * @throws Exception
+	 */
 	@ResponseBody
 	@RequestMapping("/savePermissions")
 	public Body savePermissions(@RequestBody USPermissions permissions) throws Exception {
@@ -65,6 +86,13 @@ public class PermissionsAction extends BaseAction {
 		return new Body().setMessage("保存成功！");
 	}
 
+	/**
+	 * 根据id删除权限
+	 * 
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
 	@ResponseBody
 	@RequestMapping("/delPermissions")
 	public Body delPermissions(@RequestParam Integer id) throws Exception {

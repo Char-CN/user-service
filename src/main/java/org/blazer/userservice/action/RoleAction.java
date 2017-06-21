@@ -31,9 +31,12 @@ public class RoleAction extends BaseAction {
 	RoleService roleService;
 
 	/**
-	 * TODO : 角色相关
+	 * 查询所有角色
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
 	 */
-
 	@ResponseBody
 	@RequestMapping("/findRoleAll")
 	public List<USRole> findRoleAll(HttpServletRequest request, HttpServletResponse response) {
@@ -46,6 +49,13 @@ public class RoleAction extends BaseAction {
 		return new ArrayList<USRole>();
 	}
 
+	/**
+	 * 分页查询角色
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@ResponseBody
 	@RequestMapping("/findRoleByPage")
 	public PageBody<USRole> findRoleByPage(HttpServletRequest request, HttpServletResponse response) {
@@ -58,6 +68,13 @@ public class RoleAction extends BaseAction {
 		return new PageBody<USRole>();
 	}
 
+	/**
+	 * 根据id查询角色
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@ResponseBody
 	@RequestMapping("/findRoleById")
 	public RoleBody findRoleById(HttpServletRequest request, HttpServletResponse response) {
@@ -71,6 +88,13 @@ public class RoleAction extends BaseAction {
 		return new RoleBody();
 	}
 
+	/**
+	 * 保存角色
+	 * 
+	 * @param role
+	 * @return
+	 * @throws Exception
+	 */
 	@ResponseBody
 	@RequestMapping("/saveRole")
 	public Body saveRole(@RequestBody RoleBody role) throws Exception {
@@ -84,6 +108,13 @@ public class RoleAction extends BaseAction {
 		return new Body().setMessage("保存成功！");
 	}
 
+	/**
+	 * 删除角色
+	 * 
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
 	@ResponseBody
 	@RequestMapping("/delRole")
 	public Body delRole(@RequestParam Integer id) throws Exception {
