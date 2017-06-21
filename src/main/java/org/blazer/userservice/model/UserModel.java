@@ -13,6 +13,7 @@ public class UserModel implements Serializable {
 	private String userNameCn;
 	private String phoneNumber;
 	private String email;
+	private Integer enable;
 	private MutableRoaringBitmap permissionsBitmap;
 
 	public Integer getId() {
@@ -71,10 +72,18 @@ public class UserModel implements Serializable {
 		this.permissionsBitmap = permissionsBitmap;
 	}
 
+	public Integer getEnable() {
+		return enable;
+	}
+
+	public void setEnable(Integer enable) {
+		this.enable = enable;
+	}
+
 	@Override
 	public String toString() {
-		return "UserModel [id=" + id + ", userName=" + userName + ", password=" + password + ", userNameCn=" + userNameCn + ", phoneNumber=" + phoneNumber
-				+ ", email=" + email + ", permissionsBitmap=" + permissionsBitmap + "]";
+		return "UserModel [id=" + id + ", userName=" + userName + ", password=" + password + ", userNameCn=" + userNameCn + ", phoneNumber=" + phoneNumber + ", email="
+				+ email + ", permissionsBitmap=" + permissionsBitmap + "]";
 	}
 
 }

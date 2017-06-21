@@ -9,6 +9,7 @@ public class USUser {
 	private String email;
 	private String phoneNumber;
 	private String remark;
+	private Integer enable;
 
 	public Integer getId() {
 		return id;
@@ -64,6 +65,14 @@ public class USUser {
 
 	public void setRemark(String remark) {
 		this.remark = remark;
+	}
+
+	public Integer getEnable() {
+		return enable;
+	}
+
+	public void setEnable(Integer enable) {
+		this.enable = enable;
 	}
 
 	@Override

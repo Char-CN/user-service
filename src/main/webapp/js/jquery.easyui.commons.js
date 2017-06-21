@@ -6,6 +6,8 @@ $(function() {
 			find_user_by_id : "user/findUserById.do",
 			save_user : "user/saveUser.do",
 			del_user : "user/delUser.do",
+			disable_user : "user/disableUser.do",
+			enable_user : "user/enableUser.do",
 			init_pwd_user : "user/initPwd.do",
 			find_role_by_page : "role/findRoleByPage.do",
 			find_role_by_id : "role/findRoleById.do",
@@ -185,7 +187,7 @@ $(function() {
 		},
 		confirm : function(message, func) {
 			$.messager.confirm('提示', message, function(r){
-				if (r) func();
+				if (func && r) func();
 			});
 		},
 		getBytesLength : function(str) {

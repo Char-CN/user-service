@@ -45,6 +45,44 @@
 				});
 			});
 		});
+		// 禁用
+		var a_disable = $('<a href="javascript:void(0)" class="icon-no easyui-tooltip" title="禁用"></a>');
+		this_window.parent().find(" .panel-tool").prepend(a_disable);
+		a_disable.click(function() {
+			var selected = table.datagrid('getSelected');
+			var idx = table.datagrid('getRowIndex', selected);
+			if (selected == undefined || selected == null) {
+				$.ds.show('请选择一个用户！');
+				return;
+			}
+			$.ds.confirm("您确定要禁用该用户吗？", function() {
+				$.post($.ds.url.disable_user, {
+					id : selected.id
+				}, function(data) {
+					$.ds.show(data.message);
+					table.datagrid('reload');
+				});
+			});
+		});
+		// 启用
+		var a_enable = $('<a href="javascript:void(0)" class="icon-ok easyui-tooltip" title="启用"></a>');
+		this_window.parent().find(" .panel-tool").prepend(a_enable);
+		a_enable.click(function() {
+			var selected = table.datagrid('getSelected');
+			var idx = table.datagrid('getRowIndex', selected);
+			if (selected == undefined || selected == null) {
+				$.ds.show('请选择一个用户！');
+				return;
+			}
+			$.ds.confirm("您确定要启用该用户吗？", function() {
+				$.post($.ds.url.enable_user, {
+					id : selected.id
+				}, function(data) {
+					$.ds.show(data.message);
+					table.datagrid('reload');
+				});
+			});
+		});
 		// 初始化密码
 		var a_init_pwd = $('<a href="javascript:void(0)" class="icon-redo easyui-tooltip" title="初始化密码"></a>');
 		this_window.parent().find(" .panel-tool").prepend(a_init_pwd);
@@ -71,6 +109,7 @@
 		this_window.parent().find(" .panel-tool").prepend(a_edit);
 		a_edit.click(function() {
 			var selected = table.datagrid('getSelected');
+			alert(enable);
 			var idx = table.datagrid('getRowIndex', selected);
 			if (selected == undefined || selected == null) {
 				$.ds.show('请选择一个用户！');
@@ -115,11 +154,11 @@
 				hidden : true
 			}, {
 				field : 'userName',
-				width : "15%",
+				width : "10%",
 				title : '用户名'
 			}, {
 				field : 'userNameCn',
-				width : "15%",
+				width : "10%",
 				title : '中文名'
 			}, {
 				field : 'phoneNumber',
@@ -133,6 +172,17 @@
 				field : 'remark',
 				width : "32%",
 				title : '备注'
+			}, {
+				field : 'enable',
+				width : "10%",
+				title : '状态',
+				formatter : function(value){
+					var name = "禁用" + "<span class='icon-no'>　　</span>";
+					if (value == 1) {
+						name = "可用" + "<span class='icon-ok'>　　</span>";
+					}
+					return name;
+				}
 			} ] ],
 			rownumbers : true,
 			singleSelect : true,

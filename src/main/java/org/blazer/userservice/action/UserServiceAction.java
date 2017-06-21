@@ -22,6 +22,7 @@ import org.blazer.userservice.core.util.SessionUtil;
 import org.blazer.userservice.entity.USUser;
 import org.blazer.userservice.model.PermissionsModel;
 import org.blazer.userservice.model.UserModel;
+import org.blazer.userservice.model.UserStatus;
 import org.blazer.userservice.service.UserService;
 import org.blazer.userservice.util.SqlUtil;
 import org.blazer.userservice.util.StringUtil;
@@ -101,12 +102,18 @@ public class UserServiceAction extends BaseAction {
 		logger.debug("user name : " + params.get("userName"));
 		if (!params.containsKey("userName")) {
 			// 参数中找不到用户名，登录失败
+			logger.debug("参数中找不到用户名，登录失败。");
 			return new Body().setStatus("201").setMessage("登录失败。");
 		}
 		UserModel um = userCache.get(params.get("userName").toString());
 		if (um == null) {
 			// 找不到账号，登录失败
-			return new Body().setStatus("201").setMessage("登录失败。");
+			logger.debug("找不到账号，登录失败。。");
+			return new Body().setStatus("201").setMessage("登录失败。。");
+		} else if (!UserStatus.isEnable(um.getEnable())) {
+			// 状态为非可用，登录失败
+			logger.debug("状态为非可用，登录失败。。。");
+			return new Body().setStatus("201").setMessage("登录失败。。。");
 		}
 		if (logger.isDebugEnabled()) {
 			logger.debug("user password : " + um.getPassword());
@@ -117,14 +124,11 @@ public class UserServiceAction extends BaseAction {
 					LoginType.userName.index);
 			logger.debug(SqlUtil.Show(SessionUtil.FORMAT.replaceAll("%s", "?"), getExpire(), um.getId(), um.getUserName(), um.getUserNameCn(), um.getEmail(),
 					um.getPhoneNumber(), LoginType.userName.index));
-			// String sessionId = DesUtil.encrypt(String.format(LOGGIN_FORMAT,
-			// LoginType.userName.index, um.getId(), um.getUserName(),
-			// getExpire()));
 			PermissionsFilter.delay(request, response, sessionId);
 			return new LoginBody().setSessionId(sessionId).setMessage("登录成功。");
 		}
 		// 密码不正确，登录失败
-		return new Body().setStatus("201").setMessage("登录失败。");
+		return new Body().setStatus("201").setMessage("登录失败。。。。");
 	}
 
 	/**
@@ -146,6 +150,8 @@ public class UserServiceAction extends BaseAction {
 		UserModel um = userCache.get(params.get("userName").toString());
 		if (um == null) {
 			return output(true, "找不到账号，修改失败");
+		} else if (!UserStatus.isEnable(um.getEnable())) {
+			return output(true, "账号状态非可用，修改失败");
 		}
 		if (logger.isDebugEnabled()) {
 			logger.debug("user password : " + um.getPassword());
@@ -177,7 +183,7 @@ public class UserServiceAction extends BaseAction {
 			list = userService.findUserBySystemAndUrl(getParamMap(request));
 		} catch (Exception e) {
 			list = new ArrayList<org.blazer.userservice.core.model.UserModel>();
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 		}
 		logger.debug("list:" + list);
 		return list;
@@ -194,8 +200,10 @@ public class UserServiceAction extends BaseAction {
 	@RequestMapping("/getuserbyuserids")
 	public List<org.blazer.userservice.core.model.UserModel> getUserByUserIds(HttpServletRequest request, HttpServletResponse response) {
 		List<org.blazer.userservice.core.model.UserModel> list = new ArrayList<org.blazer.userservice.core.model.UserModel>();
+		HashMap<String, String> map = getParamMap(request);
 		try {
-			String ids = StringUtil.getStrEmpty(getParamMap(request).get("ids"));
+			// 兼容userids与ids两个参数
+			String ids = StringUtil.getStrEmpty(map.containsKey("userids") ? map.get("userids") : map.get("ids"));
 			for (String id : StringUtils.splitByWholeSeparatorPreserveAllTokens(ids, ",")) {
 				org.blazer.userservice.core.model.UserModel um = new org.blazer.userservice.core.model.UserModel();
 				UserModel um2 = userCache.get(IntegerUtil.getInt0(id));
@@ -211,7 +219,7 @@ public class UserServiceAction extends BaseAction {
 			}
 		} catch (Exception e) {
 			list = new ArrayList<org.blazer.userservice.core.model.UserModel>();
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 		}
 		logger.debug("list:" + list);
 		return list;
@@ -230,17 +238,23 @@ public class UserServiceAction extends BaseAction {
 		HashMap<String, String> map = getParamMap(request);
 		String ids = StringUtil.getStrEmpty(map.get("userids"));
 		StringBuilder sb = new StringBuilder();
-		for (String id : StringUtils.splitByWholeSeparator(ids, ",")) {
-			UserModel um = userCache.get(IntegerUtil.getInt0(id));
+		String[] arrIds = StringUtils.splitByWholeSeparator(ids, ",");
+		for (int i = 0; i < arrIds.length; i++) {
+			UserModel um = userCache.get(IntegerUtil.getInt0(arrIds[i]));
+			String mail = "";
 			if (um == null) {
-				logger.error("um is null, id : " + id);
-				continue;
+				logger.warn("um is null, id : " + arrIds[i]);
+			} else if (!UserStatus.isEnable(um.getEnable())) {
+				logger.warn("um status is disable, id : " + arrIds[i]);
+			} else {
+				mail = um.getEmail();
 			}
-			if (sb.length() != 0) {
+			if (i != 0) {
 				sb.append(",");
 			}
-			sb.append(um.getEmail());
+			sb.append(mail);
 		}
+		logger.info("emails : " + sb.toString());
 		return sb.toString();
 	}
 
@@ -268,10 +282,10 @@ public class UserServiceAction extends BaseAction {
 		// 延期session
 		String newSession = newSessionId(sessionModel, response, request);
 		if (newSession == null) {
-			return output(false, null, um.getUserName(), um.getUserNameCn(), um.getPhoneNumber(), um.getEmail());
+			return output(false, null, um.getUserName(), um.getUserNameCn(), um.getPhoneNumber(), um.getEmail(), UserStatus.get(um.getEnable()).getStatusName());
 		}
 		// 返回
-		return output(true, newSession, um.getUserName(), um.getUserNameCn(), um.getPhoneNumber(), um.getEmail());
+		return output(true, newSession, um.getUserName(), um.getUserNameCn(), um.getPhoneNumber(), um.getEmail(), UserStatus.get(um.getEnable()).getStatusName());
 	}
 
 	/**
@@ -354,6 +368,9 @@ public class UserServiceAction extends BaseAction {
 		if (um == null) {
 			return null;
 		}
+		if (!UserStatus.isEnable(um.getEnable())) {
+			return null;
+		}
 		String domain = StringUtil.findOneStrByReg(request.getRequestURL().toString(), "[http|https]://([a-zA-Z0-9.]*).*");
 		logger.debug("domain : " + domain);
 		// String newSessionId = DesUtil.encrypt(String.format(LOGGIN_FORMAT,
@@ -376,6 +393,9 @@ public class UserServiceAction extends BaseAction {
 			return null;
 		}
 		UserModel um = userCache.get(sessionModel.getUserName());
+		if (!UserStatus.isEnable(um.getEnable())) {
+			return null;
+		}
 		return um;
 	}
 
@@ -389,6 +409,9 @@ public class UserServiceAction extends BaseAction {
 		UserModel um = userCache.get(sessionModel.getUserName());
 		if (um == null) {
 			logger.debug("check user is null...");
+			return false;
+		} else if (!UserStatus.isEnable(um.getEnable())) {
+			logger.debug("check user status code " + um.getEnable() + "...");
 			return false;
 		}
 		return true;

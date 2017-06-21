@@ -13,17 +13,26 @@
 <!-- 		> -->
 <!-- 	</cache> -->
 
+<!-- 	<cache  -->
+<!-- 		name="user_cache" -->
+<!-- 		eternal="false" -->
+<!-- 		diskPersistent="false" -->
+<!-- 		timeToIdleSeconds="36000" -->
+<!-- 		timeToLiveSeconds="0" -->
+<!-- 		memoryStoreEvictionPolicy="LRU" -->
+<!-- 		maxElementsInMemory="1000" -->
+<!-- 		maxElementsOnDisk="0" -->
+<!-- 		overflowToDisk="true" -->
+<!-- 		diskSpoolBufferSizeMB="20" -->
+<!-- 		> -->
+<!-- 	</cache> -->
+
 	<cache 
 		name="user_cache"
-		eternal="false"
-		diskPersistent="false"
-		timeToIdleSeconds="3600"
-		timeToLiveSeconds="0"
-		memoryStoreEvictionPolicy="LRU"
-		maxElementsInMemory="100"
-		maxElementsOnDisk="0"
-		overflowToDisk="true"
-		diskSpoolBufferSizeMB="20"
+		eternal="true"
+		diskPersistent="true"
+		maxElementsInMemory="0"
+		overflowToDisk="false"
 		>
 	</cache>
 

@@ -17,7 +17,9 @@
 <script type="text/javascript" src="js/supersized.custom.js"></script>
 <style>
 h1 {
+	
 }
+
 .myli {
 	float: left;
 	margin: 5px;
@@ -38,7 +40,7 @@ h1 {
 		$("#content").width(contentWidth + 8);
 		$("#content").height(100);
 		$.get($.ds.url.find_system_all_by_display, function(data) {
-			for (var i in data) {
+			for ( var i in data) {
 				var title = data[i].title;
 				if (title == null) {
 					title = data[i].systemName;
@@ -46,23 +48,35 @@ h1 {
 				var li = $("<li><h3>" + title + "</h3></li>");
 				li.addClass("myli");
 				li.width((contentWidth - 40) / 4);
-				li.height(100);
-				li.css('line-height', '100px');
-				li.hover(function(){
-				    $(this).css("filter", "alpha(opacity=10)");
-				    $(this).css("-moz-opacity", "0.9");
-				    $(this).css("-khtml-opacity", "0.9");
-				    $(this).css("opacity", "0.9");
-				    $(this).css("background-color", "#C6E2FF");
-				},function(){
-				    $(this).css("filter", "");
-				    $(this).css("-moz-opacity", "");
-				    $(this).css("-khtml-opacity", "");
-				    $(this).css("opacity", "");
-				    $(this).css("background-color", "");
+				// 超出汉字10个、英文20个时，将改变高度设置。
+				if ($.ds.getBytesLength(title) > 20) {
+					li.css('height', '60px');
+					li.css('padding-top', '20px');
+					li.css('padding-bottom', '20px');
+					li.css('line-height', '30px');
+				} else {
+					li.css('height', '100px');
+					li.css('line-height', '100px');
+				}
+				li.hover(function() {
+					$(this).css("filter", "alpha(opacity=10)");
+					$(this).css("-moz-opacity", "0.9");
+					$(this).css("-khtml-opacity", "0.9");
+					$(this).css("opacity", "0.9");
+					$(this).css("background-color", "#C6E2FF");
+				}, function() {
+					$(this).css("filter", "");
+					$(this).css("-moz-opacity", "");
+					$(this).css("-khtml-opacity", "");
+					$(this).css("opacity", "");
+					$(this).css("background-color", "");
 				});
-				li.click({indexUrl: data[i].indexUrl}, function(event) {
-					if (event.data.indexUrl == null) {
+				// 点击事件
+				li.click({
+					indexUrl : data[i].indexUrl
+				}, function(event) {
+					//判断是否有url
+					if (event.data.indexUrl == null || event.data.indexUrl.length == 0) {
 						alert("对不起，该系统没有配置Url。");
 						return;
 					}
@@ -76,11 +90,11 @@ h1 {
 </head>
 <body>
 	<h1 style="margin: 20px; text-align: center;">系统列表</h1>
-	<div id="content" style="text-align:center; margin:0 auto;">
+	<div id="content" style="text-align: center; margin: 0 auto;">
 		<ul style="list-style: none; float: left;">
 		</ul>
 	</div>
-	<div style="clear: both;"></div> 
+	<div style="clear: both;"></div>
 </body>
 </html>
 

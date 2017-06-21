@@ -35,12 +35,26 @@ public class UserAction extends BaseAction {
 	@Autowired
 	UserCache userCache;
 
+	/**
+	 * 查询等待更新的用户队列
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@ResponseBody
 	@RequestMapping("/findWaitingUpdateUserCache")
 	public LinkedBlockingQueue<UserModel> findWaitingUpdateUserCache(HttpServletRequest request, HttpServletResponse response) {
 		return userCache.getQueue();
 	}
 
+	/**
+	 * 分页查找用户列表
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@ResponseBody
 	@RequestMapping("/findUserByPage")
 	public PageBody<USUser> findUserByPage(HttpServletRequest request, HttpServletResponse response) {
@@ -53,6 +67,13 @@ public class UserAction extends BaseAction {
 		return new PageBody<USUser>();
 	}
 
+	/**
+	 * 根据id查找用户
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@ResponseBody
 	@RequestMapping("/findUserById")
 	public HashMap<String, Object> findUserById(HttpServletRequest request, HttpServletResponse response) {
@@ -68,6 +89,13 @@ public class UserAction extends BaseAction {
 		return map;
 	}
 
+	/**
+	 * 保存用户
+	 * 
+	 * @param params
+	 * @return
+	 * @throws Exception
+	 */
 	@ResponseBody
 	@RequestMapping("/saveUser")
 	public Body saveUser(@RequestBody HashMap<String, Object> params) throws Exception {
@@ -84,6 +112,13 @@ public class UserAction extends BaseAction {
 		return new Body().setMessage("保存成功！");
 	}
 
+	/**
+	 * 删除用户
+	 * 
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
 	@ResponseBody
 	@RequestMapping("/delUser")
 	public Body delUser(@RequestParam Integer id) throws Exception {
@@ -97,6 +132,53 @@ public class UserAction extends BaseAction {
 		return new Body().setMessage("删除成功！");
 	}
 
+	/**
+	 * 禁用用户
+	 * 
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
+	@ResponseBody
+	@RequestMapping("/disableUser")
+	public Body disableUser(@RequestParam Integer id) throws Exception {
+		logger.debug("userid : " + id);
+		try {
+			userService.disableUser(id);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			return new Body().error().setMessage("删除失败：" + e.getMessage());
+		}
+		return new Body().setMessage("删除成功！");
+	}
+
+	/**
+	 * 启用用户
+	 * 
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
+	@ResponseBody
+	@RequestMapping("/enableUser")
+	public Body enableUser(@RequestParam Integer id) throws Exception {
+		logger.debug("userid : " + id);
+		try {
+			userService.enableUser(id);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			return new Body().error().setMessage("删除失败：" + e.getMessage());
+		}
+		return new Body().setMessage("删除成功！");
+	}
+
+	/**
+	 * 初始化密码
+	 * 
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
 	@ResponseBody
 	@RequestMapping("/initPwd")
 	public Body initPwd(@RequestParam Integer id) throws Exception {

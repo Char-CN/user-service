@@ -37,7 +37,7 @@ form {
 }
 
 input {
-	width: 50%;
+	width: 90%;
 	height: 42px;
 	margin-top: 25px;
 	padding: 0 15px;
@@ -121,9 +121,4 @@ button:active {
 /*－－－增加部份的CSS－－－*/
 form, input, button {
 	font-family: Microsoft YaHei, Segoe UI, Tahoma, Arial, Verdana, sans-serif;
-}
-
-input.Captcha {
-	width: 130px;
-	float: left;
 }

@@ -44,18 +44,27 @@ public class UserService implements InitializingBean {
 
 	private String newUserDefaultPassword;
 
+	/**
+	 * 读取配置文件初始化新密码
+	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		newUserDefaultPassword = DesUtil.encrypt(_newUserDefaultPassword);
 	}
 
+	/**
+	 * 分页查找用户
+	 * 
+	 * @param params
+	 * @return
+	 */
 	public PageBody<USUser> findUserByPage(HashMap<String, String> params) {
 		PageBody<USUser> pb = new PageBody<USUser>();
-		String where = " where 1=1 and enable=1 ";
+		String where = " where 1=1 and enable!=0 ";
 		String userName = StringUtil.getStr(params.get("userName"));
 		if (userName != null) {
-			where += String.format(" and (user_name like '%%%s%%' or user_name_cn like '%%%s%%' or phone_number like '%%%s%%' or email like '%%%s%%')",
-					userName, userName, userName, userName);
+			where += String.format(" and (user_name like '%%%s%%' or user_name_cn like '%%%s%%' or phone_number like '%%%s%%' or email like '%%%s%%')", userName,
+					userName, userName, userName);
 		}
 		String sql = "select * from us_user " + where + " limit ?,?";
 		int start = (IntegerUtil.getInt1(params.get("page")) - 1) * IntegerUtil.getInt0(params.get("rows"));
@@ -74,6 +83,7 @@ public class UserService implements InitializingBean {
 			user.setPhoneNumber(StringUtil.getStrEmpty(map.get("phone_number")));
 			user.setEmail(StringUtil.getStrEmpty(map.get("email")));
 			user.setRemark(StringUtil.getStrEmpty(map.get("remark")));
+			user.setEnable(IntegerUtil.getInt0(map.get("enable")));
 			userList.add(user);
 		}
 		pb.setTotal(IntegerUtil.getInt0(jdbcTemplate.queryForList("select count(0) as ct from us_user " + where).get(0).get("ct")));
@@ -82,6 +92,12 @@ public class UserService implements InitializingBean {
 		return pb;
 	}
 
+	/**
+	 * 根据id查找用户
+	 * 
+	 * @param params
+	 * @return
+	 */
 	public USUser findUserById(HashMap<String, String> params) {
 		String sql = "select * from us_user where id = ? and enable=1";
 		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql, IntegerUtil.getInt0(params.get("id")));
@@ -100,6 +116,13 @@ public class UserService implements InitializingBean {
 		return user;
 	}
 
+	/**
+	 * 获取拥有该权限的所有用户 参数systemName和url 代表为某system的url是否有权限
+	 * 
+	 * @param params
+	 * @return
+	 * @throws Exception
+	 */
 	public List<org.blazer.userservice.core.model.UserModel> findUserBySystemAndUrl(HashMap<String, String> params) throws Exception {
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT uu.id, uu.user_name, uu.email, uu.`password` as `password`, uu.phone_number, uu.user_name_cn, group_concat(up.id) as permissions_ids");
@@ -110,25 +133,35 @@ public class UserService implements InitializingBean {
 		sql.append(" INNER JOIN (SELECT * FROM us_permissions WHERE `enable`=1 and url=?) up ON urp.permissions_id = up.id");
 		sql.append(" INNER JOIN (SELECT * FROM us_system WHERE `enable`=1 and system_name=?) us ON up.system_id = us.id");
 		sql.append(" WHERE uu.`enable`=1 GROUP BY uu.id");
-//		logger.debug(SqlUtil.Show(sql.toString(), params.get("url"),  params.get("systemName")));
+		// logger.debug(SqlUtil.Show(sql.toString(), params.get("url"),
+		// params.get("systemName")));
 		logger.debug(params.get("url"));
 		logger.debug(params.get("systemName"));
-		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql.toString(), StringUtil.getStrEmpty(params.get("url")),  StringUtil.getStrEmpty(params.get("systemName")));
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql.toString(), StringUtil.getStrEmpty(params.get("url")),
+				StringUtil.getStrEmpty(params.get("systemName")));
 		List<org.blazer.userservice.core.model.UserModel> rst = HMap.toList(list, org.blazer.userservice.core.model.UserModel.class);
 		return rst;
 	}
 
+	/**
+	 * 保存用户
+	 * 
+	 * @param user
+	 * @param roleIds
+	 * @throws DuplicateKeyException
+	 */
 	public void saveUser(USUser user, String roleIds) throws DuplicateKeyException {
 		// 验证是否重名、重复电话号码、重复邮箱
 		Integer userId = user.getId();
 		if (userId == null) {
-//			String checkSql = "select 1 from us_user where enable=1 and (user_name=? or email=? or phone_number=?)";
+			// String checkSql = "select 1 from us_user where enable=1 and
+			// (user_name=? or email=? or phone_number=?)";
 			String checkSql = "select sum(case when user_name='' then 0 when user_name=? then 1 else 0 end) as r1,"
 					+ " sum(case when email='' then 0 when email=? then 1 else 0 end) as r2,"
-					+ " sum(case when phone_number='' then 0 when phone_number=? then 1 else 0 end) as r3"
-					+ " from us_user where enable=1"
+					+ " sum(case when phone_number='' then 0 when phone_number=? then 1 else 0 end) as r3" + " from us_user where enable=1"
 					+ " and (user_name=? or email=? or phone_number=?)";
-			List<Map<String, Object>> rst = jdbcTemplate.queryForList(checkSql, user.getUserName(), user.getEmail(), user.getPhoneNumber(), user.getUserName(), user.getEmail(), user.getPhoneNumber());
+			List<Map<String, Object>> rst = jdbcTemplate.queryForList(checkSql, user.getUserName(), user.getEmail(), user.getPhoneNumber(), user.getUserName(),
+					user.getEmail(), user.getPhoneNumber());
 			Integer r1 = IntegerUtil.getInt0(rst.get(0).get("r1"));
 			Integer r2 = IntegerUtil.getInt0(rst.get(0).get("r2"));
 			Integer r3 = IntegerUtil.getInt0(rst.get(0).get("r3"));
@@ -140,14 +173,14 @@ public class UserService implements InitializingBean {
 			jdbcTemplate.update(sql, user.getUserName(), user.getUserNameCn(), newUserDefaultPassword, user.getEmail(), user.getPhoneNumber(), user.getRemark());
 			userId = IntegerUtil.getInt0(jdbcTemplate.queryForMap("select max(id) as id from us_user where enable=1").get("id"));
 		} else {
-//			String checkSql = "select 1 from us_user where enable=1 and user_name=? and id != ?";
+			// String checkSql = "select 1 from us_user where enable=1 and
+			// user_name=? and id != ?";
 			String checkSql = "select sum(case when user_name='' then 0 when user_name=? then 1 else 0 end) as r1,"
 					+ " sum(case when email='' then 0 when email=? then 1 else 0 end) as r2,"
-					+ " sum(case when phone_number='' then 0 when phone_number=? then 1 else 0 end) as r3"
-					+ " from us_user where enable=1"
-					+ " and id != ?"
+					+ " sum(case when phone_number='' then 0 when phone_number=? then 1 else 0 end) as r3" + " from us_user where enable=1" + " and id != ?"
 					+ " and (user_name=? or email=? or phone_number=?)";
-			List<Map<String, Object>> rst = jdbcTemplate.queryForList(checkSql, user.getUserName(), user.getEmail(), user.getPhoneNumber(), user.getId(), user.getUserName(), user.getEmail(), user.getPhoneNumber());
+			List<Map<String, Object>> rst = jdbcTemplate.queryForList(checkSql, user.getUserName(), user.getEmail(), user.getPhoneNumber(), user.getId(),
+					user.getUserName(), user.getEmail(), user.getPhoneNumber());
 			Integer r1 = IntegerUtil.getInt0(rst.get(0).get("r1"));
 			Integer r2 = IntegerUtil.getInt0(rst.get(0).get("r2"));
 			Integer r3 = IntegerUtil.getInt0(rst.get(0).get("r3"));
@@ -158,39 +191,90 @@ public class UserService implements InitializingBean {
 			jdbcTemplate.update(sql, user.getUserName(), user.getUserNameCn(), user.getEmail(), user.getPhoneNumber(), user.getRemark(), user.getId());
 		}
 		addUserRole(userId, roleIds);
-//		userCache.init(userId);
+		// userCache.init(userId);
 		UserModel um = new UserModel();
 		um.setId(userId);
 		um.setUserName(user.getUserName());
 		userCache.addQueue(um);
 	}
 
+	/**
+	 * 更新密码
+	 * 
+	 * @param user
+	 */
 	public void updatePwd(USUser user) {
 		String sql = "update us_user set password=? where id=? and enable=1";
 		jdbcTemplate.update(sql, user.getPassword(), user.getId());
 		userCache.init(user.getId());
 	}
 
+	/**
+	 * 初始化密码
+	 * 
+	 * @param userId
+	 */
 	public void initPwd(Integer userId) {
 		String sql = "update us_user set password=? where id=? and enable=1";
 		jdbcTemplate.update(sql, newUserDefaultPassword, userId);
 		userCache.init(userId);
 	}
 
+	/**
+	 * 删除该用户，软删除
+	 * 
+	 * @param id
+	 */
 	public void delUser(Integer id) {
 		logger.debug("userId " + id);
 		String sql = "update us_user set enable=0 where id=?";
 		jdbcTemplate.update(sql, id);
 		// 删除用户角色关系
-		delUserRoleByUserId(id);
+		// delUserRoleByUserId(id);
+		userCache.remove(id);
 	}
 
+	/**
+	 * 禁用该用户
+	 * 
+	 * @param id
+	 */
+	public void disableUser(Integer id) {
+		logger.debug("userId " + id);
+		String sql = "update us_user set enable=2 where id=?";
+		jdbcTemplate.update(sql, id);
+		userCache.disable(id);
+	}
+
+	/**
+	 * 启用该用户
+	 * 
+	 * @param id
+	 */
+	public void enableUser(Integer id) {
+		logger.debug("userId " + id);
+		String sql = "update us_user set enable=1 where id=?";
+		jdbcTemplate.update(sql, id);
+		userCache.enable(id);
+	}
+
+	/**
+	 * 根据用户id删除该用户关联的角色
+	 * 
+	 * @param id
+	 */
 	public void delUserRoleByUserId(Integer id) {
 		logger.debug("userId " + id);
 		String sql = "delete from us_user_role where user_id=?";
 		jdbcTemplate.update(sql, id);
 	}
 
+	/**
+	 * 增加用户角色关系
+	 * 
+	 * @param userId
+	 * @param roleIds
+	 */
 	public void addUserRole(Integer userId, String roleIds) {
 		logger.debug("userId " + userId);
 		logger.debug("roleIds " + roleIds);
@@ -206,6 +290,12 @@ public class UserService implements InitializingBean {
 		}
 	}
 
+	/**
+	 * 根据用户id查找角色id，用逗号','分割
+	 * 
+	 * @param userId
+	 * @return
+	 */
 	public String findRoleByUserId(Integer userId) {
 		logger.debug("userId " + userId);
 		String sql = "select GROUP_CONCAT(role_id) as roleids from us_user_role where user_id=? group by user_id";
@@ -215,6 +305,11 @@ public class UserService implements InitializingBean {
 		return roleIds;
 	}
 
+	/**
+	 * 根据角色id更新用户缓存。一般用于修改角色后更新用户的权限信息。
+	 * 
+	 * @param roleId
+	 */
 	public void updateUserCacheByRoleId(Integer roleId) {
 		logger.debug("roleId " + roleId);
 		String sql = "select uur.user_id, uu.user_name from us_user_role uur inner join us_user uu on uu.id=uur.user_id where uur.role_id=?";
@@ -230,7 +325,7 @@ public class UserService implements InitializingBean {
 			userIds.append(userId).append(",");
 		}
 		if (userIds.length() != 0) {
-			userIds.deleteCharAt(userIds.length()-1);
+			userIds.deleteCharAt(userIds.length() - 1);
 		}
 		logger.info("userIds : " + userIds);
 	}

@@ -98,6 +98,12 @@
 	<!-- Spring集成的ehcache不知是否支持所有参数与特性，如需ehcache集群使用还有待研究 -->
 	<bean id="ehCacheManagerFactory" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
 		<property name="configLocation" value="classpath:ehcache.xml" />
+<!-- 		<property name="configLocation"> -->
+<!-- 			<list> -->
+<!-- 				<value>classpath:ehcache.xml</value> -->
+<!-- 				<value>file:/root/jetty-9.3.10/resources/ehcache.xml</value> -->
+<!-- 			</list> -->
+<!-- 		</property> -->
 	</bean>
 
 	<bean id="ehCacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
