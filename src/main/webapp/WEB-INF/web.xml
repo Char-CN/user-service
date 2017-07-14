@@ -58,7 +58,7 @@
 		<!-- serviceUrl访问的服务URL，如果逗号分隔，自动切换可ping通的节点 -->
 		<init-param>
 			<param-name>serviceUrl</param-name>
-			<param-value>http://bigdata.blazer.org:8030,http://us.xiwanglife.com</param-value>
+			<param-value>http://test.blazerhe.org:8030,http://us.xiwanglife.com</param-value>
 		</init-param>
 		<!-- 没有权限时的显示页面 -->
 		<init-param>
