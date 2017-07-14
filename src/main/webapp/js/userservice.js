@@ -67,7 +67,7 @@ var $userservice = function(systemName) {
 	/**
 	 * UserServiceJs核心内容
 	 */
-	var s_url = "http://bigdata.blazer.org:8030";
+	var s_url = "http://test.blazerhe.org:8030";
 	var s_checkurl = s_url + "/userservice/checkurl.do";
 	var s_getlogin = s_url + "/login.html";
 	var userName = null;
