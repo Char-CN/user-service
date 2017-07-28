@@ -25,7 +25,8 @@ $(function() {
 			find_permissions_by_id : "permissions/findPermissionsByID.do",
 			find_permissions_by_parent_id : "permissions/findPermissionsByParentID.do",
 			save_permissions : "permissions/savePermissions.do",
-			del_permissions : "permissions/delPermissions.do"
+			del_permissions : "permissions/delPermissions.do",
+			cache_space : "cache/space.do"
 		},
 		commons : {
 			chooseTreeId : "",
@@ -167,7 +168,9 @@ $(function() {
 			permissions_cls : 'fa fa-th-list fa-1x',
 			permissions : '<i class="fa fa-th-list fa-1x"></i>',
 			system_cls : 'fa fa-desktop fa-1x',
-			system : '<i class="fa fa-desktop fa-1x"></i>'
+			system : '<i class="fa fa-desktop fa-1x"></i>',
+			cache_cls : 'fa fa-diamond fa-1x',
+			cache : '<i class="fa fa-diamond fa-1x"></i>'
 		},
 		show : function(message) {
 			if (message == undefined || message == null || message == "") {

@@ -11,7 +11,12 @@
 <link rel="stylesheet" href="css/supersized.css">
 <script>
 	window.onload = function() {
-		if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+// 		if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+// 		} else {
+// 			$(".page-container").width("300");
+// 		}
+		if (/Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+			$(".page-container").width("100%");
 		} else {
 			$(".page-container").width("300");
 		}
@@ -23,8 +28,8 @@
 		<h1>修改密码</h1>
 		<input type="text" id="userName" placeholder="请输入您的用户名！" style="width: 90%; float: left;">
 		<input type="password" id="password" placeholder="请输入您的旧密码！" style="width: 90%; float: left;">
-		<input type="password" id="new_password_1" placeholder="请输入您的新密码！至少6位！" style="width: 90%; float: left;">
-		<input type="password" id="new_password_2" placeholder="请重新输入您的新密码！至少6位！" style="width: 90%; float: left;">
+		<input type="password" id="new_password_1" placeholder="请输入您的新密码！至少3位！" style="width: 90%; float: left;">
+		<input type="password" id="new_password_2" placeholder="请重新输入您的新密码！至少3位！" style="width: 90%; float: left;">
 		<!-- 			<input type="text" name="Captcha" placeholder="请输入验证码！" style="width:200px; float:left;"> -->
 		<button type="button" style="font-size: 24px; width: 60%; outline: none;" onclick="up()">确&nbsp;&nbsp;&nbsp;&nbsp;定</button>
 		<span id="update_pw" style="margin-top: 5px; width: 100%; float: left;">
@@ -58,8 +63,8 @@
 				alert("请填写新密码1");
 				return;
 			}
-			if (new_password_1.length < 6) {
-				alert("新密码长度必须大于6位");
+			if (new_password_1.length < 3) {
+				alert("新密码长度必须大于3位");
 				return;
 			}
 			if (new_password_2 == "") {
