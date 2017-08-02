@@ -158,7 +158,7 @@ public class UserService implements InitializingBean {
 			// (user_name=? or email=? or phone_number=?)";
 			String checkSql = "select sum(case when user_name='' then 0 when user_name=? then 1 else 0 end) as r1,"
 					+ " sum(case when email='' then 0 when email=? then 1 else 0 end) as r2,"
-					+ " sum(case when phone_number='' then 0 when phone_number=? then 1 else 0 end) as r3" + " from us_user where enable=1"
+					+ " sum(case when phone_number='' then 0 when phone_number=? then 1 else 0 end) as r3" + " from us_user where enable>0"
 					+ " and (user_name=? or email=? or phone_number=?)";
 			List<Map<String, Object>> rst = jdbcTemplate.queryForList(checkSql, user.getUserName(), user.getEmail(), user.getPhoneNumber(), user.getUserName(),
 					user.getEmail(), user.getPhoneNumber());
@@ -177,7 +177,7 @@ public class UserService implements InitializingBean {
 			// user_name=? and id != ?";
 			String checkSql = "select sum(case when user_name='' then 0 when user_name=? then 1 else 0 end) as r1,"
 					+ " sum(case when email='' then 0 when email=? then 1 else 0 end) as r2,"
-					+ " sum(case when phone_number='' then 0 when phone_number=? then 1 else 0 end) as r3" + " from us_user where enable=1" + " and id != ?"
+					+ " sum(case when phone_number='' then 0 when phone_number=? then 1 else 0 end) as r3" + " from us_user where enable>0" + " and id != ?"
 					+ " and (user_name=? or email=? or phone_number=?)";
 			List<Map<String, Object>> rst = jdbcTemplate.queryForList(checkSql, user.getUserName(), user.getEmail(), user.getPhoneNumber(), user.getId(),
 					user.getUserName(), user.getEmail(), user.getPhoneNumber());
