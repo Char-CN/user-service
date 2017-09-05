@@ -70,6 +70,7 @@ var $userservice = function(systemName) {
 	var s_url = "http://test.blazerhe.org:8030";
 	var s_checkurl = s_url + "/userservice/checkurl.do";
 	var s_getlogin = s_url + "/login.html";
+	var s_pwd_html = s_url + "/pwd.html";
 	var userName = null;
 	var userNameCn = null;
 
@@ -147,5 +148,6 @@ var $userservice = function(systemName) {
 	obj.logout = logout;
 	obj.checkurl = checkurl;
 	obj.getDomain = getDomain;
+	obj.pwdHtml = s_pwd_html;
 	return obj;
 };
