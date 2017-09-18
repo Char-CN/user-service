@@ -7,6 +7,7 @@
 	<packaging>war</packaging>
 
 	<dependencies>
+		<!-- import the project : https://github.com/Char-CN/user-service-core -->
 		<dependency>
 			<groupId>org.blazer</groupId>
 			<artifactId>user-service-core</artifactId>
