@@ -1,8 +1,9 @@
 # user-service（用户服务系统）
-单点登录系统，只需要一个账号即可统一管理各个系统的：用户-角色-权限，只需引用 https://github.com/Char-CN/user-service-core.git 即可。
+单点登录系统，只需要一个账号即可统一管理各个系统的：用户-角色-权限。
+需引用 https://github.com/Char-CN/user-service-core.git
 
-依赖Mysql数据库
-用户-角色-权限 数据存于EhCache中，如需分布式部署，交给EhCache配置分布式缓存。
+使用Mysql作为数据库
+用户-角色-权限 数据缓存于EhCache中，如需分布式部署，交给EhCache配置分布式缓存。
 
 <br>
 <br>
