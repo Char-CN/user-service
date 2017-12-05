@@ -95,7 +95,7 @@ public class UserCache extends BaseCache implements InitializingBean {
 		// 查询所有权限
 		StringBuilder sql = new StringBuilder();
 		sql.append(
-				"SELECT uu.id, uu.user_name, uu.email, uu.`password` as `password`, uu.phone_number, uu.user_name_cn, uu.enable, group_concat(up.id) as permissions_ids");
+				"SELECT uu.id, uu.user_name, uu.email, uu.`password` as `password`, uu.phone_number, uu.user_name_cn, uu.enable, group_concat(up.id) as permissions_ids, group_concat(ur.id) as roles_ids");
 		sql.append(" FROM us_user uu");
 		sql.append(" LEFT JOIN us_user_role uur ON uu.id = uur.user_id");
 		sql.append(" LEFT JOIN (SELECT * FROM us_role WHERE `enable`=1) ur ON ur.id = uur.role_id");
@@ -113,11 +113,17 @@ public class UserCache extends BaseCache implements InitializingBean {
 			userModel.setPhoneNumber(StringUtil.getStrEmpty(map.get("phone_number")));
 			userModel.setEnable(IntegerUtil.getInt0(map.get("enable")));
 			String permissions_ids = StringUtil.getStrEmpty(map.get("permissions_ids"));
-			MutableRoaringBitmap bitmap = new MutableRoaringBitmap();
+			MutableRoaringBitmap permissionsBitmap = new MutableRoaringBitmap();
 			for (String id : StringUtils.splitPreserveAllTokens(permissions_ids, ",")) {
-				bitmap.add(IntegerUtil.getInt0(id));
+				permissionsBitmap.add(IntegerUtil.getInt0(id));
 			}
-			userModel.setPermissionsBitmap(bitmap);
+			userModel.setPermissionsBitmap(permissionsBitmap);
+			String roles_ids = StringUtil.getStrEmpty(map.get("roles_ids"));
+			MutableRoaringBitmap rolesBitmap = new MutableRoaringBitmap();
+			for (String id : StringUtils.splitPreserveAllTokens(roles_ids, ",")) {
+				rolesBitmap.add(IntegerUtil.getInt0(id));
+			}
+			userModel.setRolesBitmap(rolesBitmap);
 			logger.debug("init user : " + userModel);
 			this.add(userModel);
 		}
@@ -132,7 +138,7 @@ public class UserCache extends BaseCache implements InitializingBean {
 		// 查询所有权限
 		StringBuilder sql = new StringBuilder();
 		sql.append(
-				"SELECT uu.id, uu.user_name, uu.email, uu.`password` as `password`, uu.phone_number, uu.user_name_cn, uu.enable, group_concat(up.id) as permissions_ids");
+				"SELECT uu.id, uu.user_name, uu.email, uu.`password` as `password`, uu.phone_number, uu.user_name_cn, uu.enable, group_concat(up.id) as permissions_ids, group_concat(ur.id) as roles_ids");
 		sql.append(" FROM us_user uu");
 		sql.append(" LEFT JOIN us_user_role uur ON uu.id = uur.user_id");
 		sql.append(" LEFT JOIN (SELECT * FROM us_role WHERE `enable`=1) ur ON ur.id = uur.role_id");
@@ -154,11 +160,17 @@ public class UserCache extends BaseCache implements InitializingBean {
 		userModel.setPhoneNumber(StringUtil.getStrEmpty(map.get("phone_number")));
 		userModel.setEnable(IntegerUtil.getInt0(map.get("enable")));
 		String permissions_ids = StringUtil.getStrEmpty(map.get("permissions_ids"));
-		MutableRoaringBitmap bitmap = new MutableRoaringBitmap();
+		MutableRoaringBitmap permissionsBitmap = new MutableRoaringBitmap();
 		for (String id : StringUtils.splitPreserveAllTokens(permissions_ids, ",")) {
-			bitmap.add(IntegerUtil.getInt0(id));
+			permissionsBitmap.add(IntegerUtil.getInt0(id));
 		}
-		userModel.setPermissionsBitmap(bitmap);
+		userModel.setPermissionsBitmap(permissionsBitmap);
+		String roles_ids = StringUtil.getStrEmpty(map.get("roles_ids"));
+		MutableRoaringBitmap rolesBitmap = new MutableRoaringBitmap();
+		for (String id : StringUtils.splitPreserveAllTokens(roles_ids, ",")) {
+			rolesBitmap.add(IntegerUtil.getInt0(id));
+		}
+		userModel.setRolesBitmap(rolesBitmap);
 		logger.debug("init user : " + userModel);
 		this.add(userModel);
 	}
@@ -171,7 +183,7 @@ public class UserCache extends BaseCache implements InitializingBean {
 		// 查询所有权限
 		StringBuilder sql = new StringBuilder();
 		sql.append(
-				"SELECT uu.id, uu.user_name, uu.email, uu.`password` as `password`, uu.phone_number, uu.user_name_cn, uu.enable, group_concat(up.id) as permissions_ids");
+				"SELECT uu.id, uu.user_name, uu.email, uu.`password` as `password`, uu.phone_number, uu.user_name_cn, uu.enable, group_concat(up.id) as permissions_ids, group_concat(ur.id) as roles_ids");
 		sql.append(" FROM us_user uu");
 		sql.append(" LEFT JOIN us_user_role uur ON uu.id = uur.user_id");
 		sql.append(" LEFT JOIN (SELECT * FROM us_role WHERE `enable`=1) ur ON ur.id = uur.role_id");
@@ -193,11 +205,17 @@ public class UserCache extends BaseCache implements InitializingBean {
 		userModel.setPhoneNumber(StringUtil.getStrEmpty(map.get("phone_number")));
 		userModel.setEnable(IntegerUtil.getInt0(map.get("enable")));
 		String permissions_ids = StringUtil.getStrEmpty(map.get("permissions_ids"));
-		MutableRoaringBitmap bitmap = new MutableRoaringBitmap();
+		MutableRoaringBitmap permissionsBitmap = new MutableRoaringBitmap();
 		for (String id : StringUtils.splitPreserveAllTokens(permissions_ids, ",")) {
-			bitmap.add(IntegerUtil.getInt0(id));
+			permissionsBitmap.add(IntegerUtil.getInt0(id));
 		}
-		userModel.setPermissionsBitmap(bitmap);
+		userModel.setPermissionsBitmap(permissionsBitmap);
+		String roles_ids = StringUtil.getStrEmpty(map.get("roles_ids"));
+		MutableRoaringBitmap rolesBitmap = new MutableRoaringBitmap();
+		for (String id : StringUtils.splitPreserveAllTokens(roles_ids, ",")) {
+			rolesBitmap.add(IntegerUtil.getInt0(id));
+		}
+		userModel.setRolesBitmap(rolesBitmap);
 		logger.debug("init user : " + userModel);
 		this.add(userModel);
 	}

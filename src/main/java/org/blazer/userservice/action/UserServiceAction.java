@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.blazer.userservice.body.Body;
 import org.blazer.userservice.body.LoginBody;
 import org.blazer.userservice.cache.PermissionsCache;
+import org.blazer.userservice.cache.RoleCache;
 import org.blazer.userservice.cache.UserCache;
 import org.blazer.userservice.core.filter.PermissionsFilter;
 import org.blazer.userservice.core.model.LoginType;
@@ -21,6 +22,7 @@ import org.blazer.userservice.core.util.IntegerUtil;
 import org.blazer.userservice.core.util.SessionUtil;
 import org.blazer.userservice.entity.USUser;
 import org.blazer.userservice.model.PermissionsModel;
+import org.blazer.userservice.model.RoleModel;
 import org.blazer.userservice.model.UserModel;
 import org.blazer.userservice.model.UserStatus;
 import org.blazer.userservice.service.UserService;
@@ -53,6 +55,9 @@ public class UserServiceAction extends BaseAction {
 
 	@Autowired
 	PermissionsCache permissionsCache;
+
+	@Autowired
+	RoleCache roleCache;
 
 	/**
 	 * 获得登录页面
@@ -319,7 +324,38 @@ public class UserServiceAction extends BaseAction {
 	}
 
 	/**
-	 * 检查是否有权限 请求参数systemName和url 代表为某system的url是否有权限
+	 * 检查角色
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping("/checkrole")
+	public String checkRole(HttpServletRequest request, HttpServletResponse response) {
+		logger.debug("request:" + request.toString());
+		SessionModel sessionModel = PermissionsFilter.getSessionModel(request);
+		HashMap<String, String> params = getParamMap(request);
+		String newSession = newSessionId(sessionModel, response, request);
+		UserModel um = getUser(sessionModel);
+		logger.debug("um : " + um);
+		if (um == null) {
+			logger.debug("check role, user is not invalid");
+			return output(false, false, newSession);
+		}
+		RoleModel roleModel = roleCache.get(params.get("roleName"));
+		logger.debug("roleModel : " + roleModel);
+		// 不存在该角色 或者 该用户没有拥有该角色
+		if (roleModel == null || !um.getRolesBitmap().contains(roleModel.getId())) {
+			logger.debug("check role, bitmap is not invalid");
+			return output(true, false, newSession);
+		}
+		logger.debug("check role, true");
+		return output(true, true, newSession);
+	}
+
+	/**
+	 * 检查权限
 	 * 
 	 * @param request
 	 * @param response
@@ -328,6 +364,19 @@ public class UserServiceAction extends BaseAction {
 	@ResponseBody
 	@RequestMapping("/checkurl")
 	public String checkUrl(HttpServletRequest request, HttpServletResponse response) {
+		return checkPermissions(request, response);
+	}
+
+	/**
+	 * 检查是否有权限 请求参数systemName和url 代表为某system的url是否有权限
+	 * 
+	 * @param request
+	 * @param response
+	 * @return true[用户检查,是否登录],true[权限检查,是否有权限],新的sessionId
+	 */
+	@ResponseBody
+	@RequestMapping("/checkpermissions")
+	public String checkPermissions(HttpServletRequest request, HttpServletResponse response) {
 		logger.debug("request:" + request.toString());
 		SessionModel sessionModel = PermissionsFilter.getSessionModel(request);
 		HashMap<String, String> params = getParamMap(request);
@@ -339,7 +388,7 @@ public class UserServiceAction extends BaseAction {
 		UserModel um = getUser(sessionModel);
 		logger.debug("um : " + um);
 		if (um == null) {
-			logger.debug("checkurl user is not invalid");
+			logger.debug("check permissions, user is not invalid");
 			return output(false, false, newSession);
 		}
 		PermissionsModel permissionsModel = permissionsCache.getBySystemNameAndUrl(getSystemName_Url(params));
@@ -348,10 +397,10 @@ public class UserServiceAction extends BaseAction {
 		logger.debug("bitmap : " + um.getPermissionsBitmap());
 		// 系统存了该URL并且该URL的bitmap是没有值的
 		if (permissionsModel != null && um.getPermissionsBitmap() != null && !um.getPermissionsBitmap().contains(permissionsModel.getId())) {
-			logger.debug("checkurl permissions is not invalid");
+			logger.debug("check permissions, bitmap is not invalid");
 			return output(true, false, newSession);
 		}
-		logger.debug("checkurl true");
+		logger.debug("check permissions, true");
 		return output(true, true, newSession);
 	}
 

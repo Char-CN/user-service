@@ -14,6 +14,7 @@ public class UserModel implements Serializable {
 	private String phoneNumber;
 	private String email;
 	private Integer enable;
+	private MutableRoaringBitmap rolesBitmap;
 	private MutableRoaringBitmap permissionsBitmap;
 
 	public Integer getId() {
@@ -64,6 +65,14 @@ public class UserModel implements Serializable {
 		this.email = email;
 	}
 
+	public MutableRoaringBitmap getRolesBitmap() {
+		return rolesBitmap;
+	}
+
+	public void setRolesBitmap(MutableRoaringBitmap rolesBitmap) {
+		this.rolesBitmap = rolesBitmap;
+	}
+
 	public MutableRoaringBitmap getPermissionsBitmap() {
 		return permissionsBitmap;
 	}
@@ -82,8 +91,8 @@ public class UserModel implements Serializable {
 
 	@Override
 	public String toString() {
-		return "UserModel [id=" + id + ", userName=" + userName + ", password=" + password + ", userNameCn=" + userNameCn + ", phoneNumber=" + phoneNumber + ", email="
-				+ email + ", permissionsBitmap=" + permissionsBitmap + "]";
+		return "UserModel [id=" + id + ", userName=" + userName + ", userNameCn=" + userNameCn + ", phoneNumber=" + phoneNumber + ", email="
+				+ email + ", enable=" + enable + ", rolesBitmap=" + rolesBitmap + ", permissionsBitmap=" + permissionsBitmap + "]";
 	}
 
 }

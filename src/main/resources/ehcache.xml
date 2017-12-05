@@ -54,6 +54,15 @@
 		>
 	</cache>
 
+	<cache 
+		name="role_cache"
+		eternal="true"
+		diskPersistent="false"
+		maxElementsInMemory="0"
+		overflowToDisk="false"
+		>
+	</cache>
+
 <!-- 	<cache  -->
 <!-- 		name="permissions_cache" -->
 <!-- 		eternal="false" -->

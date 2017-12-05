@@ -26,11 +26,11 @@ public class SystemCache extends BaseCache implements InitializingBean {
 	JdbcTemplate jdbcTemplate;
 
 	public void afterPropertiesSet() throws Exception {
-		logger.debug("系统权限开始加载");
+		logger.debug("系统信息开始加载");
 		TimeUtil timeUtil = TimeUtil.createAndPoint().setLogger(logger);
 		//////////////////////// 加载用户和权限 ////////////////////////
 		init();
-		timeUtil.printMs("加载权限");
+		timeUtil.printMs("加载系统信息");
 	}
 
 	private void init() {
