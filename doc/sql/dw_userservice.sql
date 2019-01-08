@@ -21,6 +21,7 @@ SET FOREIGN_KEY_CHECKS=0;
 DROP TABLE IF EXISTS `us_permissions`;
 CREATE TABLE `us_permissions` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `parent_id` bigint(20) DEFAULT NULL,
   `system_id` bigint(20) DEFAULT NULL,
   `permissions_name` varchar(20) DEFAULT NULL,
   `url` varchar(1024) DEFAULT NULL,
